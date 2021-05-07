@@ -1,0 +1,9 @@
+rootProject.name = 'social'
+include 'repository'
+include 'service'
+include 'service'
+include 'model'
+include 'controller'
+include 'security'
+include 'api'
+
