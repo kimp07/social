@@ -1,6 +1,9 @@
 package senlacourse.social.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -10,7 +13,10 @@ import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 @MappedSuperclass
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public abstract class AbstractEntity implements Serializable {
 
     @Id

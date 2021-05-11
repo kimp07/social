@@ -1,10 +1,10 @@
 package senlacourse.social.domain;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,12 +15,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
 public class User extends AbstractEntity {
@@ -31,6 +31,7 @@ public class User extends AbstractEntity {
     private String password;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+    @ToString.Exclude
     private Role role;
     @Column(name = "email")
     private String email;
@@ -55,4 +56,18 @@ public class User extends AbstractEntity {
     private AuthProvider authProvider;
     @Column(name = "auth_provider_id")
     private String authProviderId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+
+        return id != null && id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
 }
