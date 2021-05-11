@@ -10,6 +10,6 @@ import senlacourse.social.domain.Friendship;
 @Repository
 public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
-    @Query(value = "select f from FriendshipMember fm left join Friendship f on fm.friendship.id = fm.id where fm.user.id = :userId")
+    @Query(value = "select f from Friendship f left join FriendshipMember fm on f.id = fm.friendship.id where fm.user.id = :userId")
     Page<Friendship> findAllFriendshipsByMemberId(Long userId, Pageable pageable);
 }
