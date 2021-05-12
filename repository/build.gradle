@@ -7,6 +7,14 @@ plugins {
 group 'org.senlacourse'
 version '0.0.1-SNAPSHOT'
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor

@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import senlacourse.social.domain.TalkMessage;
+import org.senlacourse.social.domain.TalkMessage;
 
 @Repository
 public interface TalkMessageRepository extends JpaRepository<TalkMessage, Long> {

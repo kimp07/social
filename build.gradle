@@ -4,7 +4,7 @@ plugins {
 	id 'org.springframework.boot' version '2.4.5'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-	id 'war'
+	//id 'war'
 }
 
 group = 'org.senlacourse'
@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+	//testImplementation 'org.springframework.security:spring-security-test'
 
 	implementation project(":model")
 
@@ -32,13 +33,17 @@ dependencies {
 	//implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	//implementation 'com.okta.spring:okta-spring-boot-starter:2.0.1'
+
 	implementation 'org.liquibase:liquibase-core'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
+
 	annotationProcessor 'org.projectlombok:lombok'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	//testImplementation 'org.springframework.security:spring-security-test'
+
+	compile 'log4j:log4j:1.2.17'
 }
 
 test {

@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import senlacourse.social.domain.SocietyMember;
+import org.senlacourse.social.domain.SocietyMember;
 
 @Repository
 public interface SocietyMemberRepository extends JpaRepository<SocietyMember, Long> {

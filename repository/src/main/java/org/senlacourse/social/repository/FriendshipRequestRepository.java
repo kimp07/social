@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import senlacourse.social.domain.FriendshipRequest;
+import org.senlacourse.social.domain.FriendshipRequest;
 
 @Repository
 public interface FriendshipRequestRepository extends JpaRepository<FriendshipRequest, Long> {
