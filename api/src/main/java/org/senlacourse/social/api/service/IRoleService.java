@@ -21,5 +21,5 @@ public interface IRoleService {
 
     RoleDto updateRole(@NotNull RoleDto dto) throws ObjectNotFoundException;
 
-    void deleteRole(RoleDto dto) throws ObjectNotFoundException;
+    void deleteById(Long id) throws ObjectNotFoundException;
 }

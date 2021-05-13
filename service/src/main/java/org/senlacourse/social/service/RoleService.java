@@ -22,33 +22,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log4j
 @Transactional
-public class RoleService implements IRoleService {
+public class RoleService extends AbstractService<Role> implements IRoleService {
 
     public static final String NOT_DEFINED_FOR_ID = "Role not defined for id=";
     private final RoleRepository roleRepository;
     private final RoleDtoMapper roleDtoMapper;
     private final NewRoleDtoMapper newRoleDtoMapper;
 
-    private void validateRoleNotNull(Role role, String message) throws ObjectNotFoundException {
-        if (role == null) {
-            ObjectNotFoundException e = new ObjectNotFoundException(message);
-            log.error(e);
-            throw e;
-        }
+    @Override
+    Role findEntityById(Long id) throws ObjectNotFoundException {
+        Role role = roleRepository.findById(id).orElse(null);
+        validateEntityNotNull(role, NOT_DEFINED_FOR_ID + id);
+        return role;
     }
 
     @Override
     public Optional<RoleDto> findById(Long id) throws ObjectNotFoundException {
-        Role role = roleRepository.findById(id).orElse(null);
-        validateRoleNotNull(role, NOT_DEFINED_FOR_ID + id);
-        return  Optional.of(roleDtoMapper.fromEntity(role));
+        Role role = findEntityById(id);
+        return Optional.of(roleDtoMapper.fromEntity(role));
     }
 
     @Override
     public Optional<RoleDto> findByName(String roleName) throws ObjectNotFoundException {
         Role role = roleRepository.findByName(roleName).orElse(null);
-        validateRoleNotNull(role, "Role not defined for roleName=" + roleName);
-        return  Optional.of(roleDtoMapper.fromEntity(role));
+        validateEntityNotNull(role, "Role not defined for roleName=" + roleName);
+        return Optional.of(roleDtoMapper.fromEntity(role));
     }
 
     @Override
@@ -65,9 +63,7 @@ public class RoleService implements IRoleService {
 
     @Override
     public RoleDto updateRole(@NotNull RoleDto dto) throws ObjectNotFoundException {
-        Role roleFromBase = roleRepository.findById(dto.getId()).orElse(null);
-        validateRoleNotNull(roleFromBase, NOT_DEFINED_FOR_ID + dto.getId());
-        assert roleFromBase != null;
+        Role roleFromBase = findEntityById(dto.getId());
         roleFromBase
                 .setRoleName(dto.getRoleName())
                 .setRoleDisabled(dto.getRoleDisabled());
@@ -75,10 +71,9 @@ public class RoleService implements IRoleService {
     }
 
     @Override
-    public void deleteRole(RoleDto dto) throws ObjectNotFoundException {
-        Role roleFromBase = roleRepository.findById(dto.getId()).orElse(null);
-        validateRoleNotNull(roleFromBase, NOT_DEFINED_FOR_ID + dto.getId());
+    public void deleteById(Long id) throws ObjectNotFoundException {
+        Role roleFromBase = findEntityById(id);
         assert roleFromBase != null;
-        roleRepository.delete(roleFromBase);
+        roleRepository.deleteById(id);
     }
 }
