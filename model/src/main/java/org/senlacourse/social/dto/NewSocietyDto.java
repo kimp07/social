@@ -7,9 +7,8 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class FriendshipMemberDto {
+public class NewSocietyDto {
 
-    private Long id;
-    private UserSimpleDto user;
-    private FriendshipDto friendship;
+    private Long ownerId;
+    private String title;
 }

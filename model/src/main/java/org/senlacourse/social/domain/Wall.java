@@ -6,6 +6,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -25,6 +26,8 @@ public class Wall extends AbstractEntity {
     @JoinColumn(name = "society_id", referencedColumnName = "id")
     @ToString.Exclude
     private Society society;
+    @Column(name = "root_wall")
+    private Boolean root;
 
     @Override
     public boolean equals(Object o) {
