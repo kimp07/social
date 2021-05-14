@@ -21,5 +21,9 @@ public interface ISocietyService {
 
     SocietyMemberDto addUserToSociety(Long userId, Long societyId) throws ObjectNotFoundException;
 
+    public Optional<SocietyMemberDto> findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId);
+
+    public boolean isUserMemberOfSociety(Long userId, Long societyId);
+
     void deleteSocietyById(Long id) throws ObjectNotFoundException;
 }

@@ -8,11 +8,13 @@ public abstract class AbstractService<T> {
 
     abstract T findEntityById(Long id) throws ObjectNotFoundException;
 
-    protected <E> void validateEntityNotNull(E entity, String exceptionMessage) throws ObjectNotFoundException {
+    protected <E> E validateEntityNotNull(E entity, String exceptionMessage) throws ObjectNotFoundException {
         if (entity == null) {
             ObjectNotFoundException e = new ObjectNotFoundException(exceptionMessage);
             log.error(e.getMessage(), e);
             throw e;
+        } else {
+            return entity;
         }
     }
 }

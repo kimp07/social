@@ -7,10 +7,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class FriendshipRequestDto {
+public class NewWallMessageDto {
 
-    private Long id;
-    private String requestDate;
-    private UserSimpleDto sender;
-    private UserSimpleDto recipient;
+    private Long wallId;
+    private Long userId;
+    private String message;
 }

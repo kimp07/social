@@ -39,8 +39,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     @Override
     Society findEntityById(Long id) throws ObjectNotFoundException {
         Society society = societyRepository.findById(id).orElse(null);
-        validateEntityNotNull(society, "Society not defined for id=" + id);
-        return society;
+        return validateEntityNotNull(society, "Society not defined for id=" + id);
     }
 
     @Override
@@ -73,12 +72,11 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     public void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException {
         Society society = findEntityById(societyId);
         if (!society.getOwner().getId().equals(userId)) {
-            SocietyMember societyMember = societyMemberRepository
-                    .findByUserIdAndSocietyId(userId, societyId)
-                    .orElse(null);
-            validateEntityNotNull(societyMember,
+            SocietyMember societyMember = validateEntityNotNull(
+                    societyMemberRepository
+                            .findByUserIdAndSocietyId(userId, societyId)
+                            .orElse(null),
                     "Society member not defined for user id=" + userId + " and society id=" + societyId);
-            assert societyMember != null;
             societyMemberRepository.deleteById(societyMember.getId());
         }
     }
@@ -88,16 +86,32 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         Society society = findEntityById(societyId);
         User user = userRepository.findById(userId).orElse(null);
         validateEntityNotNull(user, USER_NOT_DEFINED_FOR_ID + userId);
-        return societyMemberDtoMapper
+        Optional<SocietyMemberDto> societyMember = findSocietyMemberByUserIdAndSocietyId(userId, societyId);
+        return societyMember.orElseGet(() -> societyMemberDtoMapper
                 .fromEntity(
                         societyMemberRepository.save(
                                 new SocietyMember()
                                         .setSociety(society)
-                                        .setUser(user)));
+                                        .setUser(user))));
+    }
+
+    public Optional<SocietyMemberDto> findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId) {
+        return Optional.ofNullable(
+                societyMemberDtoMapper
+                        .fromEntity(
+                                societyMemberRepository
+                                        .findByUserIdAndSocietyId(userId, societyId)
+                                        .orElse(null)));
+    }
+
+    public boolean isUserMemberOfSociety(Long userId, Long societyId) {
+        return societyMemberRepository.findByUserIdAndSocietyId(userId, societyId).isPresent();
     }
 
     @Override
     public void deleteSocietyById(Long id) throws ObjectNotFoundException {
+        Society society = findEntityById(id);
+        societyMemberRepository.deleteAllBySocietyId(society.getId());
         // TODO after WallService
     }
 }

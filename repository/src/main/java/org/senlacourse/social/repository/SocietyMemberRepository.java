@@ -17,4 +17,7 @@ public interface SocietyMemberRepository extends JpaRepository<SocietyMember, Lo
 
     @Query(value = "select sm from SocietyMember sm where sm.user.id = :userId and sm.society.id = :societyId")
     Optional<SocietyMember> findByUserIdAndSocietyId(Long userId, Long societyId);
+
+    @Query(value = "delete from SocietyMember sm where sm.society.id = :societyId")
+    void deleteAllBySocietyId(Long societyId);
 }

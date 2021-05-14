@@ -32,8 +32,7 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
     @Override
     Role findEntityById(Long id) throws ObjectNotFoundException {
         Role role = roleRepository.findById(id).orElse(null);
-        validateEntityNotNull(role, NOT_DEFINED_FOR_ID + id);
-        return role;
+        return validateEntityNotNull(role, NOT_DEFINED_FOR_ID + id);
     }
 
     @Override
@@ -73,7 +72,6 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         Role roleFromBase = findEntityById(id);
-        assert roleFromBase != null;
-        roleRepository.deleteById(id);
+        roleRepository.deleteById(roleFromBase.getId());
     }
 }

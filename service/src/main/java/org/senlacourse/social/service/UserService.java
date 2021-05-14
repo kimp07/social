@@ -42,8 +42,7 @@ public class UserService extends AbstractService<User> implements IUserService {
     @Override
     protected User findEntityById(Long id) throws ObjectNotFoundException {
         User user = userRepository.findById(id).orElse(null);
-        validateEntityNotNull(user, NOT_DEFINED_FOR_ID + id);
-        return user;
+        return validateEntityNotNull(user, NOT_DEFINED_FOR_ID + id);
     }
 
     private User findEntityByLogin(String login) throws ObjectNotFoundException {
@@ -83,7 +82,6 @@ public class UserService extends AbstractService<User> implements IUserService {
     public Optional<UserDto> findByUserLoginAndPassword(String userLogin, String password)
             throws ObjectNotFoundException, ServiceException {
         User user = findEntityByLogin(userLogin);
-        assert user != null;
         if (user.getPassword().equals(encodePassword(password))) {
             return Optional.of(userDtoMapper.fromEntity(user));
         } else {
@@ -151,7 +149,6 @@ public class UserService extends AbstractService<User> implements IUserService {
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         User userFromBase = findEntityById(id);
-        assert userFromBase != null;
-        userRepository.deleteById(id);
+        userRepository.deleteById(userFromBase.getId());
     }
 }

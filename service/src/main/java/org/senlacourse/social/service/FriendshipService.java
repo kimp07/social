@@ -27,15 +27,13 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
     @Override
     Friendship findEntityById(Long id) throws ObjectNotFoundException {
         Friendship friendship = friendshipRepository.findById(id).orElse(null);
-        validateEntityNotNull(friendship, "Object not defined for id=" + id);
-        return null;
+        return validateEntityNotNull(friendship, "Object not defined for id=" + id);
     }
 
     public void deleteById(Long id) throws ObjectNotFoundException {
         Friendship friendship = findEntityById(id);
-        assert friendship != null;
-        friendshipMemberRepository.deleteAllByFriendshipId(id);
-        friendshipRepository.deleteById(id);
+        friendshipMemberRepository.deleteAllByFriendshipId(friendship.getId());
+        friendshipRepository.deleteById(friendship.getId());
     }
 
     public Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(Long userId, Pageable pageable) {

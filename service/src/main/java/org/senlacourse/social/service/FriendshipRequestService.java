@@ -42,14 +42,12 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     @Override
     protected FriendshipRequest findEntityById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = friendshipRequestRepository.findById(id).orElse(null);
-        validateEntityNotNull(friendshipRequest, USER_NOT_DEFINED_FOR_ID + id);
-        return friendshipRequest;
+        return validateEntityNotNull(friendshipRequest, USER_NOT_DEFINED_FOR_ID + id);
     }
 
     private User findUserById(Long id) throws ObjectNotFoundException {
         User user = userRepository.findById(id).orElse(null);
-        validateEntityNotNull(user, USER_NOT_DEFINED_FOR_ID + id);
-        return user;
+        return validateEntityNotNull(user, USER_NOT_DEFINED_FOR_ID + id);
     }
 
     @Override
@@ -84,14 +82,12 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
-        assert friendshipRequest != null;
-        friendshipRequestRepository.deleteById(id);
+        friendshipRequestRepository.deleteById(friendshipRequest.getId());
     }
 
     @Override
     public void confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
-        assert friendshipRequest != null;
         User sender = friendshipRequest.getSender();
         User recipient = friendshipRequest.getRecipient();
         Friendship friendship = new Friendship();
