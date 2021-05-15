@@ -15,6 +15,8 @@ import org.senlacourse.social.mapstruct.SocietyMemberDtoMapper;
 import org.senlacourse.social.repository.SocietyMemberRepository;
 import org.senlacourse.social.repository.SocietyRepository;
 import org.senlacourse.social.repository.UserRepository;
+import org.senlacourse.social.repository.WallMessageCommentRepository;
+import org.senlacourse.social.repository.WallMessageRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     private final SocietyRepository societyRepository;
     private final SocietyMemberRepository societyMemberRepository;
     private final UserRepository userRepository;
+    private final WallMessageRepository wallMessageRepository;
+    private final WallMessageCommentRepository wallMessageCommentRepository;
     private final SocietyDtoMapper societyDtoMapper;
     private final SocietyMemberDtoMapper societyMemberDtoMapper;
 
@@ -112,6 +116,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     public void deleteSocietyById(Long id) throws ObjectNotFoundException {
         Society society = findEntityById(id);
         societyMemberRepository.deleteAllBySocietyId(society.getId());
-        // TODO after WallService
+        wallMessageCommentRepository.deleteAllByWallId(society.getId());
+        wallMessageRepository.deleteAllByWallId(society.getId());
     }
 }
