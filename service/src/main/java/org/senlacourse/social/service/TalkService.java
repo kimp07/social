@@ -3,6 +3,7 @@ package org.senlacourse.social.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
+import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.User;
@@ -23,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log4j
 @Transactional
-public class TalkService extends AbstractService<Talk> {
+public class TalkService extends AbstractService<Talk> implements ITalkService {
 
     private final TalkRepository talkRepository;
     private final TalkMemberRepository talkMemberRepository;
@@ -51,6 +52,7 @@ public class TalkService extends AbstractService<Talk> {
         return talkMemberRepository.findOneByTalkIdAndUserId(talkId, userId);
     }
 
+    @Override
     public boolean isUserMemberOfTalk(Long userId, Long talkId) {
         return getTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
     }
@@ -62,6 +64,7 @@ public class TalkService extends AbstractService<Talk> {
         return talkMemberRepository.save(talkMember);
     }
 
+    @Override
     public Optional<TalkDto> addNewTalk(NewTalkDto dto) throws ObjectNotFoundException {
         User sender = getUserById(dto.getSenderId());
         User recipient = getUserById(dto.getRecipientId());
@@ -76,6 +79,7 @@ public class TalkService extends AbstractService<Talk> {
                 talkDtoMapper.fromEntity(talk));
     }
 
+    @Override
     public Optional<TalkMemberDto> addTalkMemberToTalk(Long talkId, Long userId) throws ObjectNotFoundException {
         User user = getUserById(userId);
         Talk talk = getTalkById(talkId);
@@ -87,6 +91,7 @@ public class TalkService extends AbstractService<Talk> {
                                                 addTalkMemberToTalk(talk, user))));
     }
 
+    @Override
     public void removeTalkMemberFromTalk(Long talkId, Long userId) {
         getTalkMemberByUserIdAndTalkId(userId, talkId)
                 .ifPresent(
