@@ -141,6 +141,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
         }
     }
 
+    @Override
     public Optional<WallMessageCommentDto> editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(dto.getMessageId());

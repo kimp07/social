@@ -1,12 +1,12 @@
 package org.senlacourse.social.repository;
 
+import org.senlacourse.social.domain.TalkMessagesCache;
+import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
-import org.senlacourse.social.domain.TalkMessagesCache;
 
 @Repository
 public interface TalkMessagesCacheRepository extends JpaRepository<TalkMessagesCache, Long> {

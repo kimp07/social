@@ -117,8 +117,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public Optional<WallMessageDto> addNewMessge(NewWallMessageDto dto)
-            throws ObjectNotFoundException, ServiceException {
+    public Optional<WallMessageDto> addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
         User user = getUserById(dto.getUserId());
         Wall wall = validateEntityNotNull(
                 wallRepository.findById(dto.getWallId()).orElse(null),
@@ -130,7 +129,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     private WallMessage editWallMessage(User user, WallMessage wallMessage, String message)
-            throws ObjectNotFoundException, ServiceException {
+            throws ServiceException {
         Wall wall = wallMessage.getWall();
         if (userCanEditMessage(user, wall, wallMessage)) {
             wallMessage.setMessage(message);
@@ -144,8 +143,8 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
         }
     }
 
-    public Optional<WallMessageDto> editWallMessage(EditMessageDto dto)
-            throws ObjectNotFoundException, ServiceException {
+    @Override
+    public Optional<WallMessageDto> editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException {
         User user = getUserById(dto.getUserId());
         WallMessage wallMessage = findEntityById(dto.getMessageId());
         return Optional.ofNullable(
