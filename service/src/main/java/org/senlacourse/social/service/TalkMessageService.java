@@ -47,25 +47,30 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                 "Talk message not defined for id=" + id);
     }
 
-    private void sendMessageToCacheForTalkMembers(TalkMessage talkMessage, Page<TalkMember> talkMembersPage) {
-        talkMembersPage.forEach(talkMember ->
-                talkMessagesCacheRepository.save(new TalkMessagesCache()
-                        .setTalkMessage(talkMessage)
-                        .setRecipient(talkMember.getUser()))
+    private void sendMessageToCacheForTalkMembers(TalkMessage talkMessage,
+                                                  Page<TalkMember> talkMembersPage,
+                                                  User sender) {
+        talkMembersPage.forEach(talkMember -> {
+                    if (!talkMember.getUser().getId().equals(sender.getId())) {
+                        talkMessagesCacheRepository.save(new TalkMessagesCache()
+                                .setTalkMessage(talkMessage)
+                                .setRecipient(talkMember.getUser()));
+                    }
+                }
         );
     }
 
-    private void sendMessagesToCache(Talk talk, TalkMessage talkMessage) {
+    private void sendMessagesToCache(Talk talk, TalkMessage talkMessage, User sender) {
         int pageSize = 20;
         Page<TalkMember> talkMembersPage
                 = talkMemberRepository.findAllByTalkId(talk.getId(), PageRequest.of(0, pageSize));
         int totalPages = talkMembersPage.getTotalPages();
-        sendMessageToCacheForTalkMembers(talkMessage, talkMembersPage);
+        sendMessageToCacheForTalkMembers(talkMessage, talkMembersPage, sender);
         if (talkMembersPage.getTotalPages() > 1) {
             for (int pageNum = 1; pageNum < totalPages; pageNum++) {
                 talkMembersPage
                         = talkMemberRepository.findAllByTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
-                sendMessageToCacheForTalkMembers(talkMessage, talkMembersPage);
+                sendMessageToCacheForTalkMembers(talkMessage, talkMembersPage, sender);
             }
         }
     }
@@ -77,7 +82,7 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                         .setTalk(talk)
                         .setUser(user)
                         .setMessageDate(LocalDateTime.now()));
-        sendMessagesToCache(talk, talkMessage);
+        sendMessagesToCache(talk, talkMessage, user);
         return talkMessage;
     }
 
