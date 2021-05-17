@@ -13,6 +13,6 @@ public interface FriendshipRequestRepository extends JpaRepository<FriendshipReq
     @Query(value = "select fr from FriendshipRequest fr where fr.sender.id = :senderId")
     Page<FriendshipRequest> findAllBySenderId(Long senderId, Pageable pageable);
 
-    @Query(value = "select fr from FriendshipRequest fr where fr.recipient.id = :senderId")
+    @Query(value = "select fr from FriendshipRequest fr where fr.recipient.id = :recipientId")
     Page<FriendshipRequest> findAllByRecipientId(Long recipientId, Pageable pageable);
 }

@@ -9,6 +9,6 @@ import org.senlacourse.social.dto.NewRoleDto;
 public interface NewRoleDtoMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "roleDisabled", ignore = true, defaultValue = "false")
+    @Mapping(target = "roleDisabled", defaultValue = "false")
     Role toEntity(NewRoleDto dto);
 }

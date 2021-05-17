@@ -43,8 +43,9 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
 
     @Override
     public Optional<RoleDto> findByName(String roleName) throws ObjectNotFoundException {
-        Role role = roleRepository.findByName(roleName).orElse(null);
-        validateEntityNotNull(role, "Role not defined for roleName=" + roleName);
+        Role role = validateEntityNotNull(
+                roleRepository.findByName(roleName).orElse(null),
+                "Role not defined for roleName=" + roleName);
         return Optional.of(roleDtoMapper.fromEntity(role));
     }
 

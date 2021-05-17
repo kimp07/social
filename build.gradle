@@ -25,12 +25,17 @@ dependencies {
 	//testImplementation 'org.springframework.security:spring-security-test'
 
 	implementation project(":model")
+	implementation project(":controller")
+	implementation project(":api")
+	implementation project(":repository")
+	implementation project(":service")
+	implementation project(":security")
 
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	//implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	//implementation 'com.okta.spring:okta-spring-boot-starter:2.0.1'
 
@@ -39,6 +44,7 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

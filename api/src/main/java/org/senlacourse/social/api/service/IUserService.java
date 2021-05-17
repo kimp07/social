@@ -25,7 +25,7 @@ public interface IUserService {
 
     Page<UserDto> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable);
 
-    UserDto saveUser(NewUserDto dto) throws ObjectNotFoundException;
+    UserDto saveUser(NewUserDto dto) throws ObjectNotFoundException, ServiceException;
 
     UserDto updateUser(UserDto dto) throws ObjectNotFoundException;
 

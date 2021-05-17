@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "select u from User u where u.firstName like :firstName and u.surname like :surname")
-    Page<User> findAllByFirstNameAndSurname(String firtsName, String surname, Pageable pageable);
+    Page<User> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable);
 
     @Query(value = "select u from User u where u.login = :userLogin")
     Optional<User> findOneByUserLogin(String userLogin);

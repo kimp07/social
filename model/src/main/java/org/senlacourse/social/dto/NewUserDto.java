@@ -15,9 +15,12 @@ import javax.validation.constraints.NotNull;
 public class NewUserDto {
 
     @NotNull
+    @NotNull
     private String login;
+    @NotNull
+    @NotEmpty
     private String password;
-    private RoleDto role;
+    private Long roleId;
     @NotNull
     @NotEmpty
     @Email(regexp = "[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")
