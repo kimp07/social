@@ -1,5 +1,6 @@
 package org.senlacourse.social.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -19,6 +20,7 @@ public class UserDto {
     @NotNull
     @NotEmpty
     private String login;
+    @JsonIgnore
     private String password;
     @NotNull
     private RoleDto role;

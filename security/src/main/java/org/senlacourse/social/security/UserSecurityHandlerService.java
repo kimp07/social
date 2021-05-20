@@ -67,10 +67,10 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
         userService.saveUser(newUser);
     }
 
-    private UserDto getUserFromBase(Long userId) throws ObjectNotFoundException {
-        UserDto userFromBase = userService.findById(userId).orElse(null);
+    private UserDto getUserFromBase(String login) throws ObjectNotFoundException {
+        UserDto userFromBase = userService.findByUserLogin(login).orElse(null);
         if (userFromBase == null) {
-            ObjectNotFoundException e = new ObjectNotFoundException("User not defined for id=" + userId);
+            ObjectNotFoundException e = new ObjectNotFoundException("User not defined for login=" + login);
             log.error(e.getMessage(), e);
             throw e;
         } else {
@@ -82,24 +82,25 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     public void updateUser(UserDto userDto) throws ObjectNotFoundException {
         userDto.setPassword(
                 getUserFromBase(
-                        userDto.getId()
+                        userDto.getLogin()
                 ).getPassword());
         userService.updateUser(userDto);
     }
 
     @Override
     public void updateUserPassword(UserPasswordDto userDto) throws ObjectNotFoundException {
-        UserDto userFromBase = getUserFromBase(userDto.getId());
+        UserDto userFromBase = getUserFromBase(userDto.getLogin());
         userFromBase.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userService.updateUser(userFromBase);
     }
 
-    private String getToken(String userName) throws ObjectNotFoundException {
+    private String getToken(String userName, boolean temporaryToken) throws ObjectNotFoundException {
         UserDto user = userService.findByUserLogin(userName).orElse(null);
         if (user != null) {
             return tokenProvider.createToken(
                     userName,
-                    user.getPassword());
+                    user.getPassword(),
+                    temporaryToken);
         } else {
             ObjectNotFoundException e = new ObjectNotFoundException("User not defined for name=" + userName);
             log.error(e.getMessage(), e);
@@ -108,16 +109,16 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     }
 
     @Override
-    public String getUserToken(AuthDto authDto) throws ObjectNotFoundException {
-        return getToken(authDto.getLogin());
+    public String getUserToken(AuthDto authDto, boolean temporaryToken) throws ObjectNotFoundException {
+        return getToken(authDto.getLogin(), temporaryToken);
     }
 
     @Override
-    public String refreshUserToken() throws ObjectNotFoundException {
+    public String refreshUserToken(boolean temporaryToken) throws ObjectNotFoundException {
         UsernamePasswordAuthenticationToken auth =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         ApplicationUserDetails userDetails = (ApplicationUserDetails) auth.getPrincipal();
-        return getToken(userDetails.getUsername());
+        return getToken(userDetails.getUsername(), temporaryToken);
     }
 
 }

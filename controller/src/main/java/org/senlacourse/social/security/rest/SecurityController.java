@@ -5,8 +5,6 @@ import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.dto.AuthDto;
 import org.senlacourse.social.dto.NewUserDto;
 import org.senlacourse.social.dto.ResponseMessageDto;
-import org.senlacourse.social.security.util.BadRequestBodyException;
-import org.senlacourse.social.security.util.ValidationErrorMessagesUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
-public class SecurityController {
+public class SecurityController extends AbstractController {
 
     private static final String OPERATION_COMPLETED = "Operation completed";
 
@@ -30,9 +28,7 @@ public class SecurityController {
     @PostMapping("/signUp")
     public ResponseEntity<ResponseMessageDto> singnUp(@Validated @RequestBody NewUserDto dto,
                                                       BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestBodyException(ValidationErrorMessagesUtil.getErrorsMessage(bindingResult));
-        }
+        validateRequestBody(bindingResult);
         securityHandlerService.saveUser(dto);
         return new ResponseEntity<>(new ResponseMessageDto(OPERATION_COMPLETED), HttpStatus.OK);
     }
@@ -40,12 +36,10 @@ public class SecurityController {
     @PostMapping("/signIn")
     public ResponseEntity<ResponseMessageDto> signIn(@Validated @RequestBody AuthDto dto,
                                                      BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new BadRequestBodyException(ValidationErrorMessagesUtil.getErrorsMessage(bindingResult));
-        }
+        validateRequestBody(bindingResult);
         return new ResponseEntity<>(
                 new ResponseMessageDto(
-                        securityHandlerService.getUserToken(dto)),
+                        securityHandlerService.getUserToken(dto, false)),
                 HttpStatus.OK);
     }
 
@@ -54,7 +48,7 @@ public class SecurityController {
     public ResponseEntity<ResponseMessageDto> refreshToken() {
         return new ResponseEntity<>(
                 new ResponseMessageDto(
-                        securityHandlerService.refreshUserToken()),
+                        securityHandlerService.refreshUserToken(false)),
                 HttpStatus.OK);
     }
 }

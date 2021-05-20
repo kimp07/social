@@ -3,6 +3,8 @@ package org.senlacourse.social.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
+import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.domain.Friendship;
 import org.senlacourse.social.dto.FriendshipMemberDto;
@@ -22,6 +24,7 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
 
     private final FriendshipRepository friendshipRepository;
     private final FriendshipMemberRepository friendshipMemberRepository;
+    private final IAuthorizedUserService authorizedUserService;
     private final FriendshipMemberDtoMapper friendshipMemberDtoMapper;
 
     @Override
@@ -36,7 +39,9 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
         friendshipRepository.deleteById(friendship.getId());
     }
 
-    public Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(Long userId, Pageable pageable) {
+    public Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(Long userId, Pageable pageable)
+            throws ServiceException {
+        authorizedUserService.injectAuthorizedUserId(userId);
         return friendshipMemberDtoMapper.map(
                 friendshipMemberRepository.findAllFriendshipMembersByUserId(userId, pageable));
     }

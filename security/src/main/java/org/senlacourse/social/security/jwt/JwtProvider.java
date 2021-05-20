@@ -51,6 +51,8 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
 
     @Value("${application.jwt.termDays:5}")
     private Long jwtTermDays;
+    @Value("${application.jwt.termDaysTemporary:1}")
+    private Long jwtTermDaysTemporary;
     @Value("${application.jwt.baseSecret}")
     private String baseSecret;
 
@@ -88,14 +90,14 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
         return key;
     }
 
-    private String createToken(Authentication authentication) {
+    private String createToken(Authentication authentication, boolean temporaryToken) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         Date validity;
         validity = Date.from(
                 LocalDate
-                        .now().plusDays(jwtTermDays)
+                        .now().plusDays(temporaryToken ? jwtTermDaysTemporary : jwtTermDays)
                         .atStartOfDay(ZoneId.systemDefault())
                         .toInstant()
         );
@@ -109,10 +111,10 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
     }
 
     @Override
-    public String createToken(String userName, String userPassword) {
+    public String createToken(String userName, String userPassword, boolean temporaryToken) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userName, userPassword);
-        return createToken(authenticationToken);
+        return createToken(authenticationToken, temporaryToken);
     }
 
     @Override

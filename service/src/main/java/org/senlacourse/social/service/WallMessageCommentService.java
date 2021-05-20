@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IWallMessageCommentService;
 import org.senlacourse.social.domain.Society;
@@ -41,6 +42,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     private final UserRepository userRepository;
     private final WallMessageCommentDtoMapper wallMessageCommentDtoMapper;
     private final ISocietyService societyService;
+    private final IAuthorizedUserService authorizedUserService;
 
     private WallMessage getWallMessageById(Long id) throws ObjectNotFoundException {
         return validateEntityNotNull(
@@ -67,7 +69,8 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public void deleteAllByMessageId(Long messageId, Long userId) throws ObjectNotFoundException {
+    public void deleteAllByMessageId(Long messageId, Long userId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         WallMessage wallMessage = getWallMessageById(messageId);
         Society society = wallMessage.getWall().getSociety();
         if (society.getOwner().getId().equals(userId)) {
@@ -76,7 +79,8 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public void delete(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException {
+    public void delete(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         WallMessageComment wallMessageComment = findEntityById(wallMessageCommentId);
         User user = wallMessageComment.getUser();
         Society society = wallMessageComment.getWallMessage().getWall().getSociety();
@@ -118,6 +122,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     @Override
     public Optional<WallMessageCommentDto> addNewWallMessageComment(NewWallMessageCommentDto dto)
             throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
         WallMessage wallMessage = getWallMessageById(dto.getWallMessageId());
         User user = getUserById(dto.getUserId());
         Wall wall = wallMessage.getWall();
@@ -144,6 +149,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     @Override
     public Optional<WallMessageCommentDto> editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
         WallMessageComment wallMessageComment = findEntityById(dto.getMessageId());
         User user = getUserById(dto.getUserId());
         return Optional.ofNullable(wallMessageCommentDtoMapper.fromEntity(
@@ -151,7 +157,8 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException {
+    public void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         validateEntityNotNull(
                 userRepository.findById(userId).orElse(null),
                 USER_NOT_DEFINED_FOR_ID + userId);
@@ -162,7 +169,8 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException {
+    public void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         validateEntityNotNull(
                 userRepository.findById(userId).orElse(null),
                 USER_NOT_DEFINED_FOR_ID + userId);

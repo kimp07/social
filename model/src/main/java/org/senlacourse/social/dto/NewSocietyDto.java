@@ -7,8 +7,18 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class NewSocietyDto {
+public class NewSocietyDto implements IAuthorizedUserDto {
 
     private Long ownerId;
     private String title;
+
+    @Override
+    public void setAuthorizedUserId(Long id) {
+        this.ownerId = id;
+    }
+
+    @Override
+    public Long getAuthorizedUserId() {
+        return ownerId;
+    }
 }

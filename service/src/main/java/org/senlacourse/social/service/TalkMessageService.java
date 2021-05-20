@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.domain.Talk;
@@ -40,6 +41,7 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     private final TalkMessagesCacheRepository talkMessagesCacheRepository;
     private final TalkMessageDtoMapper talkMessageDtoMapper;
     private final ITalkService talkService;
+    private final IAuthorizedUserService authorizedUserService;
 
     @Override
     TalkMessage findEntityById(Long id) throws ObjectNotFoundException {
@@ -89,6 +91,7 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     @Override
     public Optional<TalkMessageDto> addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
         if (talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
             User user = validateEntityNotNull(userRepository.findById(dto.getUserId()).orElse(null),
                     "User not defined for id=" + dto.getUserId());

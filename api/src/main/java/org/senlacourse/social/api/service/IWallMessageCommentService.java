@@ -14,7 +14,7 @@ public interface IWallMessageCommentService {
 
     Page<WallMessageCommentDto> findAllByWallMessageId(Long wallMessageId, Pageable pageable);
 
-    void deleteAllByMessageId(Long messageId, Long userId) throws ObjectNotFoundException;
+    void deleteAllByMessageId(Long messageId, Long userId) throws ObjectNotFoundException, ServiceException;
 
     void delete(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException;
 
@@ -24,7 +24,7 @@ public interface IWallMessageCommentService {
     Optional<WallMessageCommentDto> editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException;
 
-    void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException;
+    void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException;
 
-    void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException;
+    void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException;
 }

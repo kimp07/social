@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @ComponentScan(basePackages = "org.senlacourse.social.*")
 @PropertySource("classpath:application.properties")
-@PropertySource("classpath:application-security.properties")
+@PropertySource("classpath:social-security.properties")
 public class SocialAppConfig {
 
     @Bean

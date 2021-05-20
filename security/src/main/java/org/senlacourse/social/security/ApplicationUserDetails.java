@@ -13,6 +13,7 @@ public class ApplicationUserDetails implements UserDetails {
 
     private static final long serialVersionUID = -1497528132480261808L;
 
+    private Long userId;
     private String userName;
     private String password;
     private Collection<? extends GrantedAuthority> grantedAuthoritys;
@@ -23,6 +24,7 @@ public class ApplicationUserDetails implements UserDetails {
 
     public static ApplicationUserDetails createFromUser(User user) {
         ApplicationUserDetails userDetails = new ApplicationUserDetails();
+        userDetails.userId = user.getId();
         userDetails.userName = user.getLogin();
         userDetails.password = user.getPassword();
         userDetails.grantedAuthoritys = Collections.singletonList(
@@ -81,4 +83,7 @@ public class ApplicationUserDetails implements UserDetails {
         return enabled;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
 }

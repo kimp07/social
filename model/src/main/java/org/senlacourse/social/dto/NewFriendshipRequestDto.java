@@ -9,10 +9,19 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class NewFriendshipRequestDto {
+public class NewFriendshipRequestDto implements IAuthorizedUserDto {
 
-    @NotNull
     private Long senderId;
     @NotNull
     private Long recipientId;
+
+    @Override
+    public void setAuthorizedUserId(Long id) {
+        this.senderId = id;
+    }
+
+    @Override
+    public Long getAuthorizedUserId() {
+        return senderId;
+    }
 }

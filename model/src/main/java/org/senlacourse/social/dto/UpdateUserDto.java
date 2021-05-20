@@ -10,23 +10,29 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class NewTalkMessageDto implements IAuthorizedUserDto {
+public class UpdateUserDto implements IAuthorizedUserDto {
 
+    private Long id;
     @NotNull
     @NotEmpty
-    private Long talkId;
-    private Long userId;
+    private String firstName;
     @NotNull
     @NotEmpty
-    private String message;
+    private String surname;
+    @NotNull
+    @NotEmpty
+    private String birthDate;
+    @NotNull
+    @NotEmpty
+    private String aboutMe;
 
     @Override
     public void setAuthorizedUserId(Long id) {
-        this.userId = id;
+        this.id = id;
     }
 
     @Override
     public Long getAuthorizedUserId() {
-        return userId;
+        return id;
     }
 }

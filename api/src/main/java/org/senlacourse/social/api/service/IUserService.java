@@ -3,6 +3,7 @@ package org.senlacourse.social.api.service;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.dto.NewUserDto;
+import org.senlacourse.social.dto.UpdateUserDto;
 import org.senlacourse.social.dto.UserDto;
 import org.senlacourse.social.dto.UserPasswordDto;
 import org.senlacourse.social.dto.UserSimpleDto;
@@ -29,9 +30,13 @@ public interface IUserService {
 
     UserDto updateUser(UserDto dto) throws ObjectNotFoundException;
 
+    UserDto updateUser(UpdateUserDto dto) throws ObjectNotFoundException, ServiceException;
+
     UserDto simpleUpdateUser(UserSimpleDto dto) throws ObjectNotFoundException;
 
     UserDto updateUserPassword(UserPasswordDto dto) throws ObjectNotFoundException;
 
     void deleteById(Long id) throws ObjectNotFoundException;
+
+    UserDto getCurrentAuthorizedUser() throws ObjectNotFoundException;
 }

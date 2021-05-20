@@ -19,7 +19,7 @@ public interface IUserSecurityHandlerService {
 
     void updateUserPassword(UserPasswordDto userDto) throws ObjectNotFoundException;
 
-    String getUserToken(AuthDto authDto) throws ObjectNotFoundException;
+    String getUserToken(AuthDto authDto, boolean temporaryToken) throws ObjectNotFoundException;
 
-    String refreshUserToken() throws ObjectNotFoundException;
+    String refreshUserToken(boolean temporaryToken) throws ObjectNotFoundException;
 }

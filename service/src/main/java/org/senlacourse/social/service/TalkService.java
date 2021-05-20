@@ -3,6 +3,8 @@ package org.senlacourse.social.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
+import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
@@ -31,6 +33,7 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     private final UserRepository userRepository;
     private final TalkDtoMapper talkDtoMapper;
     private final TalkMemberDtoMapper talkMemberDtoMapper;
+    private final IAuthorizedUserService authorizedUserService;
 
     @Override
     Talk findEntityById(Long id) throws ObjectNotFoundException {
@@ -53,7 +56,8 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
-    public boolean isUserMemberOfTalk(Long userId, Long talkId) {
+    public boolean isUserMemberOfTalk(Long userId, Long talkId) throws ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         return getTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
     }
 
@@ -65,7 +69,8 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
-    public Optional<TalkDto> addNewTalk(NewTalkDto dto) throws ObjectNotFoundException {
+    public Optional<TalkDto> addNewTalk(NewTalkDto dto) throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
         User sender = getUserById(dto.getSenderId());
         User recipient = getUserById(dto.getRecipientId());
 
@@ -80,7 +85,9 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
-    public Optional<TalkMemberDto> addTalkMemberToTalk(Long talkId, Long userId) throws ObjectNotFoundException {
+    public Optional<TalkMemberDto> addTalkMemberToTalk(Long talkId, Long userId)
+            throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         User user = getUserById(userId);
         Talk talk = getTalkById(talkId);
         return Optional.ofNullable(
@@ -92,7 +99,8 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
-    public void removeTalkMemberFromTalk(Long talkId, Long userId) {
+    public void removeTalkMemberFromTalk(Long talkId, Long userId) throws ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         getTalkMemberByUserIdAndTalkId(userId, talkId)
                 .ifPresent(
                         talkMember -> talkMemberRepository.deleteById(talkMember.getId()));

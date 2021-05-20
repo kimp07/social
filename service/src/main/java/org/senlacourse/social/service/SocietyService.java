@@ -3,6 +3,8 @@ package org.senlacourse.social.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
+import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.SocietyMember;
@@ -39,6 +41,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final SocietyDtoMapper societyDtoMapper;
     private final SocietyMemberDtoMapper societyMemberDtoMapper;
+    private final IAuthorizedUserService authorizedUserService;
 
     @Override
     Society findEntityById(Long id) throws ObjectNotFoundException {
@@ -58,9 +61,11 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     }
 
     @Override
-    public Optional<SocietyDto> createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException {
-        User owner = userRepository.findById(dto.getOwnerId()).orElse(null);
-        validateEntityNotNull(owner, USER_NOT_DEFINED_FOR_ID + dto.getOwnerId());
+    public Optional<SocietyDto> createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
+        User owner = validateEntityNotNull(
+                userRepository.findById(dto.getOwnerId()).orElse(null),
+                USER_NOT_DEFINED_FOR_ID + dto.getOwnerId());
         Society society = new Society()
                 .setTitle(dto.getTitle())
                 .setOwner(owner);
@@ -73,7 +78,8 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     }
 
     @Override
-    public void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException {
+    public void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         Society society = findEntityById(societyId);
         if (!society.getOwner().getId().equals(userId)) {
             SocietyMember societyMember = validateEntityNotNull(
@@ -86,7 +92,9 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     }
 
     @Override
-    public SocietyMemberDto addUserToSociety(Long userId, Long societyId) throws ObjectNotFoundException {
+    public SocietyMemberDto addUserToSociety(Long userId, Long societyId)
+            throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         Society society = findEntityById(societyId);
         User user = userRepository.findById(userId).orElse(null);
         validateEntityNotNull(user, USER_NOT_DEFINED_FOR_ID + userId);
@@ -99,7 +107,9 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                                         .setUser(user))));
     }
 
-    public Optional<SocietyMemberDto> findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId) {
+    public Optional<SocietyMemberDto> findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
+            throws ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         return Optional.ofNullable(
                 societyMemberDtoMapper
                         .fromEntity(

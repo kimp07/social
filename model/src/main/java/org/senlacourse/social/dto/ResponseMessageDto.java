@@ -1,10 +1,17 @@
 package org.senlacourse.social.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class ResponseMessageDto {
-    private String message;
+
+    private final String message;
+
+    public ResponseMessageDto() {
+        this.message = "Operation complete";
+    }
+
+    public ResponseMessageDto(String message) {
+        this.message = message;
+    }
 }

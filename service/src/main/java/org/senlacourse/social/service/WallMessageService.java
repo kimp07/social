@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IWallMessageService;
 import org.senlacourse.social.domain.User;
@@ -40,6 +41,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     private final UserRepository userRepository;
     private final ISocietyService societyService;
     private final WallMessageDtoMapper wallMessageDtoMapper;
+    private final IAuthorizedUserService authorizedUserService;
 
     @Override
     WallMessage findEntityById(Long id) throws ObjectNotFoundException {
@@ -60,7 +62,9 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public void deleteAllMessagesByWallIdAndUserId(Long wallId, Long userId) throws ObjectNotFoundException {
+    public void deleteAllMessagesByWallIdAndUserId(Long wallId, Long userId)
+            throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         Wall wall = validateEntityNotNull(wallRepository.findById(wallId).orElse(null),
                 "Wall not defined for id=" + wallId);
         User owner = wall.getSociety().getOwner();
@@ -73,6 +77,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     @Override
     public void deleteWallMessageByIdAndUserId(Long wallMessageId, Long userId)
             throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         WallMessage wallMessage = findEntityById(wallMessageId);
         User user = wallMessage.getUser();
         Wall wall = wallMessage.getWall();
@@ -118,6 +123,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
 
     @Override
     public Optional<WallMessageDto> addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
         User user = getUserById(dto.getUserId());
         Wall wall = validateEntityNotNull(
                 wallRepository.findById(dto.getWallId()).orElse(null),
@@ -145,6 +151,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
 
     @Override
     public Optional<WallMessageDto> editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException {
+        authorizedUserService.injectAuthorizedUserId(dto);
         User user = getUserById(dto.getUserId());
         WallMessage wallMessage = findEntityById(dto.getMessageId());
         return Optional.ofNullable(
@@ -153,7 +160,8 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException {
+    public void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         validateEntityNotNull(
                 userRepository.findById(userId).orElse(null),
                 USER_NOT_DEFINED_FOR_ID + userId);
@@ -164,7 +172,8 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException {
+    public void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
+        userId = authorizedUserService.injectAuthorizedUserId(userId);
         validateEntityNotNull(
                 userRepository.findById(userId).orElse(null),
                 USER_NOT_DEFINED_FOR_ID + userId);
