@@ -12,6 +12,7 @@ import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.TalkMessage;
 import org.senlacourse.social.domain.TalkMessagesCache;
 import org.senlacourse.social.domain.User;
+import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
@@ -22,11 +23,11 @@ import org.senlacourse.social.repository.TalkRepository;
 import org.senlacourse.social.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,17 +50,26 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                 "Talk message not defined for id=" + id);
     }
 
+    private User findUserById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(userRepository.findById(id).orElse(null),
+                "User not defined for id=" + id);
+    }
+
+    private Talk findTalkById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(talkRepository.findById(id).orElse(null),
+                "Talk not defined for id=" + id);
+    }
+
     private void sendMessageToCacheForTalkMembers(TalkMessage talkMessage,
                                                   Page<TalkMember> talkMembersPage,
                                                   User sender) {
         talkMembersPage.forEach(talkMember -> {
-                    if (!talkMember.getUser().getId().equals(sender.getId())) {
-                        talkMessagesCacheRepository.save(new TalkMessagesCache()
-                                .setTalkMessage(talkMessage)
-                                .setRecipient(talkMember.getUser()));
-                    }
-                }
-        );
+            if (!talkMember.getUser().getId().equals(sender.getId())) {
+                talkMessagesCacheRepository.save(new TalkMessagesCache()
+                        .setTalkMessage(talkMessage)
+                        .setRecipient(talkMember.getUser()));
+            }
+        });
     }
 
     private void sendMessagesToCache(Talk talk, TalkMessage talkMessage, User sender) {
@@ -88,18 +98,30 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
         return talkMessage;
     }
 
+    private Pageable getLastPageOfTalkMessages(Long talkId, Pageable pageable) {
+        return PageRequest.of(
+                talkMessageRepository.findAllByTalkId(talkId, pageable).getTotalPages(),
+                pageable.getPageSize());
+    }
+
     @Override
-    public Optional<TalkMessageDto> addNewMessage(NewTalkMessageDto dto)
+    public Page<TalkMessageDto> findAllByTalkId(Long talkId, Pageable pageable) throws ObjectNotFoundException {
+        findTalkById(talkId);
+        return talkMessageDtoMapper.map(
+                talkMessageRepository.findAllByTalkId(
+                        talkId,
+                        getLastPageOfTalkMessages(talkId, pageable)));
+    }
+
+    @Override
+    public TalkMessageDto addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         if (talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
-            User user = validateEntityNotNull(userRepository.findById(dto.getUserId()).orElse(null),
-                    "User not defined for id=" + dto.getUserId());
-            Talk talk = validateEntityNotNull(talkRepository.findById(dto.getTalkId()).orElse(null),
-                    "Talk not defined for id=" + dto.getTalkId());
-            return Optional.ofNullable(
-                    talkMessageDtoMapper.fromEntity(
-                            addNewMessage(user, talk, dto.getMessage())));
+            User user = findUserById(dto.getUserId());
+            Talk talk = findTalkById(dto.getTalkId());
+            return talkMessageDtoMapper.fromEntity(
+                    addNewMessage(user, talk, dto.getMessage()));
         } else {
             ServiceException e = new ServiceException("User with id=" + dto.getUserId() +
                     "can't add message to talk with id=" + dto.getTalkId());
@@ -107,4 +129,24 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
             throw e;
         }
     }
+
+    @Override
+    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(Long recipientId,
+                                                                                              Pageable pageable)
+            throws ObjectNotFoundException {
+        authorizedUserService.injectAuthorizedUserId(recipientId);
+        findUserById(recipientId);
+        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(recipientId, pageable);
+    }
+
+    @Override
+    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(Long recipientId,
+                                                                                         Long talkId)
+            throws ObjectNotFoundException {
+        authorizedUserService.injectAuthorizedUserId(recipientId);
+        findUserById(recipientId);
+        findTalkById(talkId);
+        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(recipientId, talkId);
+    }
+
 }

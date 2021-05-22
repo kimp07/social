@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -122,16 +121,15 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public Optional<WallMessageDto> addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
+    public WallMessageDto addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         User user = getUserById(dto.getUserId());
         Wall wall = validateEntityNotNull(
                 wallRepository.findById(dto.getWallId()).orElse(null),
                 "Wall not defined for id=" + dto.getWallId());
-        return Optional.ofNullable(
-                wallMessageDtoMapper
+        return wallMessageDtoMapper
                         .fromEntity(
-                                addNewMessage(user, wall, dto.getMessage())));
+                                addNewMessage(user, wall, dto.getMessage()));
     }
 
     private WallMessage editWallMessage(User user, WallMessage wallMessage, String message)
@@ -150,13 +148,12 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public Optional<WallMessageDto> editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException {
+    public WallMessageDto editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         User user = getUserById(dto.getUserId());
         WallMessage wallMessage = findEntityById(dto.getMessageId());
-        return Optional.ofNullable(
-                wallMessageDtoMapper.fromEntity(
-                        editWallMessage(user, wallMessage, dto.getMessage())));
+        return wallMessageDtoMapper.fromEntity(
+                editWallMessage(user, wallMessage, dto.getMessage()));
     }
 
     @Override

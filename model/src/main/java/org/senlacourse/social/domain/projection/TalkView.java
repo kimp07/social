@@ -2,6 +2,6 @@ package org.senlacourse.social.domain.projection;
 
 import org.senlacourse.social.domain.Talk;
 
-public interface TalkMessageView {
+public interface TalkView {
     Talk getTalk();
 }

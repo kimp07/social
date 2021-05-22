@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -120,19 +119,18 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public Optional<WallMessageCommentDto> addNewWallMessageComment(NewWallMessageCommentDto dto)
+    public WallMessageCommentDto addNewWallMessageComment(NewWallMessageCommentDto dto)
             throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         WallMessage wallMessage = getWallMessageById(dto.getWallMessageId());
         User user = getUserById(dto.getUserId());
         Wall wall = wallMessage.getWall();
-        return Optional.ofNullable(
-                wallMessageCommentDtoMapper.fromEntity(
-                        addNewWallMessageComment(wallMessage, user, wall, dto.getMessage())));
+        return wallMessageCommentDtoMapper.fromEntity(
+                addNewWallMessageComment(wallMessage, user, wall, dto.getMessage()));
     }
 
     private WallMessageComment editWallMessageComment(User user, WallMessageComment wallMessageComment, String message)
-        throws ObjectNotFoundException, ServiceException {
+            throws ObjectNotFoundException, ServiceException {
         Wall wall = wallMessageComment.getWallMessage().getWall();
         if (userCanEditMessage(user, wall, wallMessageComment)) {
             wallMessageComment.setMessage(message);
@@ -147,13 +145,13 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public Optional<WallMessageCommentDto> editWallMessageComment(EditMessageDto dto)
+    public WallMessageCommentDto editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         WallMessageComment wallMessageComment = findEntityById(dto.getMessageId());
         User user = getUserById(dto.getUserId());
-        return Optional.ofNullable(wallMessageCommentDtoMapper.fromEntity(
-                editWallMessageComment(user, wallMessageComment, dto.getMessage())));
+        return wallMessageCommentDtoMapper.fromEntity(
+                editWallMessageComment(user, wallMessageComment, dto.getMessage()));
     }
 
     @Override

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,17 +35,17 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
     }
 
     @Override
-    public Optional<RoleDto> findById(Long id) throws ObjectNotFoundException {
+    public RoleDto findById(Long id) throws ObjectNotFoundException {
         Role role = findEntityById(id);
-        return Optional.of(roleDtoMapper.fromEntity(role));
+        return roleDtoMapper.fromEntity(role);
     }
 
     @Override
-    public Optional<RoleDto> findByName(String roleName) throws ObjectNotFoundException {
+    public RoleDto findByName(String roleName) throws ObjectNotFoundException {
         Role role = validateEntityNotNull(
                 roleRepository.findByName(roleName).orElse(null),
                 "Role not defined for roleName=" + roleName);
-        return Optional.of(roleDtoMapper.fromEntity(role));
+        return roleDtoMapper.fromEntity(role);
     }
 
     @Override

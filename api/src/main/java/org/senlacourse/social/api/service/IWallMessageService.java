@@ -8,8 +8,6 @@ import org.senlacourse.social.dto.WallMessageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
-
 public interface IWallMessageService {
 
     Page<WallMessageDto> findAllByWallId(Long wallId, Pageable pageable);
@@ -18,9 +16,9 @@ public interface IWallMessageService {
 
     void deleteWallMessageByIdAndUserId(Long wallMessageId, Long userId) throws ObjectNotFoundException, ServiceException;
 
-    Optional<WallMessageDto> addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException;
+    WallMessageDto addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException;
 
-    Optional<WallMessageDto> editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException;
+    WallMessageDto editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException;
 
     void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException;
 

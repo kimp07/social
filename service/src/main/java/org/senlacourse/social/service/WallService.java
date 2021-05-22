@@ -11,8 +11,6 @@ import org.senlacourse.social.repository.WallRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Log4j
@@ -29,24 +27,23 @@ public class WallService extends AbstractService<Wall> implements IWallService {
     }
 
     @Override
-    public Optional<WallDto> findById(Long id) throws ObjectNotFoundException {
-        return Optional.ofNullable(
-                wallDtoMapper.fromEntity(findEntityById(id)));
+    public WallDto findById(Long id) throws ObjectNotFoundException {
+        return wallDtoMapper.fromEntity(findEntityById(id));
     }
 
     @Override
-    public Optional<WallDto> findWallBySocietyId(Long societyId) throws ObjectNotFoundException {
-        Wall wall = wallRepository.findBySocietyId(societyId).orElse(null);
-        validateEntityNotNull(wall, "Wall not defined for society id=" + societyId);
-        return Optional.ofNullable(
-                wallDtoMapper.fromEntity(wall));
+    public WallDto findWallBySocietyId(Long societyId) throws ObjectNotFoundException {
+        return wallDtoMapper.fromEntity(
+                validateEntityNotNull(
+                        wallRepository.findBySocietyId(societyId).orElse(null),
+                        "Wall not defined for society id=" + societyId));
     }
 
     @Override
-    public Optional<WallDto> findRootWall() throws ObjectNotFoundException {
-        Wall wall = wallRepository.findRootWall().orElse(null);
-        validateEntityNotNull(wall, "Root wall not defined");
-        return Optional.ofNullable(
-                wallDtoMapper.fromEntity(wall));
+    public WallDto findRootWall() throws ObjectNotFoundException {
+        return wallDtoMapper.fromEntity(
+                validateEntityNotNull(
+                        wallRepository.findRootWall().orElse(null),
+                        "Root wall not defined"));
     }
 }

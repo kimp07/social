@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Log4j
@@ -34,7 +33,6 @@ import java.util.Optional;
 public class FriendshipRequestService extends AbstractService<FriendshipRequest> implements IFriendshipRequestService {
 
     private static final String USER_NOT_DEFINED_FOR_ID = "User not defined for id=";
-    private static final String USER_NOT_DEFINED_FOR_LOGIN = "User not defined for login=";
 
     private final FriendshipRequestRepository friendshipRequestRepository;
     private final FriendshipRequestDtoMapper friendshipRequestDtoMapper;
@@ -55,9 +53,9 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     }
 
     @Override
-    public Optional<FriendshipRequestDto> findFriendshipRequestById(Long id) throws ObjectNotFoundException {
+    public FriendshipRequestDto findFriendshipRequestById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
-        return Optional.ofNullable(friendshipRequestDtoMapper.fromEntity(friendshipRequest));
+        return friendshipRequestDtoMapper.fromEntity(friendshipRequest);
     }
 
     @Override

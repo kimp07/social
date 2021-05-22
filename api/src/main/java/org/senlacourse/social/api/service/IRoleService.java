@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public interface IRoleService {
 
-    Optional<RoleDto> findById(Long id) throws ObjectNotFoundException;
+    RoleDto findById(Long id) throws ObjectNotFoundException;
 
-    Optional<RoleDto> findByName(String roleName) throws ObjectNotFoundException;
+    RoleDto findByName(String roleName) throws ObjectNotFoundException;
 
     Page<RoleDto> findAll(Pageable pageable);
 

@@ -17,6 +17,8 @@ import org.senlacourse.social.mapstruct.TalkMemberDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkRepository;
 import org.senlacourse.social.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,16 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
+    public Page<TalkDto> findAll(Pageable pageable) {
+        return talkDtoMapper.map(talkRepository.findAll(pageable));
+    }
+
+    @Override
+    public Page<TalkDto> findAllByUserIds(Long[] userId, Pageable pageable) {
+        return talkDtoMapper.map(talkRepository.findAllByTalkMemberId(userId, pageable));
+    }
+
+    @Override
     public boolean isUserMemberOfTalk(Long userId, Long talkId) throws ServiceException {
         userId = authorizedUserService.injectAuthorizedUserId(userId);
         return getTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
@@ -69,7 +81,7 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
-    public Optional<TalkDto> addNewTalk(NewTalkDto dto) throws ObjectNotFoundException, ServiceException {
+    public TalkDto addNewTalk(NewTalkDto dto) throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         User sender = getUserById(dto.getSenderId());
         User recipient = getUserById(dto.getRecipientId());
@@ -80,22 +92,20 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
         addTalkMemberToTalk(talk, sender);
         addTalkMemberToTalk(talk, recipient);
 
-        return Optional.ofNullable(
-                talkDtoMapper.fromEntity(talk));
+        return talkDtoMapper.fromEntity(talk);
     }
 
     @Override
-    public Optional<TalkMemberDto> addTalkMemberToTalk(Long talkId, Long userId)
+    public TalkMemberDto addTalkMemberToTalk(Long talkId, Long userId)
             throws ObjectNotFoundException, ServiceException {
         userId = authorizedUserService.injectAuthorizedUserId(userId);
         User user = getUserById(userId);
         Talk talk = getTalkById(talkId);
-        return Optional.ofNullable(
-                talkMemberDtoMapper
-                        .fromEntity(
-                                getTalkMemberByUserIdAndTalkId(userId, talkId)
-                                        .orElse(
-                                                addTalkMemberToTalk(talk, user))));
+        return talkMemberDtoMapper
+                .fromEntity(
+                        getTalkMemberByUserIdAndTalkId(userId, talkId)
+                                .orElse(
+                                        addTalkMemberToTalk(talk, user)));
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 public interface IFriendshipRequestService {
-    Optional<FriendshipRequestDto> findFriendshipRequestById(Long id) throws ObjectNotFoundException;
+    FriendshipRequestDto findFriendshipRequestById(Long id) throws ObjectNotFoundException;
 
     Page<FriendshipRequestDto> findAllBySenderId(Long senderId, Pageable pageable) throws ServiceException;
 
