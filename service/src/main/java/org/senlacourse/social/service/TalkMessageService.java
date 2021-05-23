@@ -102,7 +102,7 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
         return talkMessageDtoMapper.map(
                 talkMessageRepository.findAllByTalkId(
                         talkId,
-                        getLastPageOfTalkMessages(talkId, pageable)));
+                        pageable.getPageNumber() == Integer.MAX_VALUE ? getLastPageOfTalkMessages(talkId, pageable) : pageable));
     }
 
     @Override

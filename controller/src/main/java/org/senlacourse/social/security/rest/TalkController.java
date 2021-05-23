@@ -47,7 +47,7 @@ public class TalkController extends AbstractController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @PostMapping("/talks/{talkId}/members")
+    @PostMapping("/{talkId}/members")
     public ResponseEntity<ResponseMessageDto> addUserToTalk(@NotNull @PathVariable Long talkId,
                                                             @NotNull @RequestParam Long userId) {
         talkService.addTalkMemberToTalk(talkId, userId);
@@ -55,7 +55,7 @@ public class TalkController extends AbstractController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @DeleteMapping("/talks/{talkId}/members")
+    @DeleteMapping("/{talkId}/members")
     public ResponseEntity<ResponseMessageDto> removeUserFromTalk(@NotNull @PathVariable Long talkId,
                                                                  @NotNull @RequestParam Long userId) {
         talkService.removeTalkMemberFromTalk(talkId, userId);
@@ -65,11 +65,12 @@ public class TalkController extends AbstractController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/messages/{talkId}")
     public ResponseEntity<Page<TalkMessageDto>> getTalkMessages(@RequestParam(defaultValue = "10") Integer pageSize,
+                                                                @RequestParam(defaultValue = "0x7fffffff") Integer pageNum,
                                                                 @NotNull @PathVariable Long talkId) {
         return new ResponseEntity<>(
                 talkMessageService.findAllByTalkId(
                         talkId,
-                        PageRequest.of(0, pageSize)),
+                        PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
