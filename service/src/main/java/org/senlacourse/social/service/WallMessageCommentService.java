@@ -74,7 +74,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @Override
-    public void delete(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException, ServiceException {
+    public void deleteByCommentIdAndUserId(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException, ServiceException {
         userId = authorizedUserService.injectAuthorizedUserId(userId);
         WallMessageComment wallMessageComment = findEntityById(wallMessageCommentId);
         User user = wallMessageComment.getUser();

@@ -74,7 +74,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public void deleteWallMessageByIdAndUserId(Long wallMessageId, Long userId)
+    public void deleteByMessageIdAndUserId(Long wallMessageId, Long userId)
             throws ObjectNotFoundException, ServiceException {
         userId = authorizedUserService.injectAuthorizedUserId(userId);
         WallMessage wallMessage = findEntityById(wallMessageId);

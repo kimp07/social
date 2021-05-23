@@ -14,7 +14,7 @@ public interface IWallMessageCommentService {
 
     void deleteAllByMessageId(Long messageId, Long userId) throws ObjectNotFoundException, ServiceException;
 
-    void delete(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException;
+    void deleteByCommentIdAndUserId(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException;
 
     WallMessageCommentDto editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException;
