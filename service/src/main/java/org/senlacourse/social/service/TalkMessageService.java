@@ -7,20 +7,12 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
-import org.senlacourse.social.domain.Talk;
-import org.senlacourse.social.domain.TalkMember;
-import org.senlacourse.social.domain.TalkMessage;
-import org.senlacourse.social.domain.TalkMessagesCache;
-import org.senlacourse.social.domain.User;
+import org.senlacourse.social.domain.*;
 import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
-import org.senlacourse.social.repository.TalkMemberRepository;
-import org.senlacourse.social.repository.TalkMessageRepository;
-import org.senlacourse.social.repository.TalkMessagesCacheRepository;
-import org.senlacourse.social.repository.TalkRepository;
-import org.senlacourse.social.repository.UserRepository;
+import org.senlacourse.social.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -135,7 +127,6 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                                                                                               Pageable pageable)
             throws ObjectNotFoundException {
         authorizedUserService.injectAuthorizedUserId(recipientId);
-        findUserById(recipientId);
         return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(recipientId, pageable);
     }
 
@@ -144,9 +135,19 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                                                                                          Long talkId)
             throws ObjectNotFoundException {
         authorizedUserService.injectAuthorizedUserId(recipientId);
-        findUserById(recipientId);
-        findTalkById(talkId);
         return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(recipientId, talkId);
+    }
+
+    @Override
+    public void deleteCacheMessagesByRecipientId(Long recipientId) {
+        authorizedUserService.injectAuthorizedUserId(recipientId);
+        talkMessagesCacheRepository.deleteAllByRecipientId(recipientId);
+    }
+
+    @Override
+    public void deleteCacheMessagesByRecipientIdAndTalkId(Long recipientId, Long talkId) {
+        authorizedUserService.injectAuthorizedUserId(recipientId);
+        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(recipientId, talkId);
     }
 
 }

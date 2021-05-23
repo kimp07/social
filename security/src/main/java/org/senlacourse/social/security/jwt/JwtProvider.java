@@ -1,11 +1,6 @@
 package org.senlacourse.social.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ApplicationException;
@@ -41,7 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtProvider extends AbstractUserDetailsAuthenticationProvider implements IJwtProvider {
 
-    private static final String AUTHORIZATION = "Authorization"; // Bearer token header
+    private static final String AUTHORIZATION = "Authorization";
     private static final String JWT_PREFIX = "Bearer ";
 
     private static final String AUTHORITIES_KEY = "auth";
@@ -121,7 +116,7 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
     public UserDetails getUserDetailsFromToken(String token) throws ObjectNotFoundException {
         Claims claims = getClaimsFromTocken(token);
         String userName = claims.getSubject();
-        UserDto userDto = userService.findByUserLogin(userName).orElse(null);
+        UserDto userDto = userService.findByUserLogin(userName);
         if (userDto == null) {
             throw new ApplicationException("User not found for userName " + userName);
         }

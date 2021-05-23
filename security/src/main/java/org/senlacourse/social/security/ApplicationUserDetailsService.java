@@ -23,7 +23,7 @@ public class ApplicationUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userName) {
         User user;
         try {
-            user = userDtoMapper.toEntity(userService.findByUserLogin(userName).orElse(null));
+            user = userDtoMapper.toEntity(userService.findByUserLogin(userName));
         } catch (ObjectNotFoundException e) {
             log.error(e.getMessage(), e);
             throw new ApplicationException(e);

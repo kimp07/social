@@ -20,7 +20,7 @@ public interface IWallMessageCommentService {
             throws ObjectNotFoundException, ServiceException;
 
     WallMessageCommentDto addNewWallMessageComment(NewWallMessageCommentDto dto)
-    throws ObjectNotFoundException, ServiceException;
+            throws ObjectNotFoundException, ServiceException;
 
     void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException;
 

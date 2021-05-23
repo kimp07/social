@@ -10,11 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping
@@ -26,7 +22,7 @@ public class SecurityController extends AbstractController {
     private final IUserSecurityHandlerService securityHandlerService;
 
     @PostMapping("/signUp")
-    public ResponseEntity<ResponseMessageDto> singnUp(@Validated @RequestBody NewUserDto dto,
+    public ResponseEntity<ResponseMessageDto> signUp(@Validated @RequestBody NewUserDto dto,
                                                       BindingResult bindingResult) {
         validateRequestBody(bindingResult);
         securityHandlerService.saveUser(dto);

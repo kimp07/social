@@ -21,4 +21,8 @@ public interface ITalkMessageService {
 
     ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(Long recipientId,Long talkId)
             throws ObjectNotFoundException;
+
+    void deleteCacheMessagesByRecipientId(Long recipientId);
+
+    void deleteCacheMessagesByRecipientIdAndTalkId(Long recipientId, Long talkId);
 }

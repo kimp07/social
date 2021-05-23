@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UserDto {
+public class UserDto implements IAuthorizedUserDto {
 
     @NotNull
     private Long id;
@@ -45,4 +45,14 @@ public class UserDto {
     private Boolean credentialsNonExpired;
     private AuthProvider authProvider;
     private String authProviderId;
+
+    @Override
+    public void setAuthorizedUserId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public Long getAuthorizedUserId() {
+        return id;
+    }
 }

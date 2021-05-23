@@ -14,14 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Locale;
@@ -36,7 +29,7 @@ public class SocietyController extends AbstractController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping
     public ResponseEntity<Page<SocietyDto>> getAllSocieties(@RequestParam(defaultValue = "10") Integer pageSize,
-                                                            @RequestParam(defaultValue = "1") Integer pageNum,
+                                                            @RequestParam(defaultValue = "0") Integer pageNum,
                                                             @RequestParam String title,
                                                             @RequestParam(defaultValue = "id") String sortBy,
                                                             @RequestParam(defaultValue = "asc") String direction) {
@@ -80,7 +73,7 @@ public class SocietyController extends AbstractController {
     @GetMapping("/members/{societyId}")
     public ResponseEntity<Page<SocietyMemberDto>> getAllSocietyMembers(@NotNull @PathVariable Long societyId,
                                                                        @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                       @RequestParam(defaultValue = "1") Integer pageNum,
+                                                                       @RequestParam(defaultValue = "0") Integer pageNum,
                                                                        @RequestParam(defaultValue = "id") String sortBy,
                                                                        @RequestParam(defaultValue = "asc") String direction) {
         return new ResponseEntity<>(

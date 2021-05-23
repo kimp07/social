@@ -16,7 +16,7 @@ public interface IWallMessageService {
 
     void deleteWallMessageByIdAndUserId(Long wallMessageId, Long userId) throws ObjectNotFoundException, ServiceException;
 
-    WallMessageDto addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException;
+    WallMessageDto addNewMessage(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException;
 
     WallMessageDto editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException;
 

@@ -14,15 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -68,7 +60,7 @@ public class FriendshipController extends AbstractController {
     @GetMapping("/fiends/{id}")
     public ResponseEntity<Page<FriendshipMemberDto>> getFriends(@PathVariable Long id,
                                                                 @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                @RequestParam(defaultValue = "1") Integer pageNum) {
+                                                                @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
                 friendshipService.findAllFriendshipMembersByUserId(id, PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
@@ -78,7 +70,7 @@ public class FriendshipController extends AbstractController {
     @GetMapping("/requests/in/{id}")
     public ResponseEntity<Page<FriendshipRequestDto>> getInRequests(@PathVariable Long id,
                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                    @RequestParam(defaultValue = "1") Integer pageNum) {
+                                                                    @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
                 friendshipRequestService.findAllByRecipientId(id, PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
@@ -88,7 +80,7 @@ public class FriendshipController extends AbstractController {
     @GetMapping("/requests/out/{id}")
     public ResponseEntity<Page<FriendshipRequestDto>> getOutRequests(@PathVariable Long id,
                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                    @RequestParam(defaultValue = "1") Integer pageNum) {
+                                                                    @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
                 friendshipRequestService.findAllBySenderId(id, PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);

@@ -4,22 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.api.service.IRoleService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.dto.AuthDto;
-import org.senlacourse.social.dto.NewRoleDto;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.RoleDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserPasswordDto;
+import org.senlacourse.social.dto.*;
 import org.senlacourse.social.security.jwt.JwtProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +26,14 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     private final IRoleService roleService;
     private final JwtProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final IAuthorizedUserService authorizedUserService;
 
     private RoleDto roleUser;
 
-    private Optional<RoleDto> getRoleByNameUser() {
+    private RoleDto getRoleByNameUser() {
         RoleDto role = null;
         try {
-            role = roleService.findByName(ROLE_USER).orElse(null);
+            role = roleService.findByName(ROLE_USER);
         } catch (ObjectNotFoundException e) {
             log.warn(e.getMessage(), e);
         }
@@ -47,55 +42,50 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
                     new NewRoleDto()
                             .setRoleName(ROLE_USER));
         }
-        return Optional.ofNullable(role);
+        return role;
     }
 
     @Override
-    public Optional<RoleDto> getRoleUser() throws ObjectNotFoundException {
+    public RoleDto getRoleUser() throws ObjectNotFoundException {
         if (roleUser == null) {
-            roleUser = getRoleByNameUser().orElse(null);
+            roleUser = getRoleByNameUser();
         }
-        return Optional.ofNullable(roleUser);
+        return roleUser;
     }
 
     @Override
     public void saveUser(NewUserDto newUser) throws ObjectNotFoundException, ServiceException {
         if (newUser.getRoleId() == null) {
-            getRoleUser().ifPresent(role -> newUser.setRoleId(role.getId()));
+            newUser.setRoleId(getRoleUser().getId());
         }
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         userService.saveUser(newUser);
     }
 
-    private UserDto getUserFromBase(String login) throws ObjectNotFoundException {
-        UserDto userFromBase = userService.findByUserLogin(login).orElse(null);
-        if (userFromBase == null) {
-            ObjectNotFoundException e = new ObjectNotFoundException("User not defined for login=" + login);
-            log.error(e.getMessage(), e);
-            throw e;
-        } else {
-            return userFromBase;
-        }
+    private UserDto getUserFromBase(Long id) throws ObjectNotFoundException {
+        return userService.findById(id);
     }
 
     @Override
     public void updateUser(UserDto userDto) throws ObjectNotFoundException {
+        authorizedUserService.injectAuthorizedUserId(userDto);
         userDto.setPassword(
                 getUserFromBase(
-                        userDto.getLogin()
+                        userDto.getId()
                 ).getPassword());
         userService.updateUser(userDto);
     }
 
     @Override
     public void updateUserPassword(UserPasswordDto userDto) throws ObjectNotFoundException {
-        UserDto userFromBase = getUserFromBase(userDto.getLogin());
+        authorizedUserService.injectAuthorizedUserId(userDto);
+        UserDto userFromBase = getUserFromBase(userDto.getId());
         userFromBase.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userService.updateUser(userFromBase);
     }
 
     private String getToken(String userName, boolean temporaryToken) throws ObjectNotFoundException {
-        UserDto user = userService.findByUserLogin(userName).orElse(null);
+        UserDto user = userService.findByUserLogin(userName);
         if (user != null) {
             return tokenProvider.createToken(
                     userName,

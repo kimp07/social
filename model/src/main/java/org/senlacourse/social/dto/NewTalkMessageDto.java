@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 public class NewTalkMessageDto implements IAuthorizedUserDto {
 
     @NotNull
-    @NotEmpty
     private Long talkId;
     private Long userId;
     @NotNull

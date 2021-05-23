@@ -121,7 +121,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public WallMessageDto addNewMessge(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
+    public WallMessageDto addNewMessage(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
         User user = getUserById(dto.getUserId());
         Wall wall = validateEntityNotNull(

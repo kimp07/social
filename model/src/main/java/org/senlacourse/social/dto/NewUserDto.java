@@ -14,20 +14,27 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 public class NewUserDto {
 
-    @NotNull
-    @NotNull
+    @NotNull(message = "Login can't be null")
+    @NotEmpty(message = "Login can't be empty")
     private String login;
-    @NotNull
-    @NotEmpty
+    @NotNull(message = "Password can't be null")
+    @NotEmpty(message = "Password can't be empty")
     private String password;
     private Long roleId;
     @NotNull
     @NotEmpty
     @Email(regexp = "[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")
     private String email;
+    @NotNull
+    @NotEmpty
     private String firstName;
+    @NotNull
+    @NotEmpty
     private String surname;
+    @NotNull
+    @NotEmpty
     private String birthDate;
+    @NotNull
     private String aboutMe;
     private AuthProvider authProvider;
     private String authProviderId;

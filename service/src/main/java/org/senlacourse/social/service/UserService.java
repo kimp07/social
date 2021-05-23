@@ -6,12 +6,9 @@ import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IUserService;
+import org.senlacourse.social.api.util.SqlUtil;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.UpdateUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserPasswordDto;
-import org.senlacourse.social.dto.UserSimpleDto;
+import org.senlacourse.social.dto.*;
 import org.senlacourse.social.mapstruct.NewUserDtoMapper;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.repository.RoleRepository;
@@ -23,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,25 +49,25 @@ public class UserService extends AbstractService<User> implements IUserService {
     }
 
     @Override
-    public Optional<UserDto> findById(Long id) throws ObjectNotFoundException {
-        return Optional.of(userDtoMapper
+    public UserDto findById(Long id) throws ObjectNotFoundException {
+        return userDtoMapper
                 .fromEntity(
-                        findEntityById(id)));
+                        findEntityById(id));
     }
 
     @Override
-    public Optional<UserDto> findByUserLogin(String userLogin) throws ObjectNotFoundException {
-        return Optional.of(userDtoMapper
+    public UserDto findByUserLogin(String userLogin) throws ObjectNotFoundException {
+        return userDtoMapper
                 .fromEntity(
-                        findEntityByLogin(userLogin)));
+                        findEntityByLogin(userLogin));
     }
 
     @Override
-    public Optional<UserDto> findByUserLoginAndPassword(String userLogin, String password)
+    public UserDto findByUserLoginAndPassword(String userLogin, String password)
             throws ObjectNotFoundException, ServiceException {
         User user = findEntityByLogin(userLogin);
         if (user.getPassword().equals(password)) {
-            return Optional.of(userDtoMapper.fromEntity(user));
+            return userDtoMapper.fromEntity(user);
         } else {
             ServiceException e = new ServiceException("Incorrect password");
             log.warn(e);
@@ -80,10 +76,10 @@ public class UserService extends AbstractService<User> implements IUserService {
     }
 
     @Override
-    public Optional<UserDto> findByEmail(String email) throws ObjectNotFoundException {
+    public UserDto findByEmail(String email) throws ObjectNotFoundException {
         User user = validateEntityNotNull(userRepository.findOneByEmail(email).orElse(null),
                 "User not defined for email=" + email);
-        return Optional.of(userDtoMapper.fromEntity(user));
+        return userDtoMapper.fromEntity(user);
     }
 
     @Override
@@ -93,6 +89,8 @@ public class UserService extends AbstractService<User> implements IUserService {
 
     @Override
     public Page<UserDto> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable) {
+        firstName = SqlUtil.normalizeLikeFilter(firstName);
+        surname = SqlUtil.normalizeLikeFilter(surname);
         return userDtoMapper.map(userRepository.findAllByFirstNameAndSurname(firstName, surname, pageable));
     }
 
@@ -147,7 +145,7 @@ public class UserService extends AbstractService<User> implements IUserService {
     }
 
     @Override
-    public UserDto simpleUpdateUser(UserSimpleDto dto) throws ObjectNotFoundException {
+    public UserDto updateUser(UserSimpleDto dto) throws ObjectNotFoundException {
         User userFromBase = findEntityById(dto.getId());
         userFromBase
                 .setFirstName(dto.getFirstName())

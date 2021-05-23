@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 public class EditMessageDto implements IAuthorizedUserDto {
 
     @NotNull
-    @NotEmpty
     private Long messageId;
     private Long userId;
     @NotNull

@@ -15,12 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
 
@@ -35,7 +30,7 @@ public class UserController extends AbstractController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping
     public ResponseEntity<Page<UserDto>> showAllUsers(@RequestParam(defaultValue = "10") Integer pageSize,
-                                                      @RequestParam(defaultValue = "1") Integer pageNum,
+                                                      @RequestParam(defaultValue = "0") Integer pageNum,
                                                       @RequestParam(defaultValue = "id") String sortBy,
                                                       @RequestParam(defaultValue = "asc") String direction,
                                                       @RequestParam(defaultValue = "") String firstName,

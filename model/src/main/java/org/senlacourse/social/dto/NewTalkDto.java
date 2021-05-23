@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -14,7 +13,6 @@ public class NewTalkDto implements IAuthorizedUserDto {
 
     private Long senderId;
     @NotNull
-    @NotEmpty
     private Long recipientId;
 
     @Override

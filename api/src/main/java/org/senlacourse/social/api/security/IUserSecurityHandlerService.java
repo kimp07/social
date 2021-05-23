@@ -2,16 +2,11 @@ package org.senlacourse.social.api.security;
 
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.dto.AuthDto;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.RoleDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserPasswordDto;
-
-import java.util.Optional;
+import org.senlacourse.social.dto.*;
 
 public interface IUserSecurityHandlerService {
-    Optional<RoleDto> getRoleUser() throws ObjectNotFoundException;
+
+    RoleDto getRoleUser() throws ObjectNotFoundException;
 
     void saveUser(NewUserDto newUser) throws ObjectNotFoundException, ServiceException;
 
