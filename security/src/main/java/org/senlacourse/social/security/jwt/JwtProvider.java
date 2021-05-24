@@ -44,11 +44,11 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
     private final IUserService userService;
     private final UserDtoMapper userDtoMapper;
 
-    @Value("${application.jwt.termDays:5}")
+    @Value("${application.jwt.term-days:5}")
     private Long jwtTermDays;
-    @Value("${application.jwt.termDaysTemporary:1}")
+    @Value("${application.jwt.term-days-temporary:1}")
     private Long jwtTermDaysTemporary;
-    @Value("${application.jwt.baseSecret}")
+    @Value("${application.jwt.base-secret}")
     private String baseSecret;
 
     private Key key;

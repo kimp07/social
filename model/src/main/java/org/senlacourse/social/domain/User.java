@@ -49,6 +49,8 @@ public class User extends AbstractEntity {
     private AuthProvider authProvider;
     @Column(name = "auth_provider_id")
     private String authProviderId;
+    @Column(name = "user_image_file_name")
+    private String userImageFileName;
 
     @Override
     public boolean equals(Object o) {
