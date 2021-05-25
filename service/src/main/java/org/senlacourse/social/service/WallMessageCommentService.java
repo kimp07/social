@@ -4,17 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ISocietyService;
+import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.service.IWallMessageCommentService;
-import org.senlacourse.social.domain.*;
+import org.senlacourse.social.api.service.IWallMessageService;
+import org.senlacourse.social.domain.Society;
+import org.senlacourse.social.domain.User;
+import org.senlacourse.social.domain.Wall;
+import org.senlacourse.social.domain.WallMessage;
+import org.senlacourse.social.domain.WallMessageComment;
 import org.senlacourse.social.dto.EditMessageDto;
 import org.senlacourse.social.dto.NewWallMessageCommentDto;
 import org.senlacourse.social.dto.WallMessageCommentDto;
 import org.senlacourse.social.mapstruct.WallMessageCommentDtoMapper;
-import org.senlacourse.social.repository.UserRepository;
 import org.senlacourse.social.repository.WallMessageCommentRepository;
 import org.senlacourse.social.repository.WallMessageRepository;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,36 +30,23 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Log4j
-@Transactional
 public class WallMessageCommentService extends AbstractService<WallMessageComment> implements IWallMessageCommentService {
 
-    private static final String WALL_MESSAGE_NOT_DEFINED_FOR_ID = "Wall message not defined for id=";
-    private static final String USER_NOT_DEFINED_FOR_ID = "User not defined for id=";
     private static final String USER_WITH_ID = "User with id=";
 
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final WallMessageRepository wallMessageRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
+    private final IWallMessageService wallMessageService;
     private final WallMessageCommentDtoMapper wallMessageCommentDtoMapper;
     private final ISocietyService societyService;
-    private final IAuthorizedUserService authorizedUserService;
-
-    private WallMessage getWallMessageById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(
-                wallMessageRepository.findById(id).orElse(null),
-                WALL_MESSAGE_NOT_DEFINED_FOR_ID + id);
-    }
-
-    private User getUserById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(userRepository.findById(id).orElse(null),
-                USER_NOT_DEFINED_FOR_ID + id);
-    }
 
     @Override
-    WallMessageComment findEntityById(Long id) throws ObjectNotFoundException {
+    public WallMessageComment findEntityById(Long id) throws ObjectNotFoundException {
         return validateEntityNotNull(
-                wallMessageCommentRepository.findById(id).orElse(null),
-                "Wall message comment not defined for id=" + id);
+                wallMessageCommentRepository
+                        .findById(id)
+                        .orElse(null));
     }
 
     @Override
@@ -63,19 +55,21 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
                 wallMessageCommentRepository.findAllByWallMessageId(wallMessageId, pageable));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public void deleteAllByMessageId(Long messageId, Long userId) throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
-        WallMessage wallMessage = getWallMessageById(messageId);
+    public void deleteAllByMessageId(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
+        WallMessage wallMessage = wallMessageService.findEntityById(messageId);
         Society society = wallMessage.getWall().getSociety();
         if (society.getOwner().getId().equals(userId)) {
             wallMessageCommentRepository.deleteAllByWallMessageId(messageId);
         }
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteByCommentIdAndUserId(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
         WallMessageComment wallMessageComment = findEntityById(wallMessageCommentId);
         User user = wallMessageComment.getUser();
         Society society = wallMessageComment.getWallMessage().getWall().getSociety();
@@ -114,12 +108,13 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
         }
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public WallMessageCommentDto addNewWallMessageComment(NewWallMessageCommentDto dto)
             throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
-        WallMessage wallMessage = getWallMessageById(dto.getWallMessageId());
-        User user = getUserById(dto.getUserId());
+        WallMessage wallMessage = wallMessageService.findEntityById(dto.getWallMessageId());
+        User user = userService.findEntityById(dto.getUserId());
         Wall wall = wallMessage.getWall();
         return wallMessageCommentDtoMapper.fromEntity(
                 addNewWallMessageComment(wallMessage, user, wall, dto.getMessage()));
@@ -140,34 +135,29 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
         }
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public WallMessageCommentDto editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
         WallMessageComment wallMessageComment = findEntityById(dto.getMessageId());
-        User user = getUserById(dto.getUserId());
+        User user = userService.findEntityById(dto.getUserId());
         return wallMessageCommentDtoMapper.fromEntity(
                 editWallMessageComment(user, wallMessageComment, dto.getMessage()));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public void addLikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
-        validateEntityNotNull(
-                userRepository.findById(userId).orElse(null),
-                USER_NOT_DEFINED_FOR_ID + userId);
+    public void addLikeToMessage(Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(messageId);
         int likesCount = wallMessageComment.getLikesCount();
         wallMessageComment.setLikesCount(++likesCount);
         wallMessageCommentRepository.save(wallMessageComment);
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public void addDislikeToMessage(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
-        validateEntityNotNull(
-                userRepository.findById(userId).orElse(null),
-                USER_NOT_DEFINED_FOR_ID + userId);
+    public void addDislikeToMessage(Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(messageId);
         int dislikesCount = wallMessageComment.getDislikesCount();
         wallMessageComment.setLikesCount(++dislikesCount);

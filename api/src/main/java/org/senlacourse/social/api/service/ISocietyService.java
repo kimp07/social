@@ -2,13 +2,14 @@ package org.senlacourse.social.api.service;
 
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.dto.NewSocietyDto;
 import org.senlacourse.social.dto.SocietyDto;
 import org.senlacourse.social.dto.SocietyMemberDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ISocietyService {
+public interface ISocietyService extends IService<Society> {
 
     Page<SocietyDto> findAll(Pageable pageable);
 

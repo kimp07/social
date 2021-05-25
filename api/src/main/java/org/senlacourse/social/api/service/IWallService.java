@@ -1,9 +1,10 @@
 package org.senlacourse.social.api.service;
 
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
+import org.senlacourse.social.domain.Wall;
 import org.senlacourse.social.dto.WallDto;
 
-public interface IWallService {
+public interface IWallService extends IService<Wall> {
 
     WallDto findById(Long id) throws ObjectNotFoundException;
 

@@ -1,10 +1,17 @@
-package org.senlacourse.social.security.rest;
+package org.senlacourse.social.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.IWallMessageCommentService;
 import org.senlacourse.social.api.service.IWallMessageService;
 import org.senlacourse.social.api.service.IWallService;
-import org.senlacourse.social.dto.*;
+import org.senlacourse.social.api.validation.ValidatedBindingResult;
+import org.senlacourse.social.dto.EditMessageDto;
+import org.senlacourse.social.dto.NewWallMessageCommentDto;
+import org.senlacourse.social.dto.NewWallMessageDto;
+import org.senlacourse.social.dto.ResponseMessageDto;
+import org.senlacourse.social.dto.WallDto;
+import org.senlacourse.social.dto.WallMessageCommentDto;
+import org.senlacourse.social.dto.WallMessageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -12,14 +19,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/walls")
-public class WallController extends AbstractController {
+public class WallController {
 
     private final IWallService wallService;
     private final IWallMessageService wallMessageService;
@@ -54,19 +69,19 @@ public class WallController extends AbstractController {
     }
 
     @Secured(value = {"ROLE_USER"})
+    @ValidatedBindingResult
     @PostMapping("/{wallId}/messages")
     public ResponseEntity<ResponseMessageDto> addWallMessage(@Validated @RequestBody NewWallMessageDto dto,
                                                              BindingResult bindingResult) {
-        validateRequestBody(bindingResult);
         wallMessageService.addNewMessage(dto);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
+    @ValidatedBindingResult
     @PutMapping("/messages")
     public ResponseEntity<ResponseMessageDto> editWallMessage(@Validated @RequestBody EditMessageDto dto,
                                                               BindingResult bindingResult) {
-        validateRequestBody(bindingResult);
         wallMessageService.editWallMessage(dto);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
@@ -75,23 +90,21 @@ public class WallController extends AbstractController {
     @DeleteMapping("/messages")
     public ResponseEntity<ResponseMessageDto> removeWallMessage(@RequestParam Long userId,
                                                                 @NotNull @RequestParam Long messageId) {
-        wallMessageService.deleteByMessageIdAndUserId(messageId, userId);
+        wallMessageService.deleteByMessageIdAndUserId(userId, messageId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
     @PostMapping("/messages/like")
-    public ResponseEntity<ResponseMessageDto> addWallMessageLike(@RequestParam Long userId,
-                                                                 @NotNull @RequestParam Long messageId) {
-        wallMessageService.addLikeToMessage(userId, messageId);
+    public ResponseEntity<ResponseMessageDto> addWallMessageLike(@NotNull @RequestParam Long messageId) {
+        wallMessageService.addLikeToMessage(messageId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
     @PostMapping("/messages/dislike")
-    public ResponseEntity<ResponseMessageDto> addWallMessageDislike(@RequestParam Long userId,
-                                                                    @NotNull @RequestParam Long messageId) {
-        wallMessageService.addLikeToMessage(userId, messageId);
+    public ResponseEntity<ResponseMessageDto> addWallMessageDislike(@NotNull @RequestParam Long messageId) {
+        wallMessageService.addDislikeToMessage(messageId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
@@ -107,19 +120,19 @@ public class WallController extends AbstractController {
     }
 
     @Secured(value = {"ROLE_USER"})
+    @ValidatedBindingResult
     @PostMapping("/messages/comments")
     public ResponseEntity<ResponseMessageDto> addWallMessageComment(@Validated @RequestBody NewWallMessageCommentDto dto,
                                                                     BindingResult bindingResult) {
-        validateRequestBody(bindingResult);
         wallMessageCommentService.addNewWallMessageComment(dto);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
+    @ValidatedBindingResult
     @PutMapping("/messages/comments")
     public ResponseEntity<ResponseMessageDto> editWallMessageComment(@Validated @RequestBody EditMessageDto dto,
                                                                      BindingResult bindingResult) {
-        validateRequestBody(bindingResult);
         wallMessageCommentService.editWallMessageComment(dto);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
@@ -134,17 +147,15 @@ public class WallController extends AbstractController {
 
     @Secured(value = {"ROLE_USER"})
     @PostMapping("/messages/comments/like")
-    public ResponseEntity<ResponseMessageDto> addWallMessageCommentLike(@RequestParam Long userId,
-                                                                        @NotNull @RequestParam Long commentId) {
-        wallMessageCommentService.addLikeToMessage(userId, commentId);
+    public ResponseEntity<ResponseMessageDto> addWallMessageCommentLike(@NotNull @RequestParam Long commentId) {
+        wallMessageCommentService.addLikeToMessage(commentId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
     @PostMapping("/messages/comments/dislike")
-    public ResponseEntity<ResponseMessageDto> addWallMessageCommentDislike(@RequestParam Long userId,
-                                                                           @NotNull @RequestParam Long commentId) {
-        wallMessageCommentService.addLikeToMessage(userId, commentId);
+    public ResponseEntity<ResponseMessageDto> addWallMessageCommentDislike(@NotNull @RequestParam Long commentId) {
+        wallMessageCommentService.addDislikeToMessage(commentId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 

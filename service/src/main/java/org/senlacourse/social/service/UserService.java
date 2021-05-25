@@ -8,11 +8,16 @@ import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.util.SqlUtil;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.dto.*;
+import org.senlacourse.social.dto.NewUserDto;
+import org.senlacourse.social.dto.UpdateUserDto;
+import org.senlacourse.social.dto.UserDto;
+import org.senlacourse.social.dto.UserPasswordDto;
+import org.senlacourse.social.dto.UserSimpleDto;
 import org.senlacourse.social.mapstruct.NewUserDtoMapper;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.repository.RoleRepository;
 import org.senlacourse.social.repository.UserRepository;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,12 +29,9 @@ import java.time.format.DateTimeFormatter;
 @Service
 @RequiredArgsConstructor
 @Log4j
-@Transactional
 public class UserService extends AbstractService<User> implements IUserService {
 
-    private static final String NOT_DEFINED_FOR_ID = "User not defined for id=";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final String USER_NOT_DEFINED_FOR_LOGIN = "User not defined for login=";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -38,14 +40,18 @@ public class UserService extends AbstractService<User> implements IUserService {
     private final IAuthorizedUserService authorizedUserService;
 
     @Override
-    protected User findEntityById(Long id) throws ObjectNotFoundException {
-        User user = userRepository.findById(id).orElse(null);
-        return validateEntityNotNull(user, NOT_DEFINED_FOR_ID + id);
+    public User findEntityById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(
+                userRepository
+                        .findById(id)
+                        .orElse(null));
     }
 
     private User findEntityByLogin(String login) throws ObjectNotFoundException {
-        User user = userRepository.findOneByUserLogin(login).orElse(null);
-        return validateEntityNotNull(user, USER_NOT_DEFINED_FOR_LOGIN + login);
+        return validateEntityNotNull(
+                userRepository
+                        .findOneByUserLogin(login)
+                        .orElse(null));
     }
 
     @Override
@@ -77,9 +83,11 @@ public class UserService extends AbstractService<User> implements IUserService {
 
     @Override
     public UserDto findByEmail(String email) throws ObjectNotFoundException {
-        User user = validateEntityNotNull(userRepository.findOneByEmail(email).orElse(null),
-                "User not defined for email=" + email);
-        return userDtoMapper.fromEntity(user);
+        return userDtoMapper.fromEntity(
+                validateEntityNotNull(
+                        userRepository
+                                .findOneByEmail(email)
+                                .orElse(null)));
     }
 
     @Override
@@ -109,6 +117,7 @@ public class UserService extends AbstractService<User> implements IUserService {
         return user;
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto saveUser(NewUserDto dto) throws ObjectNotFoundException, ServiceException {
         User user = handleNewUserDto(dto);
@@ -124,6 +133,7 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userRepository.save(user);
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUser(UserDto dto) throws ObjectNotFoundException {
         User userFromBase = findEntityById(dto.getId());
@@ -132,6 +142,7 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userDtoMapper.fromEntity(updateUser(user));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUser(UpdateUserDto dto) throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
@@ -144,6 +155,7 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userDtoMapper.fromEntity(updateUser(userFromBase));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUser(UserSimpleDto dto) throws ObjectNotFoundException {
         User userFromBase = findEntityById(dto.getId());
@@ -155,14 +167,17 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userDtoMapper.fromEntity(updateUser(userFromBase));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUserPassword(UserPasswordDto dto) throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
         User userFromBase = findEntityById(dto.getId());
         userFromBase.setPassword(dto.getPassword());
         return userDtoMapper.fromEntity(updateUser(userFromBase));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         User userFromBase = findEntityById(id);

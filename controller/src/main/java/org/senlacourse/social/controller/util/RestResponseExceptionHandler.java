@@ -1,4 +1,4 @@
-package org.senlacourse.social.security.util;
+package org.senlacourse.social.controller.util;
 
 import org.senlacourse.social.api.exception.DtoValidationException;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;

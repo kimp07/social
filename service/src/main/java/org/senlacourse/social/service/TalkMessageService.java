@@ -4,15 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
-import org.senlacourse.social.domain.*;
+import org.senlacourse.social.api.service.IUserService;
+import org.senlacourse.social.domain.Talk;
+import org.senlacourse.social.domain.TalkMember;
+import org.senlacourse.social.domain.TalkMessage;
+import org.senlacourse.social.domain.TalkMessagesCache;
+import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
-import org.senlacourse.social.repository.*;
+import org.senlacourse.social.repository.TalkMemberRepository;
+import org.senlacourse.social.repository.TalkMessageRepository;
+import org.senlacourse.social.repository.TalkMessagesCacheRepository;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,32 +31,21 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Log4j
-@Transactional
 public class TalkMessageService extends AbstractService<TalkMessage> implements ITalkMessageService {
 
     private final TalkMessageRepository talkMessageRepository;
-    private final UserRepository userRepository;
-    private final TalkRepository talkRepository;
+    private final IUserService userService;
     private final TalkMemberRepository talkMemberRepository;
     private final TalkMessagesCacheRepository talkMessagesCacheRepository;
     private final TalkMessageDtoMapper talkMessageDtoMapper;
     private final ITalkService talkService;
-    private final IAuthorizedUserService authorizedUserService;
 
     @Override
-    TalkMessage findEntityById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(talkMessageRepository.findById(id).orElse(null),
-                "Talk message not defined for id=" + id);
-    }
-
-    private User findUserById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(userRepository.findById(id).orElse(null),
-                "User not defined for id=" + id);
-    }
-
-    private Talk findTalkById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(talkRepository.findById(id).orElse(null),
-                "Talk not defined for id=" + id);
+    public TalkMessage findEntityById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(
+                talkMessageRepository
+                        .findById(id)
+                        .orElse(null));
     }
 
     private void sendMessageToCacheForTalkMembers(TalkMessage talkMessage,
@@ -98,20 +94,21 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @Override
     public Page<TalkMessageDto> findAllByTalkId(Long talkId, Pageable pageable) throws ObjectNotFoundException {
-        findTalkById(talkId);
+        talkService.findEntityById(talkId);
         return talkMessageDtoMapper.map(
                 talkMessageRepository.findAllByTalkId(
                         talkId,
                         pageable.getPageNumber() == Integer.MAX_VALUE ? getLastPageOfTalkMessages(talkId, pageable) : pageable));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public TalkMessageDto addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
         if (talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
-            User user = findUserById(dto.getUserId());
-            Talk talk = findTalkById(dto.getTalkId());
+            User user = userService.findEntityById(dto.getUserId());
+            Talk talk = talkService.findEntityById(dto.getTalkId());
             return talkMessageDtoMapper.fromEntity(
                     addNewMessage(user, talk, dto.getMessage()));
         } else {
@@ -122,32 +119,34 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
         }
     }
 
+    @AuthorizedUser
     @Override
-    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(Long recipientId,
+    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(Long userId,
                                                                                               Pageable pageable)
             throws ObjectNotFoundException {
-        authorizedUserService.injectAuthorizedUserId(recipientId);
-        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(recipientId, pageable);
+        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(userId, pageable);
     }
 
+    @AuthorizedUser
     @Override
-    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(Long recipientId,
+    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(Long userId,
                                                                                          Long talkId)
             throws ObjectNotFoundException {
-        authorizedUserService.injectAuthorizedUserId(recipientId);
-        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(recipientId, talkId);
+        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(userId, talkId);
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public void deleteCacheMessagesByRecipientId(Long recipientId) {
-        authorizedUserService.injectAuthorizedUserId(recipientId);
-        talkMessagesCacheRepository.deleteAllByRecipientId(recipientId);
+    public void deleteCacheMessagesByRecipientId(Long userId) {
+        talkMessagesCacheRepository.deleteAllByRecipientId(userId);
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public void deleteCacheMessagesByRecipientIdAndTalkId(Long recipientId, Long talkId) {
-        authorizedUserService.injectAuthorizedUserId(recipientId);
-        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(recipientId, talkId);
+    public void deleteCacheMessagesByRecipientIdAndTalkId(Long userId, Long talkId) {
+        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(userId, talkId);
     }
 
 }

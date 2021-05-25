@@ -1,8 +1,9 @@
-package org.senlacourse.social.security.rest;
+package org.senlacourse.social.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.IFriendshipRequestService;
 import org.senlacourse.social.api.service.IFriendshipService;
+import org.senlacourse.social.api.validation.ValidatedBindingResult;
 import org.senlacourse.social.dto.FriendshipMemberDto;
 import org.senlacourse.social.dto.FriendshipRequestDto;
 import org.senlacourse.social.dto.NewFriendshipRequestDto;
@@ -14,23 +15,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/friendships")
 @RequiredArgsConstructor
-public class FriendshipController extends AbstractController {
+public class FriendshipController {
 
     private final IFriendshipRequestService friendshipRequestService;
     private final IFriendshipService friendshipService;
 
     @Secured(value = {"ROLE_USER"})
+    @ValidatedBindingResult
     @PostMapping("/requests")
     public ResponseEntity<ResponseMessageDto> sendFriendshipRequest(@Validated @RequestBody NewFriendshipRequestDto dto,
                                                                     BindingResult bindingResult) {
-        validateRequestBody(bindingResult);
         friendshipRequestService.saveNewFriendshipRequest(dto);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }

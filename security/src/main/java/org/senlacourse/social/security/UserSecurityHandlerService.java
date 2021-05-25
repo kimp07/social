@@ -4,12 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.api.service.IRoleService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.dto.*;
+import org.senlacourse.social.dto.AuthDto;
+import org.senlacourse.social.dto.NewRoleDto;
+import org.senlacourse.social.dto.NewUserDto;
+import org.senlacourse.social.dto.RoleDto;
+import org.senlacourse.social.dto.UserDto;
+import org.senlacourse.social.dto.UserPasswordDto;
 import org.senlacourse.social.security.jwt.JwtProvider;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +31,6 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     private final IRoleService roleService;
     private final JwtProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final IAuthorizedUserService authorizedUserService;
 
     private RoleDto roleUser;
 
@@ -66,21 +70,21 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
         return userService.findById(id);
     }
 
+    @AuthorizedUser
     @Override
-    public void updateUser(UserDto userDto) throws ObjectNotFoundException {
-        authorizedUserService.injectAuthorizedUserId(userDto);
-        userDto.setPassword(
+    public void updateUser(UserDto dto) throws ObjectNotFoundException {
+        dto.setPassword(
                 getUserFromBase(
-                        userDto.getId()
+                        dto.getId()
                 ).getPassword());
-        userService.updateUser(userDto);
+        userService.updateUser(dto);
     }
 
+    @AuthorizedUser
     @Override
-    public void updateUserPassword(UserPasswordDto userDto) throws ObjectNotFoundException {
-        authorizedUserService.injectAuthorizedUserId(userDto);
-        UserDto userFromBase = getUserFromBase(userDto.getId());
-        userFromBase.setPassword(passwordEncoder.encode(userDto.getPassword()));
+    public void updateUserPassword(UserPasswordDto dto) throws ObjectNotFoundException {
+        UserDto userFromBase = getUserFromBase(dto.getId());
+        userFromBase.setPassword(passwordEncoder.encode(dto.getPassword()));
         userService.updateUser(userFromBase);
     }
 

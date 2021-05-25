@@ -1,7 +1,8 @@
-package org.senlacourse.social.security.rest;
+package org.senlacourse.social.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.ISocietyService;
+import org.senlacourse.social.api.validation.ValidatedBindingResult;
 import org.senlacourse.social.dto.NewSocietyDto;
 import org.senlacourse.social.dto.ResponseMessageDto;
 import org.senlacourse.social.dto.SocietyDto;
@@ -14,7 +15,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 import java.util.Locale;
@@ -22,7 +30,7 @@ import java.util.Locale;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/societies")
-public class SocietyController extends AbstractController {
+public class SocietyController {
 
     private final ISocietyService societyService;
 
@@ -44,10 +52,10 @@ public class SocietyController extends AbstractController {
     }
 
     @Secured(value = {"ROLE_USER"})
+    @ValidatedBindingResult
     @PostMapping
     public ResponseEntity<SocietyDto> createSociety(@Validated @RequestBody NewSocietyDto dto,
                                                     BindingResult bindingResult) {
-        validateRequestBody(bindingResult);
         return new ResponseEntity<>(
                 societyService.createNewSociety(dto),
                 HttpStatus.OK);

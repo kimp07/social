@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ITalkService;
+import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.User;
@@ -16,7 +16,7 @@ import org.senlacourse.social.mapstruct.TalkDtoMapper;
 import org.senlacourse.social.mapstruct.TalkMemberDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkRepository;
-import org.senlacourse.social.repository.UserRepository;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,30 +27,20 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Log4j
-@Transactional
 public class TalkService extends AbstractService<Talk> implements ITalkService {
 
     private final TalkRepository talkRepository;
     private final TalkMemberRepository talkMemberRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
     private final TalkDtoMapper talkDtoMapper;
     private final TalkMemberDtoMapper talkMemberDtoMapper;
-    private final IAuthorizedUserService authorizedUserService;
 
     @Override
-    Talk findEntityById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(talkRepository.findById(id).orElse(null),
-                "Talk not defined for id=" + id);
-    }
-
-    private User getUserById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(userRepository.findById(id).orElse(null),
-                "User not defined for id=" + id);
-    }
-
-    private Talk getTalkById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(talkRepository.findById(id).orElse(null),
-                "Talk not defined for id=" + id);
+    public Talk findEntityById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(
+                talkRepository
+                        .findById(id)
+                        .orElse(null));
     }
 
     private Optional<TalkMember> getTalkMemberByUserIdAndTalkId(Long userId, Long talkId) {
@@ -67,9 +57,9 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
         return talkDtoMapper.map(talkRepository.findAllByTalkMemberId(userId, pageable));
     }
 
+    @AuthorizedUser
     @Override
     public boolean isUserMemberOfTalk(Long userId, Long talkId) throws ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
         return getTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
     }
 
@@ -80,11 +70,12 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
         return talkMemberRepository.save(talkMember);
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public TalkDto addNewTalk(NewTalkDto dto) throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
-        User sender = getUserById(dto.getSenderId());
-        User recipient = getUserById(dto.getRecipientId());
+        User sender = userService.findEntityById(dto.getSenderId());
+        User recipient = userService.findEntityById(dto.getRecipientId());
 
         Talk talk = new Talk().setOwner(sender);
         talk = talkRepository.save(talk);
@@ -95,12 +86,13 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
         return talkDtoMapper.fromEntity(talk);
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public TalkMemberDto addTalkMemberToTalk(Long talkId, Long userId)
+    public TalkMemberDto addTalkMemberToTalk(Long userId, Long talkId)
             throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
-        User user = getUserById(userId);
-        Talk talk = getTalkById(talkId);
+        User user = userService.findEntityById(userId);
+        Talk talk = findEntityById(talkId);
         return talkMemberDtoMapper
                 .fromEntity(
                         getTalkMemberByUserIdAndTalkId(userId, talkId)
@@ -108,9 +100,10 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
                                         addTalkMemberToTalk(talk, user)));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public void removeTalkMemberFromTalk(Long talkId, Long userId) throws ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
+    public void removeTalkMemberFromTalk(Long userId, Long talkId) throws ServiceException {
         getTalkMemberByUserIdAndTalkId(userId, talkId)
                 .ifPresent(
                         talkMember -> talkMemberRepository.deleteById(talkMember.getId()));

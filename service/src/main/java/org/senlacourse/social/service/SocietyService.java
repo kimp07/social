@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.ISocietyService;
+import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.SocietyMember;
 import org.senlacourse.social.domain.User;
@@ -14,7 +14,11 @@ import org.senlacourse.social.dto.SocietyDto;
 import org.senlacourse.social.dto.SocietyMemberDto;
 import org.senlacourse.social.mapstruct.SocietyDtoMapper;
 import org.senlacourse.social.mapstruct.SocietyMemberDtoMapper;
-import org.senlacourse.social.repository.*;
+import org.senlacourse.social.repository.SocietyMemberRepository;
+import org.senlacourse.social.repository.SocietyRepository;
+import org.senlacourse.social.repository.WallMessageCommentRepository;
+import org.senlacourse.social.repository.WallMessageRepository;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,45 +27,45 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j
-@Transactional
 public class SocietyService extends AbstractService<Society> implements ISocietyService {
-
-    private static final String USER_NOT_DEFINED_FOR_ID = "User not defined for id=";
 
     private final SocietyRepository societyRepository;
     private final SocietyMemberRepository societyMemberRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
     private final WallMessageRepository wallMessageRepository;
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final SocietyDtoMapper societyDtoMapper;
     private final SocietyMemberDtoMapper societyMemberDtoMapper;
-    private final IAuthorizedUserService authorizedUserService;
 
     private SocietyMember findEntitySocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
             throws ObjectNotFoundException {
         return validateEntityNotNull(
                 societyMemberRepository
-                        .findByUserIdAndSocietyId(userId, societyId).orElse(null),
-                "Society member not defined for user id=" + userId + " and society id=" + societyId);
+                        .findByUserIdAndSocietyId(userId, societyId).orElse(null));
     }
 
     @Override
-    Society findEntityById(Long id) throws ObjectNotFoundException {
-        Society society = societyRepository.findById(id).orElse(null);
-        return validateEntityNotNull(society, "Society not defined for id=" + id);
+    public Society findEntityById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(
+                societyRepository
+                        .findById(id)
+                        .orElse(null));
     }
 
     @Override
     public Page<SocietyDto> findAll(Pageable pageable) {
-        return societyDtoMapper.map(societyRepository.findAll(pageable));
+        return societyDtoMapper.map(
+                societyRepository.findAll(pageable));
     }
 
     @Override
     public Page<SocietyDto> findAll(String title, Pageable pageable) {
         if (title == null || title.isEmpty()) {
-            return societyDtoMapper.map(societyRepository.findAll(pageable));
+            return societyDtoMapper.map(
+                    societyRepository.findAll(pageable));
         } else {
-            return societyDtoMapper.map(societyRepository.findAllByTitle(title, pageable));
+            return societyDtoMapper.map(
+                    societyRepository.findAllByTitle(title, pageable));
         }
     }
 
@@ -71,12 +75,11 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                 societyMemberRepository.findAllBySocietyId(societyId, pageable));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public SocietyDto createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
-        User owner = validateEntityNotNull(
-                userRepository.findById(dto.getOwnerId()).orElse(null),
-                USER_NOT_DEFINED_FOR_ID + dto.getOwnerId());
+        User owner = userService.findEntityById(dto.getOwnerId());
         Society society = new Society()
                 .setTitle(dto.getTitle())
                 .setOwner(owner);
@@ -88,9 +91,10 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         return societyDtoMapper.fromEntity(society);
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
         Society society = findEntityById(societyId);
         if (!society.getOwner().getId().equals(userId)) {
             SocietyMember societyMember = findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId);
@@ -98,16 +102,17 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         }
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public SocietyMemberDto addUserToSociety(Long userId, Long societyId)
             throws ObjectNotFoundException, ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
         Society society = findEntityById(societyId);
-        User user = userRepository.findById(userId).orElse(null);
-        validateEntityNotNull(user, USER_NOT_DEFINED_FOR_ID + userId);
+        User user = userService.findEntityById(userId);
         if (isUserMemberOfSociety(userId, societyId)) {
             return societyMemberDtoMapper
-                    .fromEntity(findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId));
+                    .fromEntity(
+                            findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId));
         } else {
             return societyMemberDtoMapper
                     .fromEntity(
@@ -118,20 +123,22 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         }
     }
 
+    @AuthorizedUser
     @Override
     public SocietyMemberDto findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
             throws ServiceException {
-        userId = authorizedUserService.injectAuthorizedUserId(userId);
         return societyMemberDtoMapper
                 .fromEntity(
                         findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId));
     }
 
+    @AuthorizedUser
     @Override
     public boolean isUserMemberOfSociety(Long userId, Long societyId) {
         return societyMemberRepository.findByUserIdAndSocietyId(userId, societyId).isPresent();
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteSocietyById(Long id) throws ObjectNotFoundException {
         Society society = findEntityById(id);

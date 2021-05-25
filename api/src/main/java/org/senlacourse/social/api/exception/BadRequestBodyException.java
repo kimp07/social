@@ -1,4 +1,4 @@
-package org.senlacourse.social.security.util;
+package org.senlacourse.social.api.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -27,10 +27,12 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="friendship_members_pk"/>
             </column>
             <column name="friendship_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_members_friendship_fk"/>
+                <constraints nullable="false" foreignKeyName="friendship_members_friendship_fk"
+                             referencedTableName="friendships" referencedColumnNames="id"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_members_user_fk"/>
+                <constraints nullable="false" foreignKeyName="friendship_members_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet>  <!-- //TABLE friendship_members -->
@@ -60,10 +62,12 @@
                 <constraints nullable="false"/>
             </column>
             <column name="sender_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_requests_sender_fk"/>
+                <constraints nullable="false" foreignKeyName="friendship_requests_sender_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
             <column name="recipient_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_requests_recipient_fk"/>
+                <constraints nullable="false" foreignKeyName="friendship_requests_recipient_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE friendship_requests -->
@@ -122,7 +126,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="owner_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="societies_owner_fk"/>
+                <constraints nullable="false" foreignKeyName="societies_owner_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE societies -->
@@ -159,10 +164,12 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="society_members_pk"/>
             </column>
             <column name="society_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="society_members_society_fk"/>
+                <constraints nullable="false" foreignKeyName="society_members_society_fk"
+                             referencedTableName="societies" referencedColumnNames="id"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="society_members_user_fk"/>
+                <constraints nullable="false" foreignKeyName="society_members_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE society_members -->
@@ -199,7 +206,8 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talks_pk"/>
             </column>
             <column name="owner_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talks_owner_fk"/>
+                <constraints nullable="false" foreignKeyName="talks_owner_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE talks -->
@@ -226,10 +234,12 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talk_members_pk"/>
             </column>
             <column name="talk_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_members_talk_fk"/>
+                <constraints nullable="false" foreignKeyName="talk_members_talk_fk"
+                             referencedTableName="talks" referencedColumnNames="id"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_members_user_fk"/>
+                <constraints nullable="false" foreignKeyName="talk_members_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE talk_members -->
@@ -256,10 +266,12 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talk_messages_pk"/>
             </column>
             <column name="talk_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_messages_talk_fk"/>
+                <constraints nullable="false" foreignKeyName="talk_messages_talk_fk"
+                             referencedTableName="talks" referencedColumnNames="id"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_messages_user_fk"/>
+                <constraints nullable="false" foreignKeyName="talk_messages_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
@@ -292,10 +304,12 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talk_messages_cache_pk"/>
             </column>
             <column name="talk_message_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_messages_cache_talk_message_fk"/>
+                <constraints nullable="false" foreignKeyName="talk_messages_cache_talk_message_fk"
+                             referencedTableName="talk_messages" referencedColumnNames="id"/>
             </column>
             <column name="recipient_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_requests_recipient_fk"/>
+                <constraints nullable="false" foreignKeyName="friendship_requests_recipient_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE talk_messages_cache -->
@@ -343,7 +357,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="role_id" type="BIGINT">
-                <constraints nullable="false"/>
+                <constraints nullable="false" foreignKeyName="users_role_fk"
+                             referencedTableName="roles" referencedColumnNames="id"/>
             </column>
             <column name="auth_provider" type="VARCHAR(20)"/>
             <column name="auth_provider_id" type="VARCHAR(200)"/>
@@ -416,7 +431,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="society_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="walls_society_fk" uniqueConstraintName="walls_society_unique" unique="true"/>
+                <constraints nullable="false" foreignKeyName="walls_society_fk"
+                             referencedTableName="societies" referencedColumnNames="id"
+                             uniqueConstraintName="walls_society_unique" unique="true"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE walls -->
@@ -435,10 +452,12 @@
                 <constraints nullable="false"/>
             </column>
             <column name="wall_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="wall_messages_wall_fk"/>
+                <constraints nullable="false" foreignKeyName="wall_messages_wall_fk"
+                             referencedTableName="walls" referencedColumnNames="id"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="wall_messages_user_fk"/>
+                <constraints nullable="false" foreignKeyName="wall_messages_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -474,13 +493,15 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="wall_message_comments_pk"/>
             </column>
             <column name="wall_message_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="wall_message_comments_wall_message_fk"/>
+                <constraints nullable="false" foreignKeyName="wall_message_comments_wall_message_fk"
+                             referencedTableName="wall_messages" referencedColumnNames="id"/>
             </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="wall_message_comments_user_fk"/>
+                <constraints nullable="false" foreignKeyName="wall_message_comments_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -516,7 +537,8 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="user_images_pk"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="user_images_user_fk"/>
+                <constraints nullable="false" foreignKeyName="user_images_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
             </column>
             <column name="img_file_name" type="VARCHAR(100)">
                 <constraints nullable="false"/>

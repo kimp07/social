@@ -20,18 +20,18 @@ import javax.validation.constraints.NotNull;
 @Service
 @RequiredArgsConstructor
 @Log4j
-@Transactional
 public class RoleService extends AbstractService<Role> implements IRoleService {
 
-    public static final String NOT_DEFINED_FOR_ID = "Role not defined for id=";
     private final RoleRepository roleRepository;
     private final RoleDtoMapper roleDtoMapper;
     private final NewRoleDtoMapper newRoleDtoMapper;
 
     @Override
-    Role findEntityById(Long id) throws ObjectNotFoundException {
-        Role role = roleRepository.findById(id).orElse(null);
-        return validateEntityNotNull(role, NOT_DEFINED_FOR_ID + id);
+    public Role findEntityById(Long id) throws ObjectNotFoundException {
+        return validateEntityNotNull(
+                roleRepository
+                        .findById(id)
+                        .orElse(null));
     }
 
     @Override
@@ -42,10 +42,11 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
 
     @Override
     public RoleDto findByName(String roleName) throws ObjectNotFoundException {
-        Role role = validateEntityNotNull(
-                roleRepository.findByName(roleName).orElse(null),
-                "Role not defined for roleName=" + roleName);
-        return roleDtoMapper.fromEntity(role);
+        return roleDtoMapper.fromEntity(
+                validateEntityNotNull(
+                        roleRepository
+                                .findByName(roleName)
+                                .orElse(null)));
     }
 
     @Override
@@ -53,6 +54,7 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
         return roleDtoMapper.map(roleRepository.findAll(pageable));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public RoleDto saveRole(NewRoleDto dto) {
         return roleDtoMapper.fromEntity(
@@ -60,6 +62,7 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
                         newRoleDtoMapper.toEntity(dto)));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public RoleDto updateRole(@NotNull RoleDto dto) throws ObjectNotFoundException {
         Role roleFromBase = findEntityById(dto.getId());
@@ -69,6 +72,7 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
         return roleDtoMapper.fromEntity(roleRepository.save(roleFromBase));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         Role roleFromBase = findEntityById(id);

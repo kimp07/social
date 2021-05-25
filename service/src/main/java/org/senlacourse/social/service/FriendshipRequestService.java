@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IFriendshipRequestService;
+import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Friendship;
 import org.senlacourse.social.domain.FriendshipMember;
 import org.senlacourse.social.domain.FriendshipRequest;
@@ -16,7 +16,7 @@ import org.senlacourse.social.mapstruct.FriendshipRequestDtoMapper;
 import org.senlacourse.social.repository.FriendshipMemberRepository;
 import org.senlacourse.social.repository.FriendshipRepository;
 import org.senlacourse.social.repository.FriendshipRequestRepository;
-import org.senlacourse.social.repository.UserRepository;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,27 +29,18 @@ import java.util.List;
 @Service
 @Log4j
 @RequiredArgsConstructor
-@Transactional
 public class FriendshipRequestService extends AbstractService<FriendshipRequest> implements IFriendshipRequestService {
-
-    private static final String USER_NOT_DEFINED_FOR_ID = "User not defined for id=";
 
     private final FriendshipRequestRepository friendshipRequestRepository;
     private final FriendshipRequestDtoMapper friendshipRequestDtoMapper;
-    private final UserRepository userRepository;
-    private final IAuthorizedUserService authorizedUserService;
+    private final IUserService userService;
     private final FriendshipRepository friendshipRepository;
     private final FriendshipMemberRepository friendshipMemberRepository;
 
     @Override
-    protected FriendshipRequest findEntityById(Long id) throws ObjectNotFoundException {
+    public FriendshipRequest findEntityById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = friendshipRequestRepository.findById(id).orElse(null);
-        return validateEntityNotNull(friendshipRequest, USER_NOT_DEFINED_FOR_ID + id);
-    }
-
-    private User findUserById(Long id) throws ObjectNotFoundException {
-        User user = userRepository.findById(id).orElse(null);
-        return validateEntityNotNull(user, USER_NOT_DEFINED_FOR_ID + id);
+        return validateEntityNotNull(friendshipRequest);
     }
 
     @Override
@@ -58,40 +49,46 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
         return friendshipRequestDtoMapper.fromEntity(friendshipRequest);
     }
 
+    @AuthorizedUser
     @Override
-    public Page<FriendshipRequestDto> findAllBySenderId(Long senderId, Pageable pageable) throws ServiceException {
-        authorizedUserService.injectAuthorizedUserId(senderId);
+    public Page<FriendshipRequestDto> findAllBySenderId(Long userId, Pageable pageable) throws ServiceException {
         return friendshipRequestDtoMapper.map(
-                friendshipRequestRepository.findAllBySenderId(senderId, pageable));
+                friendshipRequestRepository.findAllBySenderId(userId, pageable));
     }
 
+    @AuthorizedUser
     @Override
-    public Page<FriendshipRequestDto> findAllByRecipientId(Long recipientId, Pageable pageable)
+    public Page<FriendshipRequestDto> findAllByRecipientId(Long userId, Pageable pageable)
             throws ServiceException {
-        authorizedUserService.injectAuthorizedUserId(recipientId);
         return friendshipRequestDtoMapper.map(
-                friendshipRequestRepository.findAllByRecipientId(recipientId, pageable));
+                friendshipRequestRepository.findAllByRecipientId(userId, pageable));
     }
 
+    @AuthorizedUser
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public FriendshipRequestDto saveNewFriendshipRequest(NewFriendshipRequestDto dto)
             throws ObjectNotFoundException, ServiceException {
-        authorizedUserService.injectAuthorizedUserId(dto);
-        User sender =  findUserById(dto.getSenderId());
-        User recipient = findUserById(dto.getRecipientId());
+        User sender = userService.findEntityById(dto.getSenderId());
+        User recipient = userService.findEntityById(dto.getRecipientId());
         FriendshipRequest friendshipRequest = new FriendshipRequest()
                 .setSender(sender)
                 .setRecipient(recipient)
                 .setRequestDate(LocalDateTime.now());
-        return friendshipRequestDtoMapper.fromEntity(friendshipRequestRepository.save(friendshipRequest));
+        return friendshipRequestDtoMapper
+                .fromEntity(
+                        friendshipRequestRepository
+                                .save(friendshipRequest));
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
         friendshipRequestRepository.deleteById(friendshipRequest.getId());
     }
 
+    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
