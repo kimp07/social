@@ -2,6 +2,117 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <!-- TABLE roles -->
+    <changeSet id="2021-05-06_8-00AM-04" author="alex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="roles"/>
+            </not>
+        </preConditions>
+        <createTable tableName="roles">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_pk"/>
+            </column>
+            <column name="role_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_disabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet><!-- //TABLE roles -->
+    <!-- TABLE users -->
+    <changeSet author="alex" id="2021-05-06_8-00AM-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pk"/>
+            </column>
+            <column name="user_login" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="users_user_login_unique"/>
+            </column>
+            <column name="user_password" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="users_email_unique"/>
+            </column>
+            <column name="u_enabled" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="u_non_locked" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="u_non_expired" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="u_credentials_non_expired" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="users_role_fk"
+                             referencedTableName="roles" referencedColumnNames="id"/>
+            </column>
+            <column name="auth_provider" type="VARCHAR(20)"/>
+            <column name="auth_provider_id" type="VARCHAR(200)"/>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birth_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="about_me" type="VARCHAR(255)"/>
+            <column name="user_image_file_name" type="VARCHAR(100)"/>
+        </createTable>
+    </changeSet><!-- //TABLE users -->
+    <!-- TABLE users INDEXES-->
+    <changeSet author="alex" id="2021-05-06_8-00AM-11-01">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="users_login_idx" tableName="users"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="users_login_idx" tableName="users">
+            <column name="user_login"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="alex" id="2021-05-06_8-00AM-11-02">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="users_email_idx" tableName="users"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="users_email_idx" tableName="users">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="alex" id="2021-05-06_8-00AM-11-03">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="users_first_name_idx" tableName="users"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="users_first_name_idx" tableName="users">
+            <column name="first_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="alex" id="2021-05-06_8-00AM-11-04">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="users_surname_idx" tableName="users"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="users_surname_idx" tableName="users">
+            <column name="surname"/>
+        </createIndex>
+    </changeSet> <!-- //TABLE users INDEXES -->
     <!-- TABLE friendships -->
     <changeSet author="alex" id="2021-05-06_8-00AM-01">
         <preConditions onFail="MARK_RAN">
@@ -92,25 +203,6 @@
             <column name="recipient_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE friendship_requests INDEXES -->
-    <!-- TABLE roles -->
-    <changeSet id="2021-05-06_8-00AM-04" author="alex">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="roles"/>
-            </not>
-        </preConditions>
-        <createTable tableName="roles">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_pk"/>
-            </column>
-            <column name="role_name" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="role_disabled" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet><!-- //TABLE roles -->
     <!-- TABLE societies -->
     <changeSet author="alex" id="2021-05-06_8-00AM-05">
         <preConditions onFail="MARK_RAN">
@@ -324,98 +416,6 @@
             <column name="recipient_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE talk_messages_cache INDEXES -->
-    <!-- TABLE users -->
-    <changeSet author="alex" id="2021-05-06_8-00AM-11">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="users"/>
-            </not>
-        </preConditions>
-        <createTable tableName="users">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pk"/>
-            </column>
-            <column name="user_login" type="VARCHAR(50)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="users_user_login_unique"/>
-            </column>
-            <column name="user_password" type="VARCHAR(512)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="email" type="VARCHAR(100)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="users_email_unique"/>
-            </column>
-            <column name="u_enabled" type="BOOLEAN" defaultValue="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="u_non_locked" type="BOOLEAN" defaultValue="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="u_non_expired" type="BOOLEAN" defaultValue="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="u_credentials_non_expired" type="BOOLEAN" defaultValue="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="role_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="users_role_fk"
-                             referencedTableName="roles" referencedColumnNames="id"/>
-            </column>
-            <column name="auth_provider" type="VARCHAR(20)"/>
-            <column name="auth_provider_id" type="VARCHAR(200)"/>
-            <column name="first_name" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="surname" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="birth_date" type="DATE">
-                <constraints nullable="false"/>
-            </column>
-            <column name="about_me" type="VARCHAR(255)"/>
-            <column name="user_image_file_name" type="VARCHAR(100)"/>
-        </createTable>
-    </changeSet><!-- //TABLE users -->
-    <!-- TABLE users INDEXES-->
-    <changeSet author="alex" id="2021-05-06_8-00AM-11-01">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="users_login_idx" tableName="users"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="users_login_idx" tableName="users">
-            <column name="user_login"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="alex" id="2021-05-06_8-00AM-11-02">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="users_email_idx" tableName="users"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="users_email_idx" tableName="users">
-            <column name="email"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="alex" id="2021-05-06_8-00AM-11-03">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="users_first_name_idx" tableName="users"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="users_first_name_idx" tableName="users">
-            <column name="first_name"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="alex" id="2021-05-06_8-00AM-11-04">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="users_surname_idx" tableName="users"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="users_surname_idx" tableName="users">
-            <column name="surname"/>
-        </createIndex>
-    </changeSet> <!-- //TABLE users INDEXES -->
     <!-- TABLE walls -->
     <changeSet author="alex" id="2021-05-06_8-00AM-12">
         <preConditions onFail="MARK_RAN">
