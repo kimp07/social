@@ -85,4 +85,13 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
         return userImageDtoMapper.fromEntity(
                 userImageRepository.save(userImage));
     }
+
+    @AuthorizedUser
+    @Override
+    public void setImageToUserAvatar(Long userId, Long imageId) throws ObjectNotFoundException {
+        User user = userService.findEntityById(userId);
+        UserImage image = findEntityById(imageId);
+        user.setUserImageFileName(image.getImgFileName());
+        userService.updateUser(userDtoMapper.fromEntity(user));
+    }
 }
