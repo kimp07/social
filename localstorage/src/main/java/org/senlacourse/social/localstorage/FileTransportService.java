@@ -5,14 +5,20 @@ import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ApplicationException;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.localstorage.IFileTransportService;
-import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IUserImageService;
 import org.senlacourse.social.dto.NewUserImageDto;
+import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -21,7 +27,6 @@ import java.io.IOException;
 @Log4j
 public class FileTransportService implements IFileTransportService {
 
-    private final IAuthorizedUserService authorizedUserService;
     private final IUserImageService userImageService;
 
     @Value("${files.dir:/imgstorage}")
@@ -37,30 +42,29 @@ public class FileTransportService implements IFileTransportService {
         }
     }
 
-    private String generateFileName(MultipartFile file, Long userId, Long currentMillis) {
+    private String generateFileName(Long userId, MultipartFile file, Long currentMillis) {
         return "/f_" + userId.toString() + "_" + currentMillis.toString() +
                 getFileNameSuffix(file);
     }
 
-    private File getConvertFile(MultipartFile file, Long userId) {
-        return new File(
-                localStorageDir
-                        + generateFileName(
-                        file,
+    private File getConvertFile(Long userId, MultipartFile file) {
+        return new File(localStorageDir,
+                generateFileName(
                         userId,
+                        file,
                         System.currentTimeMillis()));
     }
 
     private boolean storageDirExists() {
         File directory = new File(localStorageDir);
-        if (!directory.exists()){
+        if (!directory.exists()) {
             return directory.mkdir();
         }
         return true;
     }
 
-    private String uploadFileToLocalStorage(MultipartFile file, Long userId) throws ApplicationException {
-        File convertFile = getConvertFile(file, userId);
+    private String uploadFileToLocalStorage(Long userId, MultipartFile file) throws ApplicationException {
+        File convertFile = getConvertFile(userId, file);
         try (FileOutputStream fout = new FileOutputStream(convertFile)) {
             fout.write(file.getBytes());
         } catch (IOException e) {
@@ -70,16 +74,50 @@ public class FileTransportService implements IFileTransportService {
         return convertFile.getName();
     }
 
+    @AuthorizedUser
     @Override
-    public void uploadFile(MultipartFile file) throws ApplicationException, ObjectNotFoundException {
+    public void uploadFile(Long userId, MultipartFile file) throws ApplicationException, ObjectNotFoundException {
         if (!storageDirExists()) {
             ApplicationException e = new ApplicationException("Directory " + localStorageDir + " not exixts");
             log.error(e.getMessage(), e);
             throw e;
         }
-        String fileName = uploadFileToLocalStorage(file, authorizedUserService.getAuthorizedUserId());
+        String fileName = uploadFileToLocalStorage(userId, file);
         userImageService.save(
                 new NewUserImageDto()
-                .setImgFileName(fileName));
+                        .setImgFileName(fileName));
+    }
+
+    private File getImageFile(Long imageId) throws ObjectNotFoundException {
+        return new File(
+                localStorageDir,
+                userImageService
+                        .findById(imageId)
+                        .getImgFileName());
+    }
+
+    @Override
+    public ResponseEntity<Object> downloadFile(Long imageId) throws ObjectNotFoundException, ApplicationException {
+        File file = getImageFile(imageId);
+        try {
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+            HttpHeaders headers = new HttpHeaders();
+
+            headers.add("Content-Disposition", String.format("attachment; filename=`%s`", file.getName()));
+            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+            headers.add("Pragma", "no-cache");
+            headers.add("Expires", "0");
+
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .contentType(
+                            MediaType.parseMediaType("application/txt"))
+                    .body(resource);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new ApplicationException(e);
+        }
     }
 }
