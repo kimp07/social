@@ -14,9 +14,11 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @Log4j
 @RequiredArgsConstructor
 public class FriendshipService extends AbstractService<Friendship> implements IFriendshipService {
@@ -31,7 +33,6 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
         return validateEntityNotNull(friendship);
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         Friendship friendship = findEntityById(id);

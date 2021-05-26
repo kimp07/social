@@ -20,6 +20,7 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @Log4j
 @RequiredArgsConstructor
 public class FriendshipRequestService extends AbstractService<FriendshipRequest> implements IFriendshipRequestService {
@@ -65,7 +67,6 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public FriendshipRequestDto saveNewFriendshipRequest(NewFriendshipRequestDto dto)
             throws ObjectNotFoundException, ServiceException {
@@ -81,14 +82,12 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
                                 .save(friendshipRequest));
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
         friendshipRequestRepository.deleteById(friendshipRequest.getId());
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);

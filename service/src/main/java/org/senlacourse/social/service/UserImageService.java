@@ -17,9 +17,11 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 @Log4j
 public class UserImageService extends AbstractService<UserImage> implements IUserImageService {
@@ -51,7 +53,6 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteByUserImageIdAndUserId(Long userId, Long userImageId)
             throws ObjectNotFoundException, ServiceException {
@@ -66,7 +67,6 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteAllByUserId(Long userId) throws ObjectNotFoundException {
         User user = userService.findEntityById(userId);
@@ -76,7 +76,6 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserImageDto save(NewUserImageDto dto) throws ObjectNotFoundException {
         UserImage userImage = new UserImage()

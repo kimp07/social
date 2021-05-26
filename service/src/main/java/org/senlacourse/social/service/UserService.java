@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
 public class UserService extends AbstractService<User> implements IUserService {
@@ -117,7 +118,6 @@ public class UserService extends AbstractService<User> implements IUserService {
         return user;
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto saveUser(NewUserDto dto) throws ObjectNotFoundException, ServiceException {
         User user = handleNewUserDto(dto);
@@ -133,7 +133,6 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userRepository.save(user);
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUser(UserDto dto) throws ObjectNotFoundException {
         User userFromBase = findEntityById(dto.getId());
@@ -142,7 +141,6 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userDtoMapper.fromEntity(updateUser(user));
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUser(UpdateUserDto dto) throws ObjectNotFoundException, ServiceException {
         authorizedUserService.injectAuthorizedUserId(dto);
@@ -155,7 +153,6 @@ public class UserService extends AbstractService<User> implements IUserService {
         return userDtoMapper.fromEntity(updateUser(userFromBase));
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUser(UserSimpleDto dto) throws ObjectNotFoundException {
         User userFromBase = findEntityById(dto.getId());
@@ -168,7 +165,6 @@ public class UserService extends AbstractService<User> implements IUserService {
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public UserDto updateUserPassword(UserPasswordDto dto) throws ObjectNotFoundException, ServiceException {
         User userFromBase = findEntityById(dto.getId());
@@ -177,7 +173,6 @@ public class UserService extends AbstractService<User> implements IUserService {
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         User userFromBase = findEntityById(id);

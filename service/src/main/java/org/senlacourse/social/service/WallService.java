@@ -9,8 +9,11 @@ import org.senlacourse.social.dto.WallDto;
 import org.senlacourse.social.mapstruct.WallDtoMapper;
 import org.senlacourse.social.repository.WallRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 @Log4j
 public class WallService extends AbstractService<Wall> implements IWallService {

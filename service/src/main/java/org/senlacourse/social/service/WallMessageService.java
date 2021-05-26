@@ -21,11 +21,13 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 @Log4j
 public class WallMessageService extends AbstractService<WallMessage> implements IWallMessageService {
@@ -54,7 +56,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteAllMessagesByWallIdAndUserId(Long userId, Long wallId)
             throws ObjectNotFoundException, ServiceException {
@@ -67,7 +68,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteByMessageIdAndUserId(Long userId, Long wallMessageId)
             throws ObjectNotFoundException, ServiceException {
@@ -115,7 +115,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public WallMessageDto addNewMessage(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
         User user = userService.findEntityById(dto.getUserId());
@@ -141,7 +140,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public WallMessageDto editWallMessage(EditMessageDto dto) throws ObjectNotFoundException, ServiceException {
         User user = userService.findEntityById(dto.getUserId());
@@ -150,7 +148,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
                 editWallMessage(user, wallMessage, dto.getMessage()));
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void addLikeToMessage(Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = findEntityById(messageId);
@@ -159,7 +156,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
         wallMessageRepository.save(wallMessage);
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void addDislikeToMessage(Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = findEntityById(messageId);

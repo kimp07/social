@@ -22,10 +22,12 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @Log4j
 public class SocietyService extends AbstractService<Society> implements ISocietyService {
 
@@ -76,7 +78,6 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public SocietyDto createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException, ServiceException {
         User owner = userService.findEntityById(dto.getOwnerId());
@@ -92,7 +93,6 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException, ServiceException {
         Society society = findEntityById(societyId);
@@ -103,7 +103,6 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public SocietyMemberDto addUserToSociety(Long userId, Long societyId)
             throws ObjectNotFoundException, ServiceException {
@@ -138,7 +137,6 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         return societyMemberRepository.findByUserIdAndSocietyId(userId, societyId).isPresent();
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteSocietyById(Long id) throws ObjectNotFoundException {
         Society society = findEntityById(id);

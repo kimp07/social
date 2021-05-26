@@ -23,11 +23,13 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 @Log4j
 public class WallMessageCommentService extends AbstractService<WallMessageComment> implements IWallMessageCommentService {
@@ -56,7 +58,6 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteAllByMessageId(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = wallMessageService.findEntityById(messageId);
@@ -67,7 +68,6 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteByCommentIdAndUserId(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(wallMessageCommentId);
@@ -109,7 +109,6 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public WallMessageCommentDto addNewWallMessageComment(NewWallMessageCommentDto dto)
             throws ObjectNotFoundException, ServiceException {
@@ -136,7 +135,6 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public WallMessageCommentDto editWallMessageComment(EditMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
@@ -146,7 +144,6 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
                 editWallMessageComment(user, wallMessageComment, dto.getMessage()));
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void addLikeToMessage(Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(messageId);
@@ -155,7 +152,6 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
         wallMessageCommentRepository.save(wallMessageComment);
     }
 
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void addDislikeToMessage(Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(messageId);

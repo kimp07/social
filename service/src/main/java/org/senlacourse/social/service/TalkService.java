@@ -20,11 +20,13 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 @Log4j
 public class TalkService extends AbstractService<Talk> implements ITalkService {
@@ -71,7 +73,6 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public TalkDto addNewTalk(NewTalkDto dto) throws ObjectNotFoundException, ServiceException {
         User sender = userService.findEntityById(dto.getSenderId());
@@ -87,7 +88,6 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public TalkMemberDto addTalkMemberToTalk(Long userId, Long talkId)
             throws ObjectNotFoundException, ServiceException {
@@ -101,7 +101,6 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void removeTalkMemberFromTalk(Long userId, Long talkId) throws ServiceException {
         getTalkMemberByUserIdAndTalkId(userId, talkId)

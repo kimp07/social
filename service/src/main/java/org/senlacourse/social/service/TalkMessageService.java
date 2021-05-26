@@ -24,11 +24,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 @Log4j
 public class TalkMessageService extends AbstractService<TalkMessage> implements ITalkMessageService {
@@ -102,7 +104,6 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public TalkMessageDto addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException {
@@ -136,14 +137,12 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteCacheMessagesByRecipientId(Long userId) {
         talkMessagesCacheRepository.deleteAllByRecipientId(userId);
     }
 
     @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     @Override
     public void deleteCacheMessagesByRecipientIdAndTalkId(Long userId, Long talkId) {
         talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(userId, talkId);
