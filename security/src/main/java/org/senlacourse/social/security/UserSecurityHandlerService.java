@@ -102,16 +102,11 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
 
     private String getToken(String userName, boolean temporaryToken) throws ObjectNotFoundException {
         UserDto user = userService.findByUserLogin(userName);
-        if (user != null) {
-            return tokenProvider.createToken(
-                    userName,
-                    user.getPassword(),
-                    temporaryToken);
-        } else {
-            ObjectNotFoundException e = new ObjectNotFoundException("User not defined for name=" + userName);
-            log.error(e.getMessage(), e);
-            throw e;
-        }
+        return tokenProvider.createToken(
+                userName,
+                user.getPassword(),
+                temporaryToken);
+
     }
 
     @Override

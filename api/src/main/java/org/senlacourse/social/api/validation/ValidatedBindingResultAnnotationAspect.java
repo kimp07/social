@@ -16,7 +16,7 @@ import org.springframework.validation.BindingResult;
 @Component
 @RequiredArgsConstructor
 @Log4j
-public class ValidatedBindingResultAspect {
+public class ValidatedBindingResultAnnotationAspect {
 
     @Pointcut("@annotation(org.senlacourse.social.api.validation.ValidatedBindingResult) && args(.., bindingResult)")
     public void callValidationBindingResult(BindingResult bindingResult) {

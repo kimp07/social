@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Log4j
-public class AuthorizedUserAspect {
+public class AuthorizedUserAnnotationAspect {
 
     private final IAuthorizedUserService authorizedUserService;
 
