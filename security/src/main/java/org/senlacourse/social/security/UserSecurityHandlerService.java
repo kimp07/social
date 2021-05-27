@@ -8,6 +8,7 @@ import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.api.service.IRoleService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.dto.AuthDto;
+import org.senlacourse.social.dto.EmailDto;
 import org.senlacourse.social.dto.NewRoleDto;
 import org.senlacourse.social.dto.NewUserDto;
 import org.senlacourse.social.dto.RoleDto;
@@ -15,6 +16,9 @@ import org.senlacourse.social.dto.UserDto;
 import org.senlacourse.social.dto.UserPasswordDto;
 import org.senlacourse.social.security.jwt.JwtProvider;
 import org.senlacourse.social.security.service.AuthorizedUser;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +35,14 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     private final IRoleService roleService;
     private final JwtProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender emailSender;
+
+    @Value("${spring.mail.username}")
+    private String emailFrom;
+    @Value("${application.host}")
+    private String applicationHost;
+    @Value("${application.restore-password-redirect}")
+    private String restorePasswordRedirect;
 
     private RoleDto roleUser;
 
@@ -113,6 +125,33 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         ApplicationUserDetails userDetails = (ApplicationUserDetails) auth.getPrincipal();
         return getToken(userDetails.getUsername(), temporaryToken);
+    }
+
+    private String getTemporaryToken(String email) throws ObjectNotFoundException {
+        return getToken(
+                userService
+                        .findByEmail(email)
+                        .getLogin(),
+                true);
+    }
+
+    private void sendRestoreEmail(String email, String temporaryToken) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(emailFrom);
+        message.setTo(email);
+        message.setSubject("Password recovery");
+        String text = "For recovering password follow link\n " +
+                "Link is avaliable in 24 hours\n" +
+                restorePasswordRedirect + "?token=" + temporaryToken;
+        message.setText(text);
+        emailSender.send(message);
+    }
+
+    @Override
+    public String restoreAssess(EmailDto dto) throws ObjectNotFoundException {
+        String temporaryToken = getTemporaryToken(dto.getEmail());
+        sendRestoreEmail(dto.getEmail(), temporaryToken);
+        return temporaryToken;
     }
 
 }

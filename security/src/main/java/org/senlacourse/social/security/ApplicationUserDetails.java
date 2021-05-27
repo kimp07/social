@@ -22,22 +22,30 @@ public class ApplicationUserDetails implements UserDetails {
     private boolean credentialsNonExpired;
     private boolean enabled;
 
-    public static ApplicationUserDetails createFromUser(User user) {
+    public static ApplicationUserDetails createFromUser(User user, boolean temporaryAuthority, String temporaryRole) {
         ApplicationUserDetails userDetails = new ApplicationUserDetails();
         userDetails.userId = user.getId();
         userDetails.userName = user.getLogin();
         userDetails.password = user.getPassword();
-        userDetails.grantedAuthoritys = Collections.singletonList(
-                new SimpleGrantedAuthority(
-                        userDetails.getValidatedRoleName(user.getRole())
-                ));
-
+        if (!temporaryAuthority) {
+            userDetails.grantedAuthoritys = Collections.singletonList(
+                    new SimpleGrantedAuthority(
+                            userDetails.getValidatedRoleName(user.getRole())
+                    ));
+        } else {
+            userDetails.grantedAuthoritys = Collections.singletonList(
+                    new SimpleGrantedAuthority(temporaryRole));
+        }
         userDetails.accountNonExpired = user.getNonExpired();
         userDetails.accountNonLocked = user.getNonLocked();
         userDetails.credentialsNonExpired = user.getCredentialsNonExpired();
         userDetails.enabled = user.getEnabled();
 
         return userDetails;
+    }
+
+    public static ApplicationUserDetails createFromUser(User user) {
+        return createFromUser(user, false, "");
     }
 
     private String getValidatedRoleName(Role role) {

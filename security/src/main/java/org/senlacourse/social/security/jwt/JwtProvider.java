@@ -21,6 +21,7 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
 public class JwtProvider extends AbstractUserDetailsAuthenticationProvider implements IJwtProvider {
 
     private static final String AUTHORIZATION = "Authorization";
-    private static final String JWT_PREFIX = "Bearer ";
+    public static final String JWT_PREFIX = "Bearer ";
 
     private static final String AUTHORITIES_KEY = "auth";
 
@@ -55,6 +56,8 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
     private Long jwtTermDaysTemporary;
     @Value("${application.jwt.base-secret}")
     private String baseSecret;
+    @Value("${application.jwt.temporary-role:ROLE_TEMPORARY}")
+    private String temporaryRole;
 
     private Key key;
 
@@ -90,10 +93,18 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
         return key;
     }
 
+    private String getAuthorities(Authentication authentication, boolean temporaryToken) {
+        if (!temporaryToken) {
+            return authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(","));
+        } else {
+            return temporaryRole;
+        }
+    }
+
     private String createToken(Authentication authentication, boolean temporaryToken) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+        String authorities = getAuthorities(authentication, temporaryToken);
         Date validity;
         validity = Date.from(
                 LocalDate
@@ -125,9 +136,15 @@ public class JwtProvider extends AbstractUserDetailsAuthenticationProvider imple
         if (userDto == null) {
             throw new ApplicationException("User not found for userName " + userName);
         }
-        return ApplicationUserDetails
-                .createFromUser(
-                        userDtoMapper.toEntity(userDto));
+        if (claims.containsKey(AUTHORITIES_KEY) && claims.get(AUTHORITIES_KEY).equals(temporaryRole)) {
+            return ApplicationUserDetails
+                    .createFromUser(
+                            userDtoMapper.toEntity(userDto), true, temporaryRole);
+        } else {
+            return ApplicationUserDetails
+                    .createFromUser(
+                            userDtoMapper.toEntity(userDto));
+        }
     }
 
     private Claims getClaimsFromTocken(String token) {

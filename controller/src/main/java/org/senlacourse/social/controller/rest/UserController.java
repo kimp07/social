@@ -58,7 +58,7 @@ public class UserController {
                 HttpStatus.OK);
     }
 
-    @Secured(value = {"ROLE_USER"})
+    @Secured(value = {"ROLE_USER", "ROLE_TEMPORARY"})
     @GetMapping("/cabinet")
     public ResponseEntity<UserDto> getUserInfo() {
         return new ResponseEntity<>(userService.getCurrentAuthorizedUser(), HttpStatus.OK);
@@ -73,7 +73,7 @@ public class UserController {
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
-    @Secured(value = {"ROLE_USER"})
+    @Secured(value = {"ROLE_USER", "ROLE_TEMPORARY"})
     @ValidatedBindingResult
     @PutMapping("/password")
     public ResponseEntity<ResponseMessageDto> updateUserPassword(@Validated @RequestBody UserPasswordDto dto,

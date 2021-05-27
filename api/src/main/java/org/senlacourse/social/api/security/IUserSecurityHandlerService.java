@@ -3,6 +3,7 @@ package org.senlacourse.social.api.security;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.dto.AuthDto;
+import org.senlacourse.social.dto.EmailDto;
 import org.senlacourse.social.dto.NewUserDto;
 import org.senlacourse.social.dto.RoleDto;
 import org.senlacourse.social.dto.UserDto;
@@ -21,4 +22,6 @@ public interface IUserSecurityHandlerService {
     String getUserToken(AuthDto authDto, boolean temporaryToken) throws ObjectNotFoundException;
 
     String refreshUserToken(boolean temporaryToken) throws ObjectNotFoundException;
+
+    String restoreAssess(EmailDto dto) throws ObjectNotFoundException;
 }

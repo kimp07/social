@@ -38,7 +38,7 @@ public class SocialSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/signIn/**", "/signUp/**")
+                .antMatchers("/signin/**", "/signup/**", "/repair/**")
                 .permitAll()
                 .anyRequest().authenticated();
         http

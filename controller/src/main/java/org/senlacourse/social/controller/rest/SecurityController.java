@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
 import org.senlacourse.social.dto.AuthDto;
+import org.senlacourse.social.dto.EmailDto;
 import org.senlacourse.social.dto.NewUserDto;
 import org.senlacourse.social.dto.ResponseMessageDto;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class SecurityController {
     private final IUserSecurityHandlerService securityHandlerService;
 
     @ValidatedBindingResult
-    @PostMapping("/signUp")
+    @PostMapping("/signup")
     public ResponseEntity<ResponseMessageDto> signUp(@Validated @RequestBody NewUserDto dto,
                                                       BindingResult bindingResult) {
         securityHandlerService.saveUser(dto);
@@ -35,7 +36,7 @@ public class SecurityController {
     }
 
     @ValidatedBindingResult
-    @PostMapping("/signIn")
+    @PostMapping("/signin")
     public ResponseEntity<ResponseMessageDto> signIn(@Validated @RequestBody AuthDto dto,
                                                      BindingResult bindingResult) {
         return new ResponseEntity<>(
@@ -44,7 +45,15 @@ public class SecurityController {
                 HttpStatus.OK);
     }
 
-    @Secured(value = {"ROLE_ADMIN", "ROLE_USER"})
+    @GetMapping("/repair")
+    public ResponseEntity<ResponseMessageDto> restoreAccess(@Validated @RequestBody EmailDto dto) {
+        return new ResponseEntity<>(
+                new ResponseMessageDto(
+                        securityHandlerService.restoreAssess(dto)),
+                HttpStatus.OK);
+    }
+
+    @Secured(value = {"ROLE_USER"})
     @GetMapping("/refresh")
     public ResponseEntity<ResponseMessageDto> refreshToken() {
         return new ResponseEntity<>(
