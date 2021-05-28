@@ -6,6 +6,7 @@ import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.dto.NewSocietyDto;
 import org.senlacourse.social.dto.SocietyDto;
 import org.senlacourse.social.dto.SocietyMemberDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,14 +20,14 @@ public interface ISocietyService extends IService<Society> {
 
     SocietyDto createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException, ServiceException;
 
-    void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException, ServiceException;
+    void removeUserFromSociety(UserIdDto dto, Long societyId) throws ObjectNotFoundException, ServiceException;
 
-    SocietyMemberDto addUserToSociety(Long userId, Long societyId) throws ObjectNotFoundException, ServiceException;
+    SocietyMemberDto addUserToSociety(UserIdDto dto, Long societyId) throws ObjectNotFoundException, ServiceException;
 
-    public SocietyMemberDto findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
+    SocietyMemberDto findSocietyMemberByUserIdAndSocietyId(UserIdDto dto, Long societyId)
             throws ServiceException;
 
-    public boolean isUserMemberOfSociety(Long userId, Long societyId);
+    boolean isUserMemberOfSociety(Long userId, Long societyId);
 
     void deleteSocietyById(Long id) throws ObjectNotFoundException;
 }

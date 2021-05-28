@@ -5,11 +5,7 @@ import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.api.service.IUserImageService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.dto.ResponseMessageDto;
-import org.senlacourse.social.dto.UpdateUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserImageDto;
-import org.senlacourse.social.dto.UserPasswordDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,14 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Locale;
@@ -89,7 +78,7 @@ public class UserController {
                                                             @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
                 userImageService
-                        .findAllImagesByUserId(userId, PageRequest.of(pageNum, pageSize)),
+                        .findAllImagesByUserId(new UserIdDto(userId), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
@@ -97,7 +86,7 @@ public class UserController {
     @PutMapping("/images/{userId}")
     public ResponseEntity<ResponseMessageDto> setImageToAvatar(@PathVariable Long userId,
                                                                @NotNull @RequestParam Long imageId) {
-        userImageService.setImageToUserAvatar(userId, imageId);
+        userImageService.setImageToUserAvatar(new UserIdDto(userId), imageId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
@@ -105,7 +94,7 @@ public class UserController {
     @DeleteMapping("/images/{userId}")
     public ResponseEntity<ResponseMessageDto> deleteUserImage(@PathVariable Long userId,
                                                               @NotNull @RequestParam Long imageId) {
-        userImageService.deleteByUserImageIdAndUserId(userId, imageId);
+        userImageService.deleteByUserImageIdAndUserId(new UserIdDto(userId), imageId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 }

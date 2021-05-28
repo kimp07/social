@@ -5,6 +5,7 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.WallMessage;
 import org.senlacourse.social.dto.EditMessageDto;
 import org.senlacourse.social.dto.NewWallMessageDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.WallMessageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +14,9 @@ public interface IWallMessageService extends IService<WallMessage> {
 
     Page<WallMessageDto> findAllByWallId(Long wallId, Pageable pageable);
 
-    void deleteAllMessagesByWallIdAndUserId(Long userId, Long wallId) throws ObjectNotFoundException, ServiceException;
+    void deleteAllMessagesByWallIdAndUserId(UserIdDto dto, Long wallId) throws ObjectNotFoundException, ServiceException;
 
-    void deleteByMessageIdAndUserId(Long userId, Long wallMessageId) throws ObjectNotFoundException, ServiceException;
+    void deleteByMessageIdAndUserId(UserIdDto dto, Long wallMessageId) throws ObjectNotFoundException, ServiceException;
 
     WallMessageDto addNewMessage(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException;
 

@@ -6,6 +6,7 @@ import org.senlacourse.social.domain.TalkMessage;
 import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,14 +17,14 @@ public interface ITalkMessageService extends IService<TalkMessage> {
     TalkMessageDto addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException;
 
-    Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(Long userId,
+    Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
                                                                                        Pageable pageable)
             throws ObjectNotFoundException;
 
-    ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(Long userId,Long talkId)
+    ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto,Long talkId)
             throws ObjectNotFoundException;
 
-    void deleteCacheMessagesByRecipientId(Long userId);
+    void deleteCacheMessagesByRecipientId(UserIdDto dto);
 
-    void deleteCacheMessagesByRecipientIdAndTalkId(Long userId, Long talkId);
+    void deleteCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Long talkId);
 }

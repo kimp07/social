@@ -8,11 +8,7 @@ import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.util.SqlUtil;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.UpdateUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserPasswordDto;
-import org.senlacourse.social.dto.UserSimpleDto;
+import org.senlacourse.social.dto.*;
 import org.senlacourse.social.mapstruct.NewUserDtoMapper;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.repository.RoleRepository;
@@ -55,11 +51,12 @@ public class UserService extends AbstractService<User> implements IUserService {
                         .orElse(null));
     }
 
+    @AuthorizedUser
     @Override
-    public UserDto findById(Long id) throws ObjectNotFoundException {
+    public UserDto findById(UserIdDto dto) throws ObjectNotFoundException {
         return userDtoMapper
                 .fromEntity(
-                        findEntityById(id));
+                        findEntityById(dto.getAuthorizedUserId()));
     }
 
     @Override
@@ -98,8 +95,8 @@ public class UserService extends AbstractService<User> implements IUserService {
 
     @Override
     public Page<UserDto> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable) {
-        firstName = SqlUtil.normalizeLikeFilter(firstName);
-        surname = SqlUtil.normalizeLikeFilter(surname);
+        firstName = SqlUtil.normalizeLikeFilter(firstName.toLowerCase());
+        surname = SqlUtil.normalizeLikeFilter(surname.toLowerCase());
         return userDtoMapper.map(userRepository.findAllByFirstNameAndSurname(firstName, surname, pageable));
     }
 
@@ -174,8 +171,8 @@ public class UserService extends AbstractService<User> implements IUserService {
 
     @AuthorizedUser
     @Override
-    public void deleteById(Long id) throws ObjectNotFoundException {
-        User userFromBase = findEntityById(id);
+    public void deleteById(UserIdDto dto) throws ObjectNotFoundException {
+        User userFromBase = findEntityById(dto.getAuthorizedUserId());
         userRepository.deleteById(userFromBase.getId());
     }
 

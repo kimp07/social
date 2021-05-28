@@ -37,18 +37,11 @@ public class AuthorizedUserService implements IAuthorizedUserService {
         return getUserDetails().getUserId();
     }
 
+    @Override
     public void injectAuthorizedUserId(IAuthorizedUserDto dto) throws ServiceException {
         if (dto.getAuthorizedUserId() == null || dto.getAuthorizedUserId().equals(0L)) {
             dto.setAuthorizedUserId(getAuthorizedUserId());
         }
-    }
-
-    @Override
-    public Long injectAuthorizedUserId(Long id) throws ServiceException {
-        if (id == null || id.equals(0L)) {
-            return getAuthorizedUserId();
-        }
-        return id;
     }
 
 }

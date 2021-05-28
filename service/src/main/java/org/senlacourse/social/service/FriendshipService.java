@@ -6,7 +6,9 @@ import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.domain.Friendship;
+import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipMemberDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.FriendshipMemberDtoMapper;
 import org.senlacourse.social.repository.FriendshipMemberRepository;
 import org.senlacourse.social.repository.FriendshipRepository;
@@ -42,9 +44,14 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
 
     @AuthorizedUser
     @Override
-    public Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(Long userId, Pageable pageable)
+    public Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(UserIdDto dto, Pageable pageable)
             throws ServiceException {
         return friendshipMemberDtoMapper.map(
-                friendshipMemberRepository.findAllFriendshipMembersByUserId(userId, pageable));
+                friendshipMemberRepository.findAllFriendshipMembersByUserId(dto.getAuthorizedUserId(), pageable));
+    }
+
+    public FriendshipDto findByUserIds(Long[] userIds) {
+        // TODO
+        return null;
     }
 }

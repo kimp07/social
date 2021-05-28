@@ -10,6 +10,4 @@ public interface IAuthorizedUserService {
     Long getAuthorizedUserId() throws ServiceException;
 
     void injectAuthorizedUserId(IAuthorizedUserDto dto);
-
-    Long injectAuthorizedUserId(Long id) throws ServiceException;
 }

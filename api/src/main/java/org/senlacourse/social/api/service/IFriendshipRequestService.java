@@ -5,6 +5,7 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.FriendshipRequest;
 import org.senlacourse.social.dto.FriendshipRequestDto;
 import org.senlacourse.social.dto.NewFriendshipRequestDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,9 +13,9 @@ public interface IFriendshipRequestService extends IService<FriendshipRequest> {
 
     FriendshipRequestDto findFriendshipRequestById(Long id) throws ObjectNotFoundException;
 
-    Page<FriendshipRequestDto> findAllBySenderId(Long userId, Pageable pageable) throws ServiceException;
+    Page<FriendshipRequestDto> findAllBySenderId(UserIdDto dto, Pageable pageable) throws ServiceException;
 
-    Page<FriendshipRequestDto> findAllByRecipientId(Long userId, Pageable pageable) throws ServiceException;
+    Page<FriendshipRequestDto> findAllByRecipientId(UserIdDto dto, Pageable pageable) throws ServiceException;
 
     FriendshipRequestDto saveNewFriendshipRequest(NewFriendshipRequestDto dto)
             throws ObjectNotFoundException, ServiceException;

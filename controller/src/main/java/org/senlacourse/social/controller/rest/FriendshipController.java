@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.IFriendshipRequestService;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.dto.FriendshipMemberDto;
-import org.senlacourse.social.dto.FriendshipRequestDto;
-import org.senlacourse.social.dto.NewFriendshipRequestDto;
-import org.senlacourse.social.dto.ResponseMessageDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -15,15 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -71,7 +60,7 @@ public class FriendshipController {
                                                                 @RequestParam(defaultValue = "10") Integer pageSize,
                                                                 @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipService.findAllFriendshipMembersByUserId(id, PageRequest.of(pageNum, pageSize)),
+                friendshipService.findAllFriendshipMembersByUserId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
@@ -81,7 +70,7 @@ public class FriendshipController {
                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
                                                                     @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipRequestService.findAllByRecipientId(id, PageRequest.of(pageNum, pageSize)),
+                friendshipRequestService.findAllByRecipientId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
@@ -91,7 +80,7 @@ public class FriendshipController {
                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
                                                                     @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipRequestService.findAllBySenderId(id, PageRequest.of(pageNum, pageSize)),
+                friendshipRequestService.findAllBySenderId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 }

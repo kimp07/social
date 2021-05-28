@@ -12,6 +12,7 @@ import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.NewTalkDto;
 import org.senlacourse.social.dto.TalkDto;
 import org.senlacourse.social.dto.TalkMemberDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkDtoMapper;
 import org.senlacourse.social.mapstruct.TalkMemberDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
@@ -59,7 +60,6 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
         return talkDtoMapper.map(talkRepository.findAllByTalkMemberId(userId, pageable));
     }
 
-    @AuthorizedUser
     @Override
     public boolean isUserMemberOfTalk(Long userId, Long talkId) throws ServiceException {
         return getTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
@@ -89,21 +89,21 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
 
     @AuthorizedUser
     @Override
-    public TalkMemberDto addTalkMemberToTalk(Long userId, Long talkId)
+    public TalkMemberDto addTalkMemberToTalk(UserIdDto dto, Long talkId)
             throws ObjectNotFoundException, ServiceException {
-        User user = userService.findEntityById(userId);
+        User user = userService.findEntityById(dto.getAuthorizedUserId());
         Talk talk = findEntityById(talkId);
         return talkMemberDtoMapper
                 .fromEntity(
-                        getTalkMemberByUserIdAndTalkId(userId, talkId)
+                        getTalkMemberByUserIdAndTalkId(dto.getAuthorizedUserId(), talkId)
                                 .orElse(
                                         addTalkMemberToTalk(talk, user)));
     }
 
     @AuthorizedUser
     @Override
-    public void removeTalkMemberFromTalk(Long userId, Long talkId) throws ServiceException {
-        getTalkMemberByUserIdAndTalkId(userId, talkId)
+    public void removeTalkMemberFromTalk(UserIdDto dto, Long talkId) throws ServiceException {
+        getTalkMemberByUserIdAndTalkId(dto.getAuthorizedUserId(), talkId)
                 .ifPresent(
                         talkMember -> talkMemberRepository.deleteById(talkMember.getId()));
     }

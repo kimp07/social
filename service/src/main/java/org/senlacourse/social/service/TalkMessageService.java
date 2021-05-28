@@ -7,14 +7,11 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.domain.Talk;
-import org.senlacourse.social.domain.TalkMember;
-import org.senlacourse.social.domain.TalkMessage;
-import org.senlacourse.social.domain.TalkMessagesCache;
-import org.senlacourse.social.domain.User;
+import org.senlacourse.social.domain.*;
 import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkMessageRepository;
@@ -90,8 +87,16 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     private Pageable getLastPageOfTalkMessages(Long talkId, Pageable pageable) {
         return PageRequest.of(
-                talkMessageRepository.findAllByTalkId(talkId, pageable).getTotalPages(),
-                pageable.getPageSize());
+                talkMessageRepository
+                        .findAllByTalkId(
+                                talkId,
+                                PageRequest.of(
+                                        0,
+                                        pageable.getPageSize(),
+                                        pageable.getSort()))
+                        .getTotalPages(),
+                pageable.getPageSize(),
+                pageable.getSort());
     }
 
     @Override
@@ -122,30 +127,30 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @AuthorizedUser
     @Override
-    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(Long userId,
+    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
                                                                                               Pageable pageable)
             throws ObjectNotFoundException {
-        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(userId, pageable);
+        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
     }
 
     @AuthorizedUser
     @Override
-    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(Long userId,
+    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto,
                                                                                          Long talkId)
             throws ObjectNotFoundException {
-        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(userId, talkId);
+        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
     }
 
     @AuthorizedUser
     @Override
-    public void deleteCacheMessagesByRecipientId(Long userId) {
-        talkMessagesCacheRepository.deleteAllByRecipientId(userId);
+    public void deleteCacheMessagesByRecipientId(UserIdDto dto) {
+        talkMessagesCacheRepository.deleteAllByRecipientId(dto.getAuthorizedUserId());
     }
 
     @AuthorizedUser
     @Override
-    public void deleteCacheMessagesByRecipientIdAndTalkId(Long userId, Long talkId) {
-        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(userId, talkId);
+    public void deleteCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Long talkId) {
+        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
     }
 
 }

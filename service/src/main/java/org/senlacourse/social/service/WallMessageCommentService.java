@@ -8,13 +8,10 @@ import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.service.IWallMessageCommentService;
 import org.senlacourse.social.api.service.IWallMessageService;
-import org.senlacourse.social.domain.Society;
-import org.senlacourse.social.domain.User;
-import org.senlacourse.social.domain.Wall;
-import org.senlacourse.social.domain.WallMessage;
-import org.senlacourse.social.domain.WallMessageComment;
+import org.senlacourse.social.domain.*;
 import org.senlacourse.social.dto.EditMessageDto;
 import org.senlacourse.social.dto.NewWallMessageCommentDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.WallMessageCommentDto;
 import org.senlacourse.social.mapstruct.WallMessageCommentDtoMapper;
 import org.senlacourse.social.repository.WallMessageCommentRepository;
@@ -59,21 +56,22 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
 
     @AuthorizedUser
     @Override
-    public void deleteAllByMessageId(Long userId, Long messageId) throws ObjectNotFoundException, ServiceException {
+    public void deleteAllByMessageId(UserIdDto dto, Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = wallMessageService.findEntityById(messageId);
         Society society = wallMessage.getWall().getSociety();
-        if (society.getOwner().getId().equals(userId)) {
+        if (society.getOwner().getId().equals(dto.getAuthorizedUserId())) {
             wallMessageCommentRepository.deleteAllByWallMessageId(messageId);
         }
     }
 
     @AuthorizedUser
     @Override
-    public void deleteByCommentIdAndUserId(Long wallMessageCommentId, Long userId) throws ObjectNotFoundException, ServiceException {
+    public void deleteByCommentIdAndUserId(UserIdDto dto, Long wallMessageCommentId)
+            throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(wallMessageCommentId);
         User user = wallMessageComment.getUser();
         Society society = wallMessageComment.getWallMessage().getWall().getSociety();
-        if (society.getOwner().getId().equals(userId) || user.getId().equals(userId)) {
+        if (society.getOwner().getId().equals(dto.getAuthorizedUserId()) || user.getId().equals(dto.getAuthorizedUserId())) {
             wallMessageRepository.deleteById(wallMessageCommentId);
         }
     }

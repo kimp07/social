@@ -3,10 +3,7 @@ package org.senlacourse.social.controller.rest;
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.dto.NewSocietyDto;
-import org.senlacourse.social.dto.ResponseMessageDto;
-import org.senlacourse.social.dto.SocietyDto;
-import org.senlacourse.social.dto.SocietyMemberDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,14 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Locale;
@@ -65,7 +55,7 @@ public class SocietyController {
     @PostMapping("/members/{societyId}/{userId}")
     public ResponseEntity<ResponseMessageDto> addUserToSociety(@NotNull @PathVariable Long societyId,
                                                                @PathVariable Long userId) {
-        societyService.addUserToSociety(userId, societyId);
+        societyService.addUserToSociety(new UserIdDto(userId), societyId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
@@ -73,7 +63,7 @@ public class SocietyController {
     @DeleteMapping("/members/{societyId}/{userId}")
     public ResponseEntity<ResponseMessageDto> removeUserFromSociety(@NotNull @PathVariable Long societyId,
                                                                     @PathVariable Long userId) {
-        societyService.removeUserFromSociety(userId, societyId);
+        societyService.removeUserFromSociety(new UserIdDto(userId), societyId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 

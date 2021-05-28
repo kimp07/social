@@ -9,6 +9,7 @@ import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.UserImage;
 import org.senlacourse.social.dto.NewUserImageDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.UserImageDto;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.mapstruct.UserImageDtoMapper;
@@ -47,20 +48,21 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
 
     @AuthorizedUser
     @Override
-    public Page<UserImageDto> findAllImagesByUserId(Long userId, Pageable pageable) throws ObjectNotFoundException {
+    public Page<UserImageDto> findAllImagesByUserId(UserIdDto dto, Pageable pageable) throws ObjectNotFoundException {
         return userImageDtoMapper.map(
-                userImageRepository.findAllByUserId(userId, pageable));
+                userImageRepository.findAllByUserId(dto.getAuthorizedUserId(), pageable));
     }
 
     @AuthorizedUser
     @Override
-    public void deleteByUserImageIdAndUserId(Long userId, Long userImageId)
+    public void deleteByUserImageIdAndUserId(UserIdDto dto, Long userImageId)
             throws ObjectNotFoundException, ServiceException {
         UserImage userImage = findEntityById(userImageId);
-        if (userImage.getUser().getId().equals(userId)) {
+        if (userImage.getUser().getId().equals(dto.getAuthorizedUserId())) {
             userImageRepository.deleteById(userImageId);
         } else {
-            ServiceException e = new ServiceException("User id=" + userId + " can`t delete image id=" + userImageId);
+            ServiceException e
+                    = new ServiceException("User id=" + dto.getAuthorizedUserId() + " can`t delete image id=" + userImageId);
             log.error(e.getMessage(), e);
             throw e;
         }
@@ -68,11 +70,11 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
 
     @AuthorizedUser
     @Override
-    public void deleteAllByUserId(Long userId) throws ObjectNotFoundException {
-        User user = userService.findEntityById(userId);
+    public void deleteAllByUserId(UserIdDto dto) throws ObjectNotFoundException {
+        User user = userService.findEntityById(dto.getAuthorizedUserId());
         user.setUserImageFileName("");
         userService.updateUser(userDtoMapper.fromEntity(user));
-        userImageRepository.deleteAllByUserId(userId);
+        userImageRepository.deleteAllByUserId(dto.getAuthorizedUserId());
     }
 
     @AuthorizedUser
@@ -88,8 +90,8 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
 
     @AuthorizedUser
     @Override
-    public void setImageToUserAvatar(Long userId, Long imageId) throws ObjectNotFoundException {
-        User user = userService.findEntityById(userId);
+    public void setImageToUserAvatar(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
+        User user = userService.findEntityById(dto.getAuthorizedUserId());
         UserImage image = findEntityById(imageId);
         user.setUserImageFileName(image.getImgFileName());
         userService.updateUser(userDtoMapper.fromEntity(user));

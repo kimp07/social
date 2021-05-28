@@ -12,6 +12,7 @@ import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.NewSocietyDto;
 import org.senlacourse.social.dto.SocietyDto;
 import org.senlacourse.social.dto.SocietyMemberDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.SocietyDtoMapper;
 import org.senlacourse.social.mapstruct.SocietyMemberDtoMapper;
 import org.senlacourse.social.repository.SocietyMemberRepository;
@@ -94,24 +95,25 @@ public class SocietyService extends AbstractService<Society> implements ISociety
 
     @AuthorizedUser
     @Override
-    public void removeUserFromSociety(Long userId, Long societyId) throws ObjectNotFoundException, ServiceException {
+    public void removeUserFromSociety(UserIdDto dto, Long societyId) throws ObjectNotFoundException, ServiceException {
         Society society = findEntityById(societyId);
-        if (!society.getOwner().getId().equals(userId)) {
-            SocietyMember societyMember = findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId);
+        if (!society.getOwner().getId().equals(dto.getAuthorizedUserId())) {
+            SocietyMember societyMember
+                    = findEntitySocietyMemberByUserIdAndSocietyId(dto.getAuthorizedUserId(), societyId);
             societyMemberRepository.deleteById(societyMember.getId());
         }
     }
 
     @AuthorizedUser
     @Override
-    public SocietyMemberDto addUserToSociety(Long userId, Long societyId)
+    public SocietyMemberDto addUserToSociety(UserIdDto dto, Long societyId)
             throws ObjectNotFoundException, ServiceException {
         Society society = findEntityById(societyId);
-        User user = userService.findEntityById(userId);
-        if (isUserMemberOfSociety(userId, societyId)) {
+        User user = userService.findEntityById(dto.getAuthorizedUserId());
+        if (isUserMemberOfSociety(dto.getAuthorizedUserId(), societyId)) {
             return societyMemberDtoMapper
                     .fromEntity(
-                            findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId));
+                            findEntitySocietyMemberByUserIdAndSocietyId(dto.getAuthorizedUserId(), societyId));
         } else {
             return societyMemberDtoMapper
                     .fromEntity(
@@ -124,17 +126,20 @@ public class SocietyService extends AbstractService<Society> implements ISociety
 
     @AuthorizedUser
     @Override
-    public SocietyMemberDto findSocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
+    public SocietyMemberDto findSocietyMemberByUserIdAndSocietyId(UserIdDto dto, Long societyId)
             throws ServiceException {
         return societyMemberDtoMapper
                 .fromEntity(
-                        findEntitySocietyMemberByUserIdAndSocietyId(userId, societyId));
+                        findEntitySocietyMemberByUserIdAndSocietyId(dto.getAuthorizedUserId(), societyId));
     }
 
-    @AuthorizedUser
     @Override
     public boolean isUserMemberOfSociety(Long userId, Long societyId) {
-        return societyMemberRepository.findByUserIdAndSocietyId(userId, societyId).isPresent();
+        return societyMemberRepository
+                .findByUserIdAndSocietyId(
+                        userId,
+                        societyId)
+                .isPresent();
     }
 
     @Override

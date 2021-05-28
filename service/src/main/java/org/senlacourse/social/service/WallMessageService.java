@@ -13,6 +13,7 @@ import org.senlacourse.social.domain.Wall;
 import org.senlacourse.social.domain.WallMessage;
 import org.senlacourse.social.dto.EditMessageDto;
 import org.senlacourse.social.dto.NewWallMessageDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.WallMessageDto;
 import org.senlacourse.social.mapstruct.WallMessageDtoMapper;
 import org.senlacourse.social.repository.WallMessageCommentRepository;
@@ -57,11 +58,11 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
 
     @AuthorizedUser
     @Override
-    public void deleteAllMessagesByWallIdAndUserId(Long userId, Long wallId)
+    public void deleteAllMessagesByWallIdAndUserId(UserIdDto dto, Long wallId)
             throws ObjectNotFoundException, ServiceException {
         Wall wall = wallService.findEntityById(wallId);
         User owner = wall.getSociety().getOwner();
-        if (owner.getId().equals(userId)) {
+        if (owner.getId().equals(dto.getAuthorizedUserId())) {
             wallMessageRepository.deleteAllByWallId(wallId);
             wallMessageCommentRepository.deleteAllByWallId(wallId);
         }
@@ -69,17 +70,17 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
 
     @AuthorizedUser
     @Override
-    public void deleteByMessageIdAndUserId(Long userId, Long wallMessageId)
+    public void deleteByMessageIdAndUserId(UserIdDto dto, Long wallMessageId)
             throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = findEntityById(wallMessageId);
         User user = wallMessage.getUser();
         Wall wall = wallMessage.getWall();
-        if (user.getId().equals(userId) || wall.getSociety().getOwner().getId().equals(userId)) {
+        if (user.getId().equals(dto.getAuthorizedUserId()) || wall.getSociety().getOwner().getId().equals(dto.getAuthorizedUserId())) {
             wallMessageRepository.deleteById(wallMessageId);
             wallMessageCommentRepository.deleteAllByWallMessageId(wallMessageId);
         } else {
             ServiceException e = new ServiceException(
-                    USER_WITH_ID + userId +
+                    USER_WITH_ID + dto.getAuthorizedUserId() +
                             " can`t delete message with id=" + wallMessageId);
             log.warn(e.getMessage(), e);
             throw e;

@@ -25,11 +25,6 @@ public class AuthorizedUserAnnotationAspect {
         // empty
     }
 
-    @Pointcut("@annotation(org.senlacourse.social.security.service.AuthorizedUser) && args(userId,..)")
-    public void callAtAuthorizedUserWithLongArg(Long userId) {
-        // empty
-    }
-
     @Around(value = "callAtAuthorizedUserWithDtoArg(dto)", argNames = "pjp,dto")
     public Object aroundCallAt(ProceedingJoinPoint pjp, IAuthorizedUserDto dto) {
         authorizedUserService.injectAuthorizedUserId(dto);
@@ -38,17 +33,6 @@ public class AuthorizedUserAnnotationAspect {
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
             throw new ServiceException(e);
-        }
-    }
-
-    @Around(value = "callAtAuthorizedUserWithLongArg(userId)", argNames = "pjp,userId")
-    public Object aroundCallAt(ProceedingJoinPoint pjp, Long userId) {
-        authorizedUserService.injectAuthorizedUserId(userId);
-        try {
-            return pjp.proceed();
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            throw new ApplicationException(e);
         }
     }
 

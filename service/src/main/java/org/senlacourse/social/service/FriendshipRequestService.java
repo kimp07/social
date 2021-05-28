@@ -12,6 +12,7 @@ import org.senlacourse.social.domain.FriendshipRequest;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.FriendshipRequestDto;
 import org.senlacourse.social.dto.NewFriendshipRequestDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.FriendshipRequestDtoMapper;
 import org.senlacourse.social.repository.FriendshipMemberRepository;
 import org.senlacourse.social.repository.FriendshipRepository;
@@ -53,17 +54,17 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
 
     @AuthorizedUser
     @Override
-    public Page<FriendshipRequestDto> findAllBySenderId(Long userId, Pageable pageable) throws ServiceException {
+    public Page<FriendshipRequestDto> findAllBySenderId(UserIdDto dto, Pageable pageable) throws ServiceException {
         return friendshipRequestDtoMapper.map(
-                friendshipRequestRepository.findAllBySenderId(userId, pageable));
+                friendshipRequestRepository.findAllBySenderId(dto.getAuthorizedUserId(), pageable));
     }
 
     @AuthorizedUser
     @Override
-    public Page<FriendshipRequestDto> findAllByRecipientId(Long userId, Pageable pageable)
+    public Page<FriendshipRequestDto> findAllByRecipientId(UserIdDto dto, Pageable pageable)
             throws ServiceException {
         return friendshipRequestDtoMapper.map(
-                friendshipRequestRepository.findAllByRecipientId(userId, pageable));
+                friendshipRequestRepository.findAllByRecipientId(dto.getAuthorizedUserId(), pageable));
     }
 
     @AuthorizedUser
@@ -100,5 +101,7 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
         members.add(new FriendshipMember().setFriendship(friendship).setUser(sender));
         members.add(new FriendshipMember().setFriendship(friendship).setUser(recipient));
         friendshipMemberRepository.saveAll(members);
+
+        friendshipRequestRepository.deleteById(id);
     }
 }

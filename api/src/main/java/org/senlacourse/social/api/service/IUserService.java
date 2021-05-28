@@ -3,17 +3,13 @@ package org.senlacourse.social.api.service;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.UpdateUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserPasswordDto;
-import org.senlacourse.social.dto.UserSimpleDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IUserService extends IService<User> {
 
-    UserDto findById(Long id) throws ObjectNotFoundException;
+    UserDto findById(UserIdDto dto) throws ObjectNotFoundException;
 
     UserDto findByUserLogin(String userLogin) throws ObjectNotFoundException;
 
@@ -36,7 +32,7 @@ public interface IUserService extends IService<User> {
 
     UserDto updateUserPassword(UserPasswordDto dto) throws ObjectNotFoundException;
 
-    void deleteById(Long id) throws ObjectNotFoundException;
+    void deleteById(UserIdDto dto) throws ObjectNotFoundException;
 
     UserDto getCurrentAuthorizedUser() throws ObjectNotFoundException;
 }
