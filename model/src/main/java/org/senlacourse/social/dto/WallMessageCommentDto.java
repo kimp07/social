@@ -1,5 +1,6 @@
 package org.senlacourse.social.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -11,6 +12,7 @@ public class WallMessageCommentDto {
 
     private Long id;
     private UserSimpleDto user;
+    @JsonIgnore
     private WallMessageDto wallMessage;
     private String messageDate;
     private String message;

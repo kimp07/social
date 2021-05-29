@@ -56,7 +56,7 @@ public class WallController {
 
     @Secured(value = {"ROLE_USER"})
     @ValidatedBindingResult
-    @PostMapping("/{wallId}/messages")
+    @PostMapping("/messages")
     public ResponseEntity<ResponseMessageDto> addWallMessage(@Validated @RequestBody NewWallMessageDto dto,
                                                              BindingResult bindingResult) {
         wallMessageService.addNewMessage(dto);
