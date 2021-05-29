@@ -6,6 +6,7 @@ import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.domain.Friendship;
+import org.senlacourse.social.domain.projection.IFriendshipMembersCountView;
 import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
@@ -14,6 +15,7 @@ import org.senlacourse.social.repository.FriendshipMemberRepository;
 import org.senlacourse.social.repository.FriendshipRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -50,8 +52,10 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
                 friendshipMemberRepository.findAllFriendshipMembersByUserId(dto.getAuthorizedUserId(), pageable));
     }
 
-    public FriendshipDto findByUserIds(Long[] userIds) {
-        // TODO
-        return null;
+    @Override
+    public boolean friendshipExistsByBothUserIds(Long[] userIds) {
+        Page<IFriendshipMembersCountView> page
+                = friendshipRepository.findFriendshipByUserIds(userIds, PageRequest.of(0, 1));
+        return !page.getContent().isEmpty() && page.getContent().get(0).getMembersCount() == 2;
     }
 }

@@ -77,7 +77,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     }
 
     private boolean userCanAddMessageComment(User user, Wall wall) {
-        return wall.getSociety() == null
+        return wall.getRoot()
                 || societyService.isUserMemberOfSociety(user.getId(), wall.getSociety().getId());
     }
 

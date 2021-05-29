@@ -66,7 +66,7 @@ public class TalkController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/messages/{talkId}")
     public ResponseEntity<Page<TalkMessageDto>> getTalkMessages(@RequestParam(defaultValue = "10") Integer pageSize,
-                                                                @RequestParam(defaultValue = "0x7fffffff") Integer pageNum,
+                                                                @RequestParam(defaultValue = "0") Integer pageNum,
                                                                 @NotNull @PathVariable Long talkId) {
         return new ResponseEntity<>(
                 talkMessageService.findAllByTalkId(

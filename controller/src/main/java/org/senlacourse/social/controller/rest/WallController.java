@@ -45,7 +45,7 @@ public class WallController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/{wallId}/messages")
     public ResponseEntity<Page<WallMessageDto>> getWallMessages(@RequestParam(defaultValue = "10") Integer pageSize,
-                                                                @RequestParam(defaultValue = "0x7fffffff") Integer pageNum,
+                                                                @RequestParam(defaultValue = "0") Integer pageNum,
                                                                 @NotNull @PathVariable Long wallId) {
         return new ResponseEntity<>(
                 wallMessageService.findAllByWallId(
@@ -97,7 +97,7 @@ public class WallController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/messages/{wallMessageId}/comments")
     public ResponseEntity<Page<WallMessageCommentDto>> getWallMessageComments(@RequestParam(defaultValue = "10") Integer pageSize,
-                                                                              @RequestParam(defaultValue = "0x7fffffff") Integer pageNum,
+                                                                              @RequestParam(defaultValue = "0") Integer pageNum,
                                                                               @NotNull @PathVariable Long wallMessageId) {
         return new ResponseEntity<>(wallMessageCommentService.findAllByWallMessageId(
                 wallMessageId,

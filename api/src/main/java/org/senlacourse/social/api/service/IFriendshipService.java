@@ -13,4 +13,6 @@ public interface IFriendshipService extends IService<Friendship> {
     void deleteById(Long id) throws ObjectNotFoundException;
 
     Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(UserIdDto dto, Pageable pageable) throws ServiceException;
+
+    boolean friendshipExistsByBothUserIds(Long[] userIds);
 }

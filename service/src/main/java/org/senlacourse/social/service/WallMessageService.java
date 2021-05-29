@@ -20,6 +20,7 @@ import org.senlacourse.social.repository.WallMessageCommentRepository;
 import org.senlacourse.social.repository.WallMessageRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -53,7 +54,10 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     @Override
     public Page<WallMessageDto> findAllByWallId(Long wallId, Pageable pageable) {
         return wallMessageDtoMapper.map(
-                wallMessageRepository.findAllByWallId(wallId, pageable));
+                wallMessageRepository
+                        .findAllByWallId(
+                                wallId,
+                                pageable));
     }
 
     @AuthorizedUser
@@ -88,7 +92,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     private boolean userCanAddMessage(User user, Wall wall) {
-        return wall.getSociety() == null
+        return wall.getRoot()
                 || societyService.isUserMemberOfSociety(user.getId(), wall.getSociety().getId());
     }
 
@@ -121,8 +125,8 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
         User user = userService.findEntityById(dto.getUserId());
         Wall wall = wallService.findEntityById(dto.getWallId());
         return wallMessageDtoMapper
-                        .fromEntity(
-                                addNewMessage(user, wall, dto.getMessage()));
+                .fromEntity(
+                        addNewMessage(user, wall, dto.getMessage()));
     }
 
     private WallMessage editWallMessage(User user, WallMessage wallMessage, String message)

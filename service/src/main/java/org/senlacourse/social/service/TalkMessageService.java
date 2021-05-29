@@ -85,27 +85,13 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
         return talkMessage;
     }
 
-    private Pageable getLastPageOfTalkMessages(Long talkId, Pageable pageable) {
-        return PageRequest.of(
-                talkMessageRepository
-                        .findAllByTalkId(
-                                talkId,
-                                PageRequest.of(
-                                        0,
-                                        pageable.getPageSize(),
-                                        pageable.getSort()))
-                        .getTotalPages(),
-                pageable.getPageSize(),
-                pageable.getSort());
-    }
-
     @Override
     public Page<TalkMessageDto> findAllByTalkId(Long talkId, Pageable pageable) throws ObjectNotFoundException {
         talkService.findEntityById(talkId);
         return talkMessageDtoMapper.map(
                 talkMessageRepository.findAllByTalkId(
                         talkId,
-                        pageable.getPageNumber() == Integer.MAX_VALUE ? getLastPageOfTalkMessages(talkId, pageable) : pageable));
+                        pageable));
     }
 
     @AuthorizedUser

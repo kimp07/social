@@ -556,4 +556,33 @@
             <column name="user_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE user_images INDEXES -->
+    <!-- SYSTEM DATA -->
+    <changeSet id="" author="2021-05-06_8-00AM-16">
+        <insert tableName="roles">
+            <column name="role_name">USER</column>
+            <column name="role_disabled">false</column>
+        </insert>
+        <insert tableName="users">
+            <column name="user_login">root</column>
+            <column name="user_password">$2a$10$4aKf2PGp6pFCvlHFdX6ys.frNxwJyC1EIYdwfE3xSVnIrO1hIQaNW</column>
+            <column name="email">root@social.net</column>
+            <column name="first_name">root</column>
+            <column name="surname">root</column>
+            <column name="about_me">"root"</column>
+            <column name="birth_date">2021-05-06</column>
+            <column name="role_id">1</column>
+            <column name="u_credentials_non_expired">true</column>
+            <column name="u_enabled">true</column>
+            <column name="u_non_expired">true</column>
+            <column name="u_non_locked">true</column>
+        </insert>
+        <insert tableName="societies">
+            <column name="title">root society</column>
+            <column name="owner_id">1</column>
+        </insert>
+        <insert tableName="walls">
+            <column name="root_wall">true</column>
+            <column name="society_id">1</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
