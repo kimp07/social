@@ -50,8 +50,9 @@ public class TalkController {
     @Secured(value = {"ROLE_USER"})
     @PostMapping("/{talkId}/members")
     public ResponseEntity<ResponseMessageDto> addUserToTalk(@NotNull @PathVariable Long talkId,
-                                                            @NotNull @RequestParam(defaultValue = "0") Long userId) {
-        talkService.addTalkMemberToTalk(new UserIdDto(userId), talkId);
+                                                            @NotNull @RequestParam(defaultValue = "0") Long userId,
+                                                            @NotNull @RequestParam Long memberId) {
+        talkService.addTalkMemberToTalk(new UserIdDto(userId), talkId, memberId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 

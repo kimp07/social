@@ -89,15 +89,21 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
 
     @AuthorizedUser
     @Override
-    public TalkMemberDto addTalkMemberToTalk(UserIdDto dto, Long talkId)
+    public void addTalkMemberToTalk(UserIdDto dto, Long talkId, Long memberId)
             throws ObjectNotFoundException, ServiceException {
-        User user = userService.findEntityById(dto.getAuthorizedUserId());
+        if (!isUserMemberOfTalk(dto.getAuthorizedUserId(), talkId)) {
+            ServiceException e = new ServiceException("User id=" + dto.getAuthorizedUserId() + " can`t add talk member");
+            log.debug(e.getMessage(), e);
+            throw e;
+        }
         Talk talk = findEntityById(talkId);
-        return talkMemberDtoMapper
-                .fromEntity(
-                        getTalkMemberByUserIdAndTalkId(dto.getAuthorizedUserId(), talkId)
-                                .orElse(
-                                        addTalkMemberToTalk(talk, user)));
+        if (!isUserMemberOfTalk(memberId, talkId)) {
+            addTalkMemberToTalk(talk, userService.findEntityById(memberId));
+        } else {
+            ServiceException e = new ServiceException("User id=" + memberId + " is member of talk");
+            log.debug(e.getMessage(), e);
+            throw e;
+        }
     }
 
     @AuthorizedUser

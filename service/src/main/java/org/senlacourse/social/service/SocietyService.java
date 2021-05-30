@@ -9,16 +9,14 @@ import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.SocietyMember;
 import org.senlacourse.social.domain.User;
+import org.senlacourse.social.domain.Wall;
 import org.senlacourse.social.dto.NewSocietyDto;
 import org.senlacourse.social.dto.SocietyDto;
 import org.senlacourse.social.dto.SocietyMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.SocietyDtoMapper;
 import org.senlacourse.social.mapstruct.SocietyMemberDtoMapper;
-import org.senlacourse.social.repository.SocietyMemberRepository;
-import org.senlacourse.social.repository.SocietyRepository;
-import org.senlacourse.social.repository.WallMessageCommentRepository;
-import org.senlacourse.social.repository.WallMessageRepository;
+import org.senlacourse.social.repository.*;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +33,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     private final SocietyRepository societyRepository;
     private final SocietyMemberRepository societyMemberRepository;
     private final IUserService userService;
+    private final WallRepository wallRepository;
     private final WallMessageRepository wallMessageRepository;
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final SocietyDtoMapper societyDtoMapper;
@@ -78,6 +77,13 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                 societyMemberRepository.findAllBySocietyId(societyId, pageable));
     }
 
+    private void createWall(Society society) {
+        wallRepository.save(
+                new Wall()
+                        .setSociety(society)
+                        .setRoot(false));
+    }
+
     @AuthorizedUser
     @Override
     public SocietyDto createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException, ServiceException {
@@ -85,7 +91,8 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         Society society = new Society()
                 .setTitle(dto.getTitle())
                 .setOwner(owner);
-        societyRepository.save(society);
+        society = societyRepository.save(society);
+        createWall(society);
         SocietyMember societyMember = new SocietyMember()
                 .setSociety(society)
                 .setUser(owner);

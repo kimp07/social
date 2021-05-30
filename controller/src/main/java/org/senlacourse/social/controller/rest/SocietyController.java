@@ -52,17 +52,17 @@ public class SocietyController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @PostMapping("/members/{societyId}/{userId}")
+    @PostMapping("/members/{societyId}")
     public ResponseEntity<ResponseMessageDto> addUserToSociety(@NotNull @PathVariable Long societyId,
-                                                               @PathVariable Long userId) {
+                                                               @RequestParam(defaultValue = "0") Long userId) {
         societyService.addUserToSociety(new UserIdDto(userId), societyId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @DeleteMapping("/members/{societyId}/{userId}")
+    @DeleteMapping("/members/{societyId}")
     public ResponseEntity<ResponseMessageDto> removeUserFromSociety(@NotNull @PathVariable Long societyId,
-                                                                    @PathVariable Long userId) {
+                                                                    @RequestParam(defaultValue = "0") Long userId) {
         societyService.removeUserFromSociety(new UserIdDto(userId), societyId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
     }

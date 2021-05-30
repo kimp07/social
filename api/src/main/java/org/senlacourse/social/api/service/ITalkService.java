@@ -20,7 +20,7 @@ public interface ITalkService extends IService<Talk> {
 
     TalkDto addNewTalk(NewTalkDto dto) throws ObjectNotFoundException, ServiceException;
 
-    TalkMemberDto addTalkMemberToTalk(UserIdDto dto, Long talkId) throws ObjectNotFoundException, ServiceException;
+    void addTalkMemberToTalk(UserIdDto dto, Long talkId, Long memberId) throws ObjectNotFoundException, ServiceException;
 
     void removeTalkMemberFromTalk(UserIdDto dto, Long talkId) throws ServiceException;
 }
