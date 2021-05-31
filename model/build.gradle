@@ -7,12 +7,22 @@ plugins {
 group 'org.senlacourse'
 version '0.0.1-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+bootJar {
+    enabled = false
 }
 
 jar {
     enabled = true
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -23,4 +33,28 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.9.2'
+
+    compile 'org.hibernate:hibernate-validator:6.2.0.Final'
+    annotationProcessor 'org.hibernate:hibernate-validator-annotation-processor:6.2.0.Final'
+}
+
+compileJava.options.compilerArgs += '-Amapstruct.defaultComponentModel=spring'
+
+compileJava {
+    options.annotationProcessorGeneratedSourcesDirectory = file("${buildDir}/generated")
+    options.compilerArgs += [
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+            '-Amapstruct.verbose=true'
+    ]
 }

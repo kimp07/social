@@ -6,4 +6,5 @@ include 'model'
 include 'controller'
 include 'security'
 include 'api'
+include 'localstorage'
 
