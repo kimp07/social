@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class UserServiceEndToEndTest {
 
+    public static final String ABOUT_ME = "About me";
     @Autowired
     private IUserService userService;
 
@@ -66,9 +67,9 @@ class UserServiceEndToEndTest {
     void updateUser() {
         UserDto userFromBase = userService
                 .saveUser(updateUserDto);
-        userFromBase.setAboutMe("About me");
+        userFromBase.setAboutMe(ABOUT_ME);
         userService.updateUser(userFromBase);
-        Assertions.assertEquals("About me",
+        Assertions.assertEquals(ABOUT_ME,
                 userService.
                         findById(
                                 new UserIdDto(
