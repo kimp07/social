@@ -20,6 +20,7 @@ class UserServiceEndToEndTest {
     private IUserService userService;
 
     private NewUserDto userDto;
+    private NewUserDto updateUserDto;
 
     @BeforeEach
     public void setUp() {
@@ -28,7 +29,18 @@ class UserServiceEndToEndTest {
                 .setFirstName("FirstName")
                 .setSurname("Surname")
                 .setEmail("email@mail.com")
+                .setPassword("password")
                 .setBirthDate("1990-02-15")
+                .setAboutMe("")
+                .setRoleId(1L);
+
+        updateUserDto = new NewUserDto()
+                .setLogin("user2")
+                .setFirstName("FirstName")
+                .setSurname("Surname")
+                .setEmail("email2@mail.com")
+                .setBirthDate("1990-02-15")
+                .setPassword("password")
                 .setAboutMe("")
                 .setRoleId(1L);
     }
@@ -36,7 +48,6 @@ class UserServiceEndToEndTest {
 
     @Test
     void addNewUser() {
-        userDto.setPassword("password");
         UserDto userFromBase = userService
                 .saveUser(userDto);
         Assertions.assertNotNull(
@@ -47,14 +58,14 @@ class UserServiceEndToEndTest {
 
     @Test
     void addNewUserFailedWithNullPassword() {
+        userDto.setPassword(null);
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> userService.saveUser(userDto));
     }
 
     @Test
     void updateUser() {
-        userDto.setPassword("password");
         UserDto userFromBase = userService
-                .saveUser(userDto);
+                .saveUser(updateUserDto);
         userFromBase.setAboutMe("About me");
         userService.updateUser(userFromBase);
         Assertions.assertEquals("About me",

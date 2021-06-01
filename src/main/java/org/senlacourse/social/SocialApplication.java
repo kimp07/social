@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SocialApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SocialApplication.class, args);
+		SpringApplication application = new SpringApplication(SocialApplication.class);
+		application.setAdditionalProfiles("dev");
+		application.run(args);
 	}
 
 }

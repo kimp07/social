@@ -26,8 +26,6 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter'
 
@@ -37,7 +35,6 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
 
     implementation 'javax.validation:validation-api:2.0.1.Final'
 
