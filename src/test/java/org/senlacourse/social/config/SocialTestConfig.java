@@ -9,16 +9,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@PropertySource({"classpath:application-test.properties",
+        "classpath:social.properties",
+        "classpath:social-security.properties"})
 @ComponentScan(basePackages = "org.senlacourse.social.*")
-@PropertySource("classpath:application-dev.properties")
-@PropertySource("classpath:social-security.properties")
-@PropertySource("classpath:social.properties")
-@Profile("dev")
-public class SocialAppConfig {
+@Profile("test")
+public class SocialTestConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

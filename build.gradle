@@ -22,7 +22,9 @@ repositories {
 }
 
 dependencies {
-	//testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+	testRuntimeOnly 'com.h2database:h2:1.4.200'
 
 	implementation project(":model")
 	implementation project(":controller")
