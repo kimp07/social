@@ -7,7 +7,6 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.domain.Friendship;
 import org.senlacourse.social.domain.projection.IFriendshipMembersCountView;
-import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.FriendshipMemberDtoMapper;

@@ -5,7 +5,6 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.dto.NewTalkDto;
 import org.senlacourse.social.dto.TalkDto;
-import org.senlacourse.social.dto.TalkMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

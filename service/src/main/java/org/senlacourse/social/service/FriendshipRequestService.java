@@ -10,10 +10,11 @@ import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Friendship;
 import org.senlacourse.social.domain.FriendshipMember;
 import org.senlacourse.social.domain.FriendshipRequest;
-import org.senlacourse.social.domain.User;
+import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipRequestDto;
 import org.senlacourse.social.dto.NewFriendshipRequestDto;
 import org.senlacourse.social.dto.UserIdDto;
+import org.senlacourse.social.mapstruct.FriendshipDtoMapper;
 import org.senlacourse.social.mapstruct.FriendshipRequestDtoMapper;
 import org.senlacourse.social.repository.FriendshipMemberRepository;
 import org.senlacourse.social.repository.FriendshipRepository;
@@ -38,6 +39,7 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
 
     private final FriendshipRequestRepository friendshipRequestRepository;
     private final FriendshipRequestDtoMapper friendshipRequestDtoMapper;
+    private final FriendshipDtoMapper friendshipDtoMapper;
     private final IUserService userService;
     private final FriendshipRepository friendshipRepository;
     private final IFriendshipService friendshipService;
@@ -115,10 +117,10 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     }
 
     @Override
-    public void confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
+    public FriendshipDto confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
         Friendship friendship = new Friendship();
-        friendshipRepository.save(friendship);
+        FriendshipDto friendshipDto = friendshipDtoMapper.fromEntity(friendshipRepository.save(friendship));
 
         List<FriendshipMember> members = new ArrayList<>();
         members.add(new FriendshipMember()
@@ -130,5 +132,7 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
         friendshipMemberRepository.saveAll(members);
 
         friendshipRequestRepository.deleteById(id);
+
+        return friendshipDto;
     }
 }

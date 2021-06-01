@@ -11,7 +11,6 @@ import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.NewTalkDto;
 import org.senlacourse.social.dto.TalkDto;
-import org.senlacourse.social.dto.TalkMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkDtoMapper;
 import org.senlacourse.social.mapstruct.TalkMemberDtoMapper;
