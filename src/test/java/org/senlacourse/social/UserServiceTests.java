@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class UserServiceEndToEndTest {
+class UserServiceTests {
 
     public static final String ABOUT_ME = "About me";
     @Autowired
