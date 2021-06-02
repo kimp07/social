@@ -4,9 +4,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.dto.NewTalkDto;
+import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.NewUserDto;
 import org.senlacourse.social.dto.TalkDto;
 import org.senlacourse.social.dto.UserDto;
@@ -14,18 +16,22 @@ import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.repository.TalkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class TalkServiceTests {
+class TalkMessageTests {
 
     @Autowired
-    IUserService userService;
+    ITalkMessageService talkMessageService;
     @Autowired
     ITalkService talkService;
     @Autowired
+    IUserService userService;
+    @Autowired
     TalkRepository talkRepository;
+
     UserDto sender;
     UserDto recipient;
     TalkDto talkDto;
@@ -52,6 +58,10 @@ class TalkServiceTests {
                         .setBirthDate("1990-02-15")
                         .setAboutMe("")
                         .setRoleId(1L));
+        talkDto = talkService.addNewTalk(
+                new NewTalkDto()
+                        .setSenderId(sender.getId())
+                        .setRecipientId(recipient.getId()));
     }
 
     @AfterEach
@@ -68,36 +78,17 @@ class TalkServiceTests {
     }
 
     @Test
-    void addNewTalkTestMustCreateNewTalk() {
-        talkDto = talkService.addNewTalk(
-                new NewTalkDto()
-                        .setSenderId(sender.getId())
-                        .setRecipientId(recipient.getId()));
-        Assertions.assertNotNull(talkDto);
-    }
-
-    @Test
-    void mustAddNewMemberToTalk() {
-        UserDto thirdMember = userService.saveUser(
-                new NewUserDto()
-                        .setLogin("talk_member3")
-                        .setFirstName("FirstName")
-                        .setSurname("Surname")
-                        .setEmail("talk_member3@mail.com")
-                        .setPassword("password")
-                        .setBirthDate("1990-02-15")
-                        .setAboutMe("")
-                        .setRoleId(1L));
-        talkDto = talkService.addNewTalk(
-                new NewTalkDto()
-                        .setSenderId(sender.getId())
-                        .setRecipientId(recipient.getId()));
-        talkService.addTalkMemberToTalk(
-                new UserIdDto(sender.getId()),
-                talkDto.getId(),
-                thirdMember.getId());
-        Assertions.assertTrue(
-                talkService
-                        .isUserMemberOfTalk(thirdMember.getId(), talkDto.getId()));
+    void mustCreatedTalkMessageCacheRecord() {
+        talkMessageService.addNewMessage(
+                new NewTalkMessageDto()
+                        .setTalkId(talkDto.getId())
+                        .setUserId(sender.getId())
+                        .setMessage("Some message"));
+        Assertions.assertNotNull(
+                talkMessageService
+                        .findCacheMessagesByRecipientIdAndTalkId(
+                                new UserIdDto(recipient.getId()),
+                                        PageRequest.of(0, 1))
+                        .getContent());
     }
 }

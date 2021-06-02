@@ -117,16 +117,14 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @AuthorizedUser
     @Override
-    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
-                                                                                              Pageable pageable)
+    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
             throws ObjectNotFoundException {
         return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
     }
 
     @AuthorizedUser
     @Override
-    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto,
-                                                                                         Long talkId)
+    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto, Long talkId)
             throws ObjectNotFoundException {
         return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
     }

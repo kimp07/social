@@ -113,7 +113,7 @@ public class TalkController {
             @RequestParam(defaultValue = "0") Integer pageNum,
             @RequestParam(defaultValue = "0") Long userId) {
         return new ResponseEntity<>(
-                talkMessageService.findCacheMessagesByRecipientIdGroupByTalkId(
+                talkMessageService.findCacheMessagesByRecipientIdAndTalkId(
                         new UserIdDto(userId),
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
