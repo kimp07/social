@@ -24,13 +24,12 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
-@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
+@Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
 public class WallMessageCommentService extends AbstractService<WallMessageComment> implements IWallMessageCommentService {

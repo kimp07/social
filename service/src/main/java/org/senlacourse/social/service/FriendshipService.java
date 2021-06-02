@@ -17,11 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
+@Transactional(rollbackFor = {Throwable.class})
 @Log4j
 @RequiredArgsConstructor
 public class FriendshipService extends AbstractService<Friendship> implements IFriendshipService {
