@@ -58,6 +58,10 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                         .orElse(null));
     }
 
+    public SocietyDto findById(Long id) throws ObjectNotFoundException {
+        return societyDtoMapper.fromEntity(findEntityById(id));
+    }
+
     @Override
     public Page<SocietyDto> findAll(Pageable pageable) {
         return societyDtoMapper.map(

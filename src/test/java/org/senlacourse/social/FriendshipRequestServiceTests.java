@@ -81,6 +81,8 @@ class FriendshipRequestServiceTests {
     void confirmFriendipRequestMustBeCreatedFriendship() {
         requestDto = saveNewRequest();
         FriendshipDto friendshipDto = friendshipRequestService.confirmFriendshipRequestById(requestDto.getId());
-        Assertions.assertNotNull(friendshipService.findEntityById(friendshipDto.getId()));
+        Assertions.assertNotNull(
+                friendshipService
+                        .findEntityById(friendshipDto.getId()));
     }
 }

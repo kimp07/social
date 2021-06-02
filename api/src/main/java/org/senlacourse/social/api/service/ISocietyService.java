@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface ISocietyService extends IService<Society> {
 
+    SocietyDto findById(Long id) throws ObjectNotFoundException;
+
     Page<SocietyDto> findAll(Pageable pageable);
 
     Page<SocietyDto> findAll(String title, Pageable pageable);
