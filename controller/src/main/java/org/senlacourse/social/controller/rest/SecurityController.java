@@ -36,7 +36,7 @@ public class SecurityController {
     }
 
     @ValidatedBindingResult
-    @PostMapping("/signin")
+    @GetMapping("/signin")
     public ResponseEntity<ResponseMessageDto> signIn(@Validated @RequestBody AuthDto dto,
                                                      BindingResult bindingResult) {
         return new ResponseEntity<>(
