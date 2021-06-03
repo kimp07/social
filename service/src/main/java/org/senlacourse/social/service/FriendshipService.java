@@ -47,13 +47,13 @@ public class FriendshipService extends AbstractService<Friendship> implements IF
     public Page<FriendshipMemberDto> findAllFriendshipMembersByUserId(UserIdDto dto, Pageable pageable)
             throws ServiceException {
         return friendshipMemberDtoMapper.map(
-                friendshipMemberRepository.findAllFriendshipMembersByUserId(dto.getAuthorizedUserId(), pageable));
+                friendshipMemberRepository.findAllByUserId(dto.getAuthorizedUserId(), pageable));
     }
 
     @Override
     public boolean friendshipExistsByBothUserIds(Long[] userIds) {
         Page<IFriendshipMembersCountView> page
-                = friendshipRepository.findFriendshipByUserIds(userIds, PageRequest.of(0, 1));
+                = friendshipRepository.findAllByUserIds(userIds, PageRequest.of(0, 1));
         return !page.getContent().isEmpty() && page.getContent().get(0).getMembersCount() == 2;
     }
 }

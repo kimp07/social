@@ -76,7 +76,7 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     }
 
     private Optional<FriendshipRequest> findByBothUserIds(Long[] userIds) {
-        return friendshipRequestRepository.findByBothUserIds(userIds[0], userIds[1]);
+        return friendshipRequestRepository.findOneByBothUserIds(userIds[0], userIds[1]);
     }
 
     private void friendshipOrFriendshipRequestNotExists(Long[] userIds) throws ServiceException {

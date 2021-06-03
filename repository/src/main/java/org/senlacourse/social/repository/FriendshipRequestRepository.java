@@ -21,5 +21,5 @@ public interface FriendshipRequestRepository extends JpaRepository<FriendshipReq
     @Query("select fr from FriendshipRequest fr where "
     + "(fr.sender.id = :senderId and fr.recipient.id = :recipientId) or "
     + "(fr.recipient.id = :senderId and fr.sender.id = :recipientId)")
-    Optional<FriendshipRequest> findByBothUserIds(Long senderId, Long recipientId);
+    Optional<FriendshipRequest> findOneByBothUserIds(Long senderId, Long recipientId);
 }
