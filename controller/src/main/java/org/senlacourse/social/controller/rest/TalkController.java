@@ -5,7 +5,12 @@ import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
 import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
-import org.senlacourse.social.dto.*;
+import org.senlacourse.social.dto.NewTalkDto;
+import org.senlacourse.social.dto.NewTalkMessageDto;
+import org.senlacourse.social.dto.ResponseMessageDto;
+import org.senlacourse.social.dto.TalkDto;
+import org.senlacourse.social.dto.TalkMessageDto;
+import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -13,7 +18,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
@@ -101,7 +113,7 @@ public class TalkController {
             @RequestParam(defaultValue = "0") Integer pageNum,
             @RequestParam(defaultValue = "0") Long userId) {
         return new ResponseEntity<>(
-                talkMessageService.findCacheMessagesByRecipientIdGroupByTalkId(
+                talkMessageService.findCacheMessagesByRecipientIdAndTalkId(
                         new UserIdDto(userId),
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);

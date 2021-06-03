@@ -6,7 +6,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.senlacourse.social.api.exception.ApplicationException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.dto.IAuthorizedUserDto;

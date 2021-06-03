@@ -26,8 +26,6 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-
     implementation project(':api')
     implementation project(':model')
 
@@ -36,6 +34,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    implementation 'org.hibernate:hibernate-validator:6.2.0.Final'
+    annotationProcessor 'org.hibernate:hibernate-validator-annotation-processor:6.2.0.Final'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

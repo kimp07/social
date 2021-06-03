@@ -1,10 +1,7 @@
-//import sun.security.util.SecurityProperties
-
 plugins {
 	id 'org.springframework.boot' version '2.4.5'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-	//id 'war'
 }
 
 group = 'org.senlacourse'
@@ -22,7 +19,9 @@ repositories {
 }
 
 dependencies {
-	//testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+	testRuntimeOnly 'com.h2database:h2:1.4.200'
 
 	implementation project(":model")
 	implementation project(":controller")
@@ -46,12 +45,16 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	compile 'log4j:log4j:1.2.17'
+	implementation 'log4j:log4j:1.2.17'
+}
+
+bootRun {
+	systemProperty 'spring.profiles.active', 'dev'
 }
 
 test {
 	useJUnitPlatform()
+	systemProperty 'spring.profiles.active', 'test'
 }

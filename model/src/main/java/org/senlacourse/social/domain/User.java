@@ -6,7 +6,14 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -23,7 +30,7 @@ public class User extends AbstractEntity {
     @Column(name = "user_password")
     private String password;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
     @ToString.Exclude
     private Role role;
     @Column(name = "email")

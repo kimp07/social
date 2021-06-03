@@ -7,7 +7,11 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.domain.*;
+import org.senlacourse.social.domain.Talk;
+import org.senlacourse.social.domain.TalkMember;
+import org.senlacourse.social.domain.TalkMessage;
+import org.senlacourse.social.domain.TalkMessagesCache;
+import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
@@ -21,13 +25,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
-@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
+@Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
 public class TalkMessageService extends AbstractService<TalkMessage> implements ITalkMessageService {
@@ -113,16 +116,14 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @AuthorizedUser
     @Override
-    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
-                                                                                              Pageable pageable)
+    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
             throws ObjectNotFoundException {
         return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
     }
 
     @AuthorizedUser
     @Override
-    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto,
-                                                                                         Long talkId)
+    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto, Long talkId)
             throws ObjectNotFoundException {
         return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
     }

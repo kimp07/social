@@ -8,7 +8,11 @@ import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.service.IWallMessageCommentService;
 import org.senlacourse.social.api.service.IWallMessageService;
-import org.senlacourse.social.domain.*;
+import org.senlacourse.social.domain.Society;
+import org.senlacourse.social.domain.User;
+import org.senlacourse.social.domain.Wall;
+import org.senlacourse.social.domain.WallMessage;
+import org.senlacourse.social.domain.WallMessageComment;
 import org.senlacourse.social.dto.EditMessageDto;
 import org.senlacourse.social.dto.NewWallMessageCommentDto;
 import org.senlacourse.social.dto.UserIdDto;
@@ -20,13 +24,12 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
-@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
+@Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
 public class WallMessageCommentService extends AbstractService<WallMessageComment> implements IWallMessageCommentService {

@@ -11,7 +11,6 @@ import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.NewTalkDto;
 import org.senlacourse.social.dto.TalkDto;
-import org.senlacourse.social.dto.TalkMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkDtoMapper;
 import org.senlacourse.social.mapstruct.TalkMemberDtoMapper;
@@ -21,13 +20,12 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-@Transactional(rollbackFor = {Throwable.class}, propagation = Propagation.REQUIRED)
+@Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
 public class TalkService extends AbstractService<Talk> implements ITalkService {

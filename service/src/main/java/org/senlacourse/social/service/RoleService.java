@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
-
 @Service
 @RequiredArgsConstructor
 @Log4j
@@ -64,7 +62,7 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
 
     @Transactional(rollbackFor = {Throwable.class})
     @Override
-    public RoleDto updateRole(@NotNull RoleDto dto) throws ObjectNotFoundException {
+    public RoleDto updateRole(RoleDto dto) throws ObjectNotFoundException {
         Role roleFromBase = findEntityById(dto.getId());
         roleFromBase
                 .setRoleName(dto.getRoleName())

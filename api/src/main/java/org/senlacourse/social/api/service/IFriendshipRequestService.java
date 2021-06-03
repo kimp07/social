@@ -3,6 +3,7 @@ package org.senlacourse.social.api.service;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.FriendshipRequest;
+import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipRequestDto;
 import org.senlacourse.social.dto.NewFriendshipRequestDto;
 import org.senlacourse.social.dto.UserIdDto;
@@ -22,5 +23,5 @@ public interface IFriendshipRequestService extends IService<FriendshipRequest> {
 
     void deleteById(Long id) throws ObjectNotFoundException;
 
-    void confirmFriendshipRequestById(Long id) throws ObjectNotFoundException;
+    FriendshipDto confirmFriendshipRequestById(Long id) throws ObjectNotFoundException;
 }

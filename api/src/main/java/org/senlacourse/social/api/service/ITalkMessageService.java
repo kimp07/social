@@ -17,8 +17,7 @@ public interface ITalkMessageService extends IService<TalkMessage> {
     TalkMessageDto addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException;
 
-    Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
-                                                                                       Pageable pageable)
+    Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
             throws ObjectNotFoundException;
 
     ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto,Long talkId)
