@@ -44,7 +44,7 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
                         .orElse(null));
     }
 
-    private Optional<TalkMember> getTalkMemberByUserIdAndTalkId(Long userId, Long talkId) {
+    private Optional<TalkMember> findTalkMemberByUserIdAndTalkId(Long userId, Long talkId) {
         return talkMemberRepository.findOneByTalkIdAndUserId(talkId, userId);
     }
 
@@ -60,7 +60,7 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
 
     @Override
     public boolean isUserMemberOfTalk(Long userId, Long talkId) throws ServiceException {
-        return getTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
+        return findTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
     }
 
     private TalkMember addTalkMemberToTalk(Talk talk, User user) {
@@ -107,7 +107,7 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     @AuthorizedUser
     @Override
     public void removeTalkMemberFromTalk(UserIdDto dto, Long talkId) throws ServiceException {
-        getTalkMemberByUserIdAndTalkId(dto.getAuthorizedUserId(), talkId)
+        findTalkMemberByUserIdAndTalkId(dto.getAuthorizedUserId(), talkId)
                 .ifPresent(
                         talkMember -> talkMemberRepository.deleteById(talkMember.getId()));
     }

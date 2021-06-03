@@ -14,5 +14,5 @@ public interface WallRepository extends JpaRepository<Wall, Long> {
     Optional<Wall> findBySocietyId(Long societyId);
 
     @Query(value = "select w from Wall w where w.root = true")
-    Optional<Wall> findRootWall();
+    Optional<Wall> findOneByRootIsTrue();
 }

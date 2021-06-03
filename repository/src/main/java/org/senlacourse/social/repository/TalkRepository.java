@@ -16,5 +16,5 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
     Page<Talk> findAllByTalkMemberId(Long[] talkMemberId, Pageable pageable);
 
     @Query(value = "select t from Talk t left join TalkMember tm on t.id = tm.user.id where tm.user.id in :talkMemberIds")
-    Optional<Talk> findByTalkMemberIds(Long[] talkMemberIds);
+    Optional<Talk> findOneByTalkMemberIds(Long[] talkMemberIds);
 }

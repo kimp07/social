@@ -17,7 +17,6 @@ public interface FriendshipMemberRepository extends JpaRepository<FriendshipMemb
     Page<FriendshipMember> findAllByFriendshipId(Long friendshipId, Pageable pageable);
 
     @Query(value = "select fm from FriendshipMember fm where fm.user.id <> :userId and fm.friendship in " +
-            "(select f.friendship from FriendshipMember f where f.user.id = :userId)"
-    )
-    Page<FriendshipMember> findAllFriendshipMembersByUserId(Long userId, Pageable pageable);
+            "(select f.friendship from FriendshipMember f where f.user.id = :userId)")
+    Page<FriendshipMember> findAllByUserId(Long userId, Pageable pageable);
 }
