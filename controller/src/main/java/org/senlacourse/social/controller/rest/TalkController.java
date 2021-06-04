@@ -56,7 +56,7 @@ public class TalkController {
                                               BindingResult bindingResult) {
         return new ResponseEntity<>(
                 talkService.addNewTalk(dto),
-                HttpStatus.OK);
+                HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -65,7 +65,7 @@ public class TalkController {
                                                             @NotNull @RequestParam(defaultValue = "0") Long userId,
                                                             @NotNull @RequestParam Long memberId) {
         talkService.addTalkMemberToTalk(new UserIdDto(userId), talkId, memberId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -73,7 +73,7 @@ public class TalkController {
     public ResponseEntity<ResponseMessageDto> removeUserFromTalk(@NotNull @PathVariable Long talkId,
                                                                  @NotNull @RequestParam(defaultValue = "0") Long userId) {
         talkService.removeTalkMemberFromTalk(new UserIdDto(userId), talkId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -94,7 +94,7 @@ public class TalkController {
     public ResponseEntity<ResponseMessageDto> addNewMessage(@Validated @RequestBody NewTalkMessageDto dto,
                                                             BindingResult bindingResult) {
         talkMessageService.addNewMessage(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -124,14 +124,14 @@ public class TalkController {
     public ResponseEntity<ResponseMessageDto> removeUnreadMessages(@NotNull @PathVariable Long talkId,
                                                                    @RequestParam(defaultValue = "0") Long userId) {
         talkMessageService.deleteCacheMessagesByRecipientIdAndTalkId(new UserIdDto(userId), talkId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
     @DeleteMapping("/messages/cache")
     public ResponseEntity<ResponseMessageDto> removeUnreadMessages(@RequestParam(defaultValue = "0") Long userId) {
         talkMessageService.deleteCacheMessagesByRecipientId(new UserIdDto(userId));
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
 }

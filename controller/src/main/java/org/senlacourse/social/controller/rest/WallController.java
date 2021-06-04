@@ -75,7 +75,7 @@ public class WallController {
     public ResponseEntity<ResponseMessageDto> addWallMessage(@Validated @RequestBody NewWallMessageDto dto,
                                                              BindingResult bindingResult) {
         wallMessageService.addNewMessage(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -84,7 +84,7 @@ public class WallController {
     public ResponseEntity<ResponseMessageDto> editWallMessage(@Validated @RequestBody EditMessageDto dto,
                                                               BindingResult bindingResult) {
         wallMessageService.editWallMessage(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -92,21 +92,21 @@ public class WallController {
     public ResponseEntity<ResponseMessageDto> removeWallMessage(@RequestParam Long userId,
                                                                 @NotNull @RequestParam Long messageId) {
         wallMessageService.deleteByMessageIdAndUserId(new UserIdDto(userId), messageId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @PostMapping("/messages/like")
+    @PutMapping("/messages/like")
     public ResponseEntity<ResponseMessageDto> addWallMessageLike(@NotNull @RequestParam Long messageId) {
         wallMessageService.addLikeToMessage(messageId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @PostMapping("/messages/dislike")
+    @PutMapping("/messages/dislike")
     public ResponseEntity<ResponseMessageDto> addWallMessageDislike(@NotNull @RequestParam Long messageId) {
         wallMessageService.addDislikeToMessage(messageId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -126,7 +126,7 @@ public class WallController {
     public ResponseEntity<ResponseMessageDto> addWallMessageComment(@Validated @RequestBody NewWallMessageCommentDto dto,
                                                                     BindingResult bindingResult) {
         wallMessageCommentService.addNewWallMessageComment(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -135,7 +135,7 @@ public class WallController {
     public ResponseEntity<ResponseMessageDto> editWallMessageComment(@Validated @RequestBody EditMessageDto dto,
                                                                      BindingResult bindingResult) {
         wallMessageCommentService.editWallMessageComment(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -143,21 +143,21 @@ public class WallController {
     public ResponseEntity<ResponseMessageDto> removeWallMessageComment(@RequestParam Long userId,
                                                                        @NotNull @RequestParam Long commentId) {
         wallMessageCommentService.deleteByCommentIdAndUserId(new UserIdDto(userId), commentId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @PostMapping("/messages/comments/like")
+    @PutMapping("/messages/comments/like")
     public ResponseEntity<ResponseMessageDto> addWallMessageCommentLike(@NotNull @RequestParam Long commentId) {
         wallMessageCommentService.addLikeToMessage(commentId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @PostMapping("/messages/comments/dislike")
+    @PutMapping("/messages/comments/dislike")
     public ResponseEntity<ResponseMessageDto> addWallMessageCommentDislike(@NotNull @RequestParam Long commentId) {
         wallMessageCommentService.addDislikeToMessage(commentId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
 }

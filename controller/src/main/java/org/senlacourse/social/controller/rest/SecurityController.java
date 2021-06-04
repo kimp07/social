@@ -32,7 +32,7 @@ public class SecurityController {
     public ResponseEntity<ResponseMessageDto> signUp(@Validated @RequestBody NewUserDto dto,
                                                       BindingResult bindingResult) {
         securityHandlerService.saveUser(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(OPERATION_COMPLETED), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(OPERATION_COMPLETED), HttpStatus.CREATED);
     }
 
     @ValidatedBindingResult

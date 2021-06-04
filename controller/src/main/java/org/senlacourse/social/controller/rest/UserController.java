@@ -80,7 +80,7 @@ public class UserController {
     public ResponseEntity<ResponseMessageDto> updateUserPassword(@Validated @RequestBody UserPasswordDto dto,
                                                                  BindingResult bindingResult) {
         securityHandlerService.updateUserPassword(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -99,7 +99,7 @@ public class UserController {
     public ResponseEntity<ResponseMessageDto> setImageToAvatar(@PathVariable Long userId,
                                                                @NotNull @RequestParam Long imageId) {
         userImageService.setImageToUserAvatar(new UserIdDto(userId), imageId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
@@ -107,6 +107,6 @@ public class UserController {
     public ResponseEntity<ResponseMessageDto> deleteUserImage(@PathVariable Long userId,
                                                               @NotNull @RequestParam Long imageId) {
         userImageService.deleteByUserImageIdAndUserId(new UserIdDto(userId), imageId);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 }

@@ -42,28 +42,28 @@ public class FriendshipController {
     public ResponseEntity<ResponseMessageDto> sendFriendshipRequest(@Validated @RequestBody NewFriendshipRequestDto dto,
                                                                     BindingResult bindingResult) {
         friendshipRequestService.saveNewFriendshipRequest(dto);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
     @PostMapping("/requests/{id}")
     public ResponseEntity<ResponseMessageDto> sendFriendshipRequest(@PathVariable Long id) {
         friendshipRequestService.saveNewFriendshipRequest(new NewFriendshipRequestDto().setRecipientId(id));
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.CREATED);
     }
 
     @Secured(value = {"ROLE_USER"})
     @PutMapping("/requests/{id}")
     public ResponseEntity<ResponseMessageDto> confirmFriendshipRequest(@NotNull @PathVariable Long id) {
         friendshipRequestService.confirmFriendshipRequestById(id);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
     @DeleteMapping("/requests/{id}")
     public ResponseEntity<ResponseMessageDto> declineFriendshipRequest(@NotNull @PathVariable Long id) {
         friendshipRequestService.deleteById(id);
-        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
