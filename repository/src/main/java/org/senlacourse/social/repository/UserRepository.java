@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "select u from User u where lower(u.firstName) like :firstName and lower(u.surname) like :surname")
     Page<User> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable);
 
-    @Query(value = "select u from User u where u.login = :userLogin")
+    @Query(value = "select u from User u join fetch u.role r where u.login = :userLogin")
     Optional<User> findOneByUserLogin(String userLogin);
 
     @Query(value = "select u from User u where u.email = :email")
