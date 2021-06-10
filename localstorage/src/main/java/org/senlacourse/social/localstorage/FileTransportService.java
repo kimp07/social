@@ -5,9 +5,6 @@ import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ApplicationException;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.localstorage.IFileTransportService;
-import org.senlacourse.social.api.service.IUserImageService;
-import org.senlacourse.social.dto.NewUserImageDto;
-import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -42,15 +39,13 @@ public class FileTransportService implements IFileTransportService {
         }
     }
 
-    private String generateFileName(Long userId, MultipartFile file, Long currentMillis) {
-        return "/f_" + userId.toString() + "_" + currentMillis.toString() +
-                getFileNameSuffix(file);
+    private String generateFileName(MultipartFile file, Long currentMillis) {
+        return "/f_" + currentMillis.toString() + getFileNameSuffix(file);
     }
 
-    private File getConvertFile(Long userId, MultipartFile file) {
+    private File getConvertFile(MultipartFile file) {
         return new File(localStorageDir,
                 generateFileName(
-                        userId,
                         file,
                         System.currentTimeMillis()));
     }
@@ -63,8 +58,8 @@ public class FileTransportService implements IFileTransportService {
         return true;
     }
 
-    private String uploadFileToLocalStorage(Long userId, MultipartFile file) throws ApplicationException {
-        File convertFile = getConvertFile(userId, file);
+    private String uploadFileToLocalStorage(MultipartFile file) throws ApplicationException {
+        File convertFile = getConvertFile(file);
         try (FileOutputStream fout = new FileOutputStream(convertFile)) {
             fout.write(file.getBytes());
         } catch (IOException e) {
@@ -74,31 +69,25 @@ public class FileTransportService implements IFileTransportService {
         return convertFile.getName();
     }
 
-    @AuthorizedUser
     @Override
-    public void uploadFile(Long userId, MultipartFile file) throws ApplicationException, ObjectNotFoundException {
+    public String uploadFile(MultipartFile file) throws ApplicationException, ObjectNotFoundException {
         if (!storageDirExists()) {
             ApplicationException e = new ApplicationException("Directory " + localStorageDir + " not exixts");
             log.error(e.getMessage(), e);
             throw e;
         }
-        String fileName = uploadFileToLocalStorage(userId, file);
-        userImageService.save(
-                new NewUserImageDto()
-                        .setImgFileName(fileName));
+        return uploadFileToLocalStorage(file);
     }
 
-    private File getImageFile(Long imageId) throws ObjectNotFoundException {
+    private File getImageFile(String imgFileName) throws ObjectNotFoundException {
         return new File(
                 localStorageDir,
-                userImageService
-                        .findById(imageId)
-                        .getImgFileName());
+                imgFileName);
     }
 
     @Override
-    public ResponseEntity<Object> downloadFile(Long imageId) throws ObjectNotFoundException, ApplicationException {
-        File file = getImageFile(imageId);
+    public ResponseEntity<Object> downloadFile(String imgFileName) throws ObjectNotFoundException, ApplicationException {
+        File file = getImageFile(imgFileName);
         try {
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             HttpHeaders headers = new HttpHeaders();

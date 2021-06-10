@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.service.IImageService;
 import org.senlacourse.social.api.service.IUserImageService;
 import org.senlacourse.social.api.service.IUserService;
+import org.senlacourse.social.domain.Image;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.UserImage;
+import org.senlacourse.social.domain.UserImagePk;
 import org.senlacourse.social.dto.NewUserImageDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.UserImageDto;
@@ -24,41 +27,40 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
-public class UserImageService extends AbstractService<UserImage> implements IUserImageService {
+public class UserImageService implements IUserImageService {
 
     private final UserImageRepository userImageRepository;
     private final UserDtoMapper userDtoMapper;
     private final IUserService userService;
+    private final IImageService imageService;
     private final UserImageDtoMapper userImageDtoMapper;
 
     @Override
-    public UserImage findEntityById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(
-                userImageRepository
-                        .findById(id)
-                        .orElse(null));
-    }
-
-    @Override
-    public UserImageDto findById(Long id) throws ObjectNotFoundException {
+    public UserImageDto findByUserIdAndImageId(Long userId, Long imageId) throws ObjectNotFoundException {
         return userImageDtoMapper.fromEntity(
-                findEntityById(id));
+                userImageRepository
+                        .findByIdUserIdAndIdImageId(userId, imageId)
+                        .orElseThrow(ObjectNotFoundException::new));
     }
 
     @AuthorizedUser
     @Override
     public Page<UserImageDto> findAllImagesByUserId(UserIdDto dto, Pageable pageable) throws ObjectNotFoundException {
         return userImageDtoMapper.map(
-                userImageRepository.findAllByUserId(dto.getAuthorizedUserId(), pageable));
+                userImageRepository.findAllByIdUserId(dto.getAuthorizedUserId(), pageable));
     }
 
     @AuthorizedUser
     @Override
     public void deleteByUserImageIdAndUserId(UserIdDto dto, Long userImageId)
             throws ObjectNotFoundException, ServiceException {
-        UserImage userImage = findEntityById(userImageId);
-        if (userImage.getUser().getId().equals(dto.getAuthorizedUserId())) {
-            userImageRepository.deleteById(userImageId);
+        UserImage image = userImageRepository
+                .findByIdUserIdAndIdImageId(dto.getAuthorizedUserId(), userImageId)
+                .orElseThrow(() -> {
+                    throw new ObjectNotFoundException("Object not found");
+                });
+        if (image.getId().getUser().getId().equals(dto.getAuthorizedUserId())) {
+            userImageRepository.deleteById(image.getId());
         } else {
             ServiceException e
                     = new ServiceException("User id=" + dto.getAuthorizedUserId() + " can`t delete image id=" + userImageId);
@@ -71,28 +73,31 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
     @Override
     public void deleteAllByUserId(UserIdDto dto) throws ObjectNotFoundException {
         User user = userService.findEntityById(dto.getAuthorizedUserId());
-        user.setUserImageFileName("");
+        user.setAvatar(null);
         userService.updateUser(userDtoMapper.fromEntity(user));
-        userImageRepository.deleteAllByUserId(dto.getAuthorizedUserId());
+        userImageRepository.deleteAllByIdUserId(dto.getAuthorizedUserId());
     }
 
     @AuthorizedUser
     @Override
     public UserImageDto save(NewUserImageDto dto) throws ObjectNotFoundException {
-        UserImage userImage = new UserImage()
-                .setUser(
-                        userService.findEntityById(dto.getUserId()))
+        Image image = new Image()
                 .setImgFileName(dto.getImgFileName());
+        User user = userService.findEntityById(dto.getUserId());
         return userImageDtoMapper.fromEntity(
-                userImageRepository.save(userImage));
+                userImageRepository
+                        .save(new UserImage()
+                                .setId(new UserImagePk()
+                                        .setUser(user)
+                                        .setImage(image))));
     }
 
     @AuthorizedUser
     @Override
     public void setImageToUserAvatar(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
         User user = userService.findEntityById(dto.getAuthorizedUserId());
-        UserImage image = findEntityById(imageId);
-        user.setUserImageFileName(image.getImgFileName());
+        Image image = imageService.findEntityById(imageId);
+        user.setAvatar(image);
         userService.updateUser(userDtoMapper.fromEntity(user));
     }
 }

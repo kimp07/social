@@ -8,6 +8,7 @@ import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.SocietyMember;
+import org.senlacourse.social.domain.SocietyMemberPk;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.Wall;
 import org.senlacourse.social.dto.NewSocietyDto;
@@ -31,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(rollbackFor = {Throwable.class})
 @Log4j
-public class SocietyService extends AbstractService<Society> implements ISocietyService {
+public class SocietyService implements ISocietyService {
 
     private final SocietyRepository societyRepository;
     private final SocietyMemberRepository societyMemberRepository;
@@ -74,7 +75,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                     societyRepository.findAll(pageable));
         } else {
             return societyDtoMapper.map(
-                    societyRepository.findAllByTitle(title, pageable));
+                    societyRepository.findAllByTitleIsLike(title, pageable));
         }
     }
 
@@ -101,8 +102,9 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         society = societyRepository.save(society);
         createWall(society);
         SocietyMember societyMember = new SocietyMember()
-                .setSociety(society)
-                .setUser(owner);
+                .setId(new SocietyMemberPk()
+                        .setSociety(society)
+                        .setUser(owner));
         societyMemberRepository.save(societyMember);
         return societyDtoMapper.fromEntity(society);
     }
@@ -159,8 +161,8 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     @Override
     public void deleteSocietyById(Long id) throws ObjectNotFoundException {
         Society society = findEntityById(id);
-        societyMemberRepository.deleteAllBySocietyId(society.getId());
         wallMessageCommentRepository.deleteAllByWallId(society.getId());
         wallMessageRepository.deleteAllByWallId(society.getId());
+        societyMemberRepository.deleteAllByIdSocietyId(society.getId());
     }
 }

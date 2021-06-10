@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
+import org.senlacourse.social.domain.projection.IUnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.dto.NewTalkDto;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.ResponseMessageDto;
@@ -99,8 +99,8 @@ public class TalkController {
 
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/messages/{talkId}/cache")
-    public ResponseEntity<ITalkMessagesCacheTalksCountView> getUnreadMessages(@NotNull @PathVariable Long talkId,
-                                                                              @RequestParam(defaultValue = "0") Long userId) {
+    public ResponseEntity<IUnreadTalkMessagesGroupByTalkIdCountView> getUnreadMessages(@NotNull @PathVariable Long talkId,
+                                                                                       @RequestParam(defaultValue = "0") Long userId) {
         return new ResponseEntity<>(
                 talkMessageService.findCacheMessagesCountByRecipientIdAndTalkId(new UserIdDto(userId), talkId),
                 HttpStatus.OK);
@@ -108,7 +108,7 @@ public class TalkController {
 
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/messages/cache")
-    public ResponseEntity<Page<ITalkMessagesCacheTalksCountView>> getUnreadMessages(
+    public ResponseEntity<Page<IUnreadTalkMessagesGroupByTalkIdCountView>> getUnreadMessages(
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "0") Integer pageNum,
             @RequestParam(defaultValue = "0") Long userId) {

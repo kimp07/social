@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,10 +36,10 @@ public class FriendshipRequest extends AbstractEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        FriendshipRequest that = (FriendshipRequest) o;
-
-        return id != null && id.equals(that.id);
+        if (o == null) return false;
+        if (o.getClass() != getClass()) return false;
+        FriendshipRequest friendshipRequest = (FriendshipRequest) o;
+        return id != null && id.equals(friendshipRequest.id);
     }
 
     @Override

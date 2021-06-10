@@ -2,7 +2,6 @@ package org.senlacourse.social.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.security.IUserSecurityHandlerService;
-import org.senlacourse.social.api.service.IUserImageService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
 import org.senlacourse.social.dto.ResponseMessageDto;

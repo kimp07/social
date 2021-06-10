@@ -3,7 +3,7 @@ package org.senlacourse.social.api.service;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.TalkMessage;
-import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
+import org.senlacourse.social.domain.projection.IUnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
 import org.senlacourse.social.dto.UserIdDto;
@@ -14,13 +14,13 @@ public interface ITalkMessageService extends IService<TalkMessage> {
 
     Page<TalkMessageDto> findAllByTalkId(Long talkId, Pageable pageable) throws ObjectNotFoundException;
 
-    TalkMessageDto addNewMessage(NewTalkMessageDto dto)
+    void addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException;
 
-    Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
+    Page<IUnreadTalkMessagesGroupByTalkIdCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
             throws ObjectNotFoundException;
 
-    ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto,Long talkId)
+    IUnreadTalkMessagesGroupByTalkIdCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto, Long talkId)
             throws ObjectNotFoundException;
 
     void deleteCacheMessagesByRecipientId(UserIdDto dto);

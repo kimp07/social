@@ -1,23 +1,26 @@
 package org.senlacourse.social.repository;
 
 import org.senlacourse.social.domain.SocietyMember;
+import org.senlacourse.social.domain.SocietyMemberPk;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface SocietyMemberRepository extends JpaRepository<SocietyMember, Long> {
+public interface SocietyMemberRepository extends JpaRepository<SocietyMember, SocietyMemberPk> {
 
-    @Query(value = "select sm from SocietyMember sm where sm.society.id = :societyId")
-    Page<SocietyMember> findAllBySocietyId(Long societyId, Pageable pageable);
+    @EntityGraph(attributePaths = {"user"})
+    Page<SocietyMember> findAllByIdSocietyId(Long societyId, Pageable pageable);
 
-    @Query(value = "select sm from SocietyMember sm where sm.user.id = :userId and sm.society.id = :societyId")
-    Optional<SocietyMember> findByUserIdAndSocietyId(Long userId, Long societyId);
+    @EntityGraph(attributePaths = {"society", "user"})
+    Optional<SocietyMember> findByIdUserIdAndIdSocietyId(Long userId, Long societyId);
 
-    @Query(value = "delete from SocietyMember sm where sm.society.id = :societyId")
-    void deleteAllBySocietyId(Long societyId);
+    @EntityGraph(attributePaths = {"society"})
+    Page<SocietyMember> findAllByIdUserId(Long id, Pageable pageable);
+
+    void deleteAllByIdSocietyId(Long societyId);
 }

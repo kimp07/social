@@ -5,32 +5,33 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "friendships")
+@Table(name = "images")
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @Accessors(chain = true)
-public class Friendship {
+public class Image extends AbstractEntity {
 
-    @EmbeddedId
-    private FriendshipPk id;
+    @Column(name = "img_file_name")
+    private String imgFileName;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Friendship that = (Friendship) o;
-        return getId().equals(that.getId());
+        if (o == null) return false;
+        if (o.getClass() != this.getClass()) return false;
+        Image image = (Image) o;
+        return id != null && id.equals(image.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hashCode(getId());
     }
 }

@@ -12,12 +12,16 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(value = "select u from User u where lower(u.firstName) like :firstName and lower(u.surname) like :surname")
+    @Query("select u from User u where lower(u.firstName) like :firstName and lower(u.surname) like :surname")
     Page<User> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable);
 
-    @Query(value = "select u from User u join fetch u.role r where u.login = :userLogin")
+    @Query("select u from User u join fetch u.role r where u.login = :userLogin")
     Optional<User> findOneByUserLogin(String userLogin);
 
-    @Query(value = "select u from User u where u.email = :email")
+    @Query("select u from User u join fetch u.role r where u.email = :email")
     Optional<User> findOneByEmail(String email);
+
+    @Query("select u from User u inner join Friendship f1 on u.id = f1.user.id "
+            + "inner join Friendship f2 on u.id = f2.friend.id where f1.friend.id = :userId and f2.user.id = :userId")
+    Page<User> findAllFriendsByUserId(Long userId, Pageable pageable);
 }

@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -56,15 +55,17 @@ public class User extends AbstractEntity {
     private AuthProvider authProvider;
     @Column(name = "auth_provider_id")
     private String authProviderId;
-    @Column(name = "user_image_file_name")
-    private String userImageFileName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    @ToString.Exclude
+    private Image avatar;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null) return false;
+        if (o.getClass() != getClass()) return false;
         User user = (User) o;
-
         return id != null && id.equals(user.id);
     }
 

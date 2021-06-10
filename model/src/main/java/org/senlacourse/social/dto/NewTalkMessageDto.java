@@ -18,6 +18,8 @@ public class NewTalkMessageDto implements IAuthorizedUserDto {
     @NotNull
     @NotEmpty
     private String message;
+    private Long answeredMessage;
+
 
     @Override
     public void setAuthorizedUserId(Long id) {

@@ -10,7 +10,7 @@ import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ISocietyService extends IService<Society> {
+public interface ISocietyService {
 
     SocietyDto findById(Long id) throws ObjectNotFoundException;
 

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.Hibernate;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,17 +32,29 @@ public class TalkMessage extends AbstractEntity {
     @ToString.Exclude
     private Talk talk;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answered_message_id", referencedColumnName = "id")
+    @BatchSize(size = 1)
+    @ToString.Exclude
+    private TalkMessage answeredMessage;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    @ToString.Exclude
+    private User sender;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ToString.Exclude
     private User user;
+    @Column(name = "unread")
+    private Boolean unread;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        TalkMessage that = (TalkMessage) o;
-
-        return id != null && id.equals(that.id);
+        if (o == null) return false;
+        if (o.getClass() != getClass()) return false;
+        TalkMessage talkMessage = (TalkMessage) o;
+        return id != null && id.equals(talkMessage.id);
     }
 
     @Override
