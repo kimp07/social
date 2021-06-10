@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(rollbackFor = {Throwable.class})
 @Log4j
-public class SocietyService implements ISocietyService {
+public class SocietyService extends AbstractService<Society> implements ISocietyService {
 
     private final SocietyRepository societyRepository;
     private final SocietyMemberRepository societyMemberRepository;
@@ -42,13 +42,6 @@ public class SocietyService implements ISocietyService {
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final SocietyDtoMapper societyDtoMapper;
     private final SocietyMemberDtoMapper societyMemberDtoMapper;
-
-    private SocietyMember findEntitySocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
-            throws ObjectNotFoundException {
-        return validateEntityNotNull(
-                societyMemberRepository
-                        .findByUserIdAndSocietyId(userId, societyId).orElse(null));
-    }
 
     @Override
     public Society findEntityById(Long id) throws ObjectNotFoundException {

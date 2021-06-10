@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -24,6 +25,8 @@ public class Talk extends AbstractEntity {
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     @ToString.Exclude
     private User owner;
+    @Column(name = "title")
+    private String title;
 
     @Override
     public boolean equals(Object o) {

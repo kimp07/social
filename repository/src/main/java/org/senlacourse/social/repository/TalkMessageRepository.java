@@ -18,7 +18,7 @@ public interface TalkMessageRepository extends JpaRepository<TalkMessage, Long> 
     Page<TalkMessage> findAllByTalkId(Long talkId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user", "answeredMessage"})
-    Page<TalkMessage> findAllBySenderAndTalkIdAndUnreadIsTrue(Long senderId, Long talkId, Pageable pageable);
+    Page<TalkMessage> findAllBySenderIdAndTalkIdAndUnreadIsTrue(Long senderId, Long talkId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user", "answeredMessage", "talk", "sender"})
     @Override

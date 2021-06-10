@@ -11,7 +11,7 @@ public interface IRoleService extends IService<Role> {
 
     RoleDto findById(Long id) throws ObjectNotFoundException;
 
-    RoleDto findByName(String roleName) throws ObjectNotFoundException;
+    RoleDto findByRoleName(String roleName) throws ObjectNotFoundException;
 
     Page<RoleDto> findAll(Pageable pageable);
 

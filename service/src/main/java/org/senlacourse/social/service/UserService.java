@@ -52,7 +52,7 @@ public class UserService extends AbstractService<User> implements IUserService {
     private User findEntityByLogin(String login) throws ObjectNotFoundException {
         return validateEntityNotNull(
                 userRepository
-                        .findOneByUserLogin(login)
+                        .findOneByLogin(login)
                         .orElse(null));
     }
 
@@ -102,7 +102,7 @@ public class UserService extends AbstractService<User> implements IUserService {
     public Page<UserDto> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable) {
         firstName = SqlUtil.normalizeLikeFilter(firstName.toLowerCase());
         surname = SqlUtil.normalizeLikeFilter(surname.toLowerCase());
-        return userDtoMapper.map(userRepository.findAllByFirstNameAndSurname(firstName, surname, pageable));
+        return userDtoMapper.map(userRepository.findAllByFirstNameIsLikeAndSurnameIsLike(firstName, surname, pageable));
     }
 
     private User handleNewUserDto(NewUserDto dto) throws ServiceException {

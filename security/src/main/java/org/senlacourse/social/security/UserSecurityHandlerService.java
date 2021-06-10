@@ -50,7 +50,7 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     private RoleDto getRoleByNameUser() {
         RoleDto role = null;
         try {
-            role = roleService.findByName(ROLE_USER);
+            role = roleService.findByRoleName(ROLE_USER);
         } catch (ObjectNotFoundException e) {
             log.warn(e.getMessage(), e);
         }

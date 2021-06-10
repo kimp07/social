@@ -18,7 +18,6 @@ import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkMessageRepository;
-import org.senlacourse.social.repository.TalkMessagesCacheRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -13,14 +13,16 @@ import java.util.Optional;
 @Repository
 public interface SocietyMemberRepository extends JpaRepository<SocietyMember, SocietyMemberPk> {
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"society", "user"})
     Page<SocietyMember> findAllByIdSocietyId(Long societyId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"society", "user"})
-    Optional<SocietyMember> findByIdUserIdAndIdSocietyId(Long userId, Long societyId);
+    Optional<SocietyMember> findOneByIdUserIdAndIdSocietyId(Long userId, Long societyId);
 
-    @EntityGraph(attributePaths = {"society"})
+    @EntityGraph(attributePaths = {"society", "user"})
     Page<SocietyMember> findAllByIdUserId(Long id, Pageable pageable);
 
     void deleteAllByIdSocietyId(Long societyId);
+
+    void deleteByIdUserIdAndIdSocietyId(Long userId, Long societyId);
 }
