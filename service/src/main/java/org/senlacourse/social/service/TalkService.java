@@ -8,12 +8,12 @@ import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
+import org.senlacourse.social.domain.TalkMemberId;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.NewTalkDto;
 import org.senlacourse.social.dto.TalkDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkDtoMapper;
-import org.senlacourse.social.mapstruct.TalkMemberDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
@@ -34,7 +34,6 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     private final TalkMemberRepository talkMemberRepository;
     private final IUserService userService;
     private final TalkDtoMapper talkDtoMapper;
-    private final TalkMemberDtoMapper talkMemberDtoMapper;
 
     @Override
     public Talk findEntityById(Long id) throws ObjectNotFoundException {
@@ -45,7 +44,7 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     private Optional<TalkMember> findTalkMemberByUserIdAndTalkId(Long userId, Long talkId) {
-        return talkMemberRepository.findOneByTalkIdAndUserId(talkId, userId);
+        return talkMemberRepository.findOneByIdTalkIdAndIdUserId(talkId, userId);
     }
 
     @Override
@@ -54,8 +53,8 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
     }
 
     @Override
-    public Page<TalkDto> findAllByUserIds(Long[] userId, Pageable pageable) {
-        return talkDtoMapper.map(talkRepository.findAllByTalkMemberId(userId, pageable));
+    public Page<TalkDto> findAllByUserId(Long userId, Pageable pageable) {
+        return talkDtoMapper.map(talkRepository.findAllByUserId(userId, pageable));
     }
 
     @Override
@@ -63,11 +62,12 @@ public class TalkService extends AbstractService<Talk> implements ITalkService {
         return findTalkMemberByUserIdAndTalkId(userId, talkId).isPresent();
     }
 
-    private TalkMember addTalkMemberToTalk(Talk talk, User user) {
+    private void addTalkMemberToTalk(Talk talk, User user) {
         TalkMember talkMember = new TalkMember()
-                .setTalk(talk)
-                .setUser(user);
-        return talkMemberRepository.save(talkMember);
+                .setId(new TalkMemberId()
+                        .setTalk(talk)
+                        .setUser(user));
+        talkMemberRepository.save(talkMember);
     }
 
     @AuthorizedUser

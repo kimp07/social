@@ -43,7 +43,7 @@ public class TalkController {
                                                          @RequestParam(defaultValue = "0") Integer pageNum,
                                                          @RequestParam(defaultValue = "") Long[] userId) {
         return new ResponseEntity<>(
-                talkService.findAllByUserIds(
+                talkService.findAllByUserId(
                         userId,
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);

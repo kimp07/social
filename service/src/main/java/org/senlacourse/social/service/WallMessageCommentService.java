@@ -88,12 +88,14 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
         return userCanAddMessageComment(user, wall) && wallMessageComment.getUser().getId().equals(user.getId());
     }
 
-    private WallMessageComment addNewWallMessageComment(WallMessage wallMessage, User user, Wall wall, String message)
+    private WallMessageComment addNewWallMessageComment(WallMessage wallMessage, User user, Wall wall,
+                                                        String message, WallMessageComment answeredComment)
             throws ServiceException {
         if (userCanAddMessageComment(user, wall)) {
             WallMessageComment wallMessageComment = new WallMessageComment()
                     .setWallMessage(wallMessage)
-                    .setUser(user);
+                    .setUser(user)
+                    .setAnsweredComment(answeredComment);
             wallMessageComment
                     .setMessage(message)
                     .setLikesCount(0)
@@ -114,10 +116,14 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     public WallMessageCommentDto addNewWallMessageComment(NewWallMessageCommentDto dto)
             throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = wallMessageService.findEntityById(dto.getWallMessageId());
+        WallMessageComment answeredMessage = null;
+        if (dto.getAnsweredCommentId() != null && !dto.getAnsweredCommentId().equals(0L)) {
+            answeredMessage = findEntityById(dto.getAnsweredCommentId());
+        }
         User user = userService.findEntityById(dto.getUserId());
         Wall wall = wallMessage.getWall();
         return wallMessageCommentDtoMapper.fromEntity(
-                addNewWallMessageComment(wallMessage, user, wall, dto.getMessage()));
+                addNewWallMessageComment(wallMessage, user, wall, dto.getMessage(), answeredMessage));
     }
 
     private WallMessageComment editWallMessageComment(User user, WallMessageComment wallMessageComment, String message)

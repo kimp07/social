@@ -93,20 +93,22 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @AuthorizedUser
     @Override
-    public void addNewMessage(NewTalkMessageDto dto)
-            throws ObjectNotFoundException, ServiceException {
-        if (talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
-            addNewMessage(
-                    userService.findEntityById(dto.getUserId()),
-                    talkService.findEntityById(dto.getTalkId()),
-                    dto.getMessage(),
-                    findEntityById(dto.getAnsweredMessage()));
-        } else {
+    public void addNewMessage(NewTalkMessageDto dto) throws ObjectNotFoundException, ServiceException {
+        if (!talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
             ServiceException e = new ServiceException("User with id=" + dto.getUserId() +
                     "can't add message to talk with id=" + dto.getTalkId());
             log.error(e.getMessage(), e);
             throw e;
         }
+        TalkMessage answeredMessage = null;
+        if (dto.getAnsweredMessageId() != null && !dto.getAnsweredMessageId().equals(0L)) {
+            answeredMessage = findEntityById(dto.getAnsweredMessageId());
+        }
+        addNewMessage(
+                userService.findEntityById(dto.getUserId()),
+                talkService.findEntityById(dto.getTalkId()),
+                dto.getMessage(),
+                answeredMessage);
     }
 
     @AuthorizedUser

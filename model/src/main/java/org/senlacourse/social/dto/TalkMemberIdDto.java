@@ -7,7 +7,8 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class TalkMemberDto {
+public class TalkMemberIdDto {
 
-    private TalkMemberIdDto id;
+    private TalkDto talk;
+    private UserSimpleDto user;
 }
