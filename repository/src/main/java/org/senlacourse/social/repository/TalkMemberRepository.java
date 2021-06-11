@@ -1,7 +1,7 @@
 package org.senlacourse.social.repository;
 
 import org.senlacourse.social.domain.TalkMember;
-import org.senlacourse.social.domain.TalkMemberPk;
+import org.senlacourse.social.domain.TalkMemberId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TalkMemberRepository extends JpaRepository<TalkMember, TalkMemberPk> {
+public interface TalkMemberRepository extends JpaRepository<TalkMember, TalkMemberId> {
 
     @EntityGraph(attributePaths = {"user"})
     Page<TalkMember> findAllByIdTalkId(Long talkId, Pageable pageable);

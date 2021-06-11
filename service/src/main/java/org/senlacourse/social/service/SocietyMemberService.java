@@ -6,7 +6,7 @@ import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.SocietyMember;
-import org.senlacourse.social.domain.SocietyMemberPk;
+import org.senlacourse.social.domain.SocietyMemberId;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.dto.SocietyMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
@@ -80,7 +80,7 @@ public class SocietyMemberService {
     private void addUserToSociety(User user, Society society) {
         societyMemberRepository.save(
                 new SocietyMember().setId(
-                        new SocietyMemberPk().setSociety(society).setUser(user)));
+                        new SocietyMemberId().setSociety(society).setUser(user)));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

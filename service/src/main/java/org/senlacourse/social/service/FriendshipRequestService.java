@@ -8,6 +8,7 @@ import org.senlacourse.social.api.service.IFriendshipRequestService;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Friendship;
+import org.senlacourse.social.domain.FriendshipId;
 import org.senlacourse.social.domain.FriendshipRequest;
 import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipRequestDto;
@@ -24,12 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional(rollbackFor = {Throwable.class})
 @Log4j
 @RequiredArgsConstructor
 public class FriendshipRequestService extends AbstractService<FriendshipRequest> implements IFriendshipRequestService {
@@ -40,7 +38,6 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     private final IUserService userService;
     private final FriendshipRepository friendshipRepository;
     private final IFriendshipService friendshipService;
-    private final FriendshipMemberRepository friendshipMemberRepository;
 
     @Override
     public FriendshipRequest findEntityById(Long id) throws ObjectNotFoundException {
@@ -73,17 +70,17 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
                                 pageable));
     }
 
-    private Optional<FriendshipRequest> findByBothUserIds(Long[] userIds) {
-        return friendshipRequestRepository.findOneByBothUserIds(userIds[0], userIds[1]);
+    private Optional<FriendshipRequest> findByBothUserIds(Long userId, Long friendId) {
+        return friendshipRequestRepository.findOneByBothUserIds(userId, friendId);
     }
 
-    private void friendshipOrFriendshipRequestNotExists(Long[] userIds) throws ServiceException {
-        if (friendshipService.friendshipExistsByBothUserIds(userIds)) {
+    private void friendshipOrFriendshipRequestNotExists(Long userId, Long friendId) throws ServiceException {
+        if (friendshipService.friendshipExistsByBothUserIds(userId, friendId)) {
             ServiceException e = new ServiceException("Friendship for users exists");
             log.debug(e.getMessage(), e);
             throw e;
         }
-        if (findByBothUserIds(userIds).isPresent()) {
+        if (findByBothUserIds(userId, friendId).isPresent()) {
             ServiceException e = new ServiceException("FriendshipRequest for users exists");
             log.debug(e.getMessage(), e);
             throw e;
@@ -91,10 +88,11 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
     }
 
     @AuthorizedUser
+    @Transactional
     @Override
     public FriendshipRequestDto saveNewFriendshipRequest(NewFriendshipRequestDto dto)
             throws ObjectNotFoundException, ServiceException {
-        friendshipOrFriendshipRequestNotExists(new Long[]{dto.getRecipientId(), dto.getSenderId()});
+        friendshipOrFriendshipRequestNotExists(dto.getRecipientId(), dto.getSenderId());
         FriendshipRequest friendshipRequest = new FriendshipRequest()
                 .setSender(userService
                         .findEntityById(dto.getSenderId()))
@@ -106,6 +104,7 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
                         .save(friendshipRequest));
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) throws ObjectNotFoundException {
         friendshipRequestRepository.deleteById(
@@ -113,23 +112,21 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
                         .getId());
     }
 
+    @Transactional
     @Override
     public FriendshipDto confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
         FriendshipRequest friendshipRequest = findEntityById(id);
-        Friendship friendship = new Friendship();
+        Friendship friendship = new Friendship()
+                .setId(new FriendshipId()
+                        .setUser(
+                                userService.findEntityById(
+                                        friendshipRequest.getSender().getId()))
+                        .setFriend(
+                                userService.findEntityById(
+                                        friendshipRequest.getRecipient().getId()))
+                );
         FriendshipDto friendshipDto = friendshipDtoMapper.fromEntity(friendshipRepository.save(friendship));
-
-        List<FriendshipMember> members = new ArrayList<>();
-        members.add(new FriendshipMember()
-                .setFriendship(friendship)
-                .setUser(friendshipRequest.getSender()));
-        members.add(new FriendshipMember()
-                .setFriendship(friendship)
-                .setUser(friendshipRequest.getRecipient()));
-        friendshipMemberRepository.saveAll(members);
-
         friendshipRequestRepository.deleteById(id);
-
         return friendshipDto;
     }
 }

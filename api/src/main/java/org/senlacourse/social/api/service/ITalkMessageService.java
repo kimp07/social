@@ -17,13 +17,10 @@ public interface ITalkMessageService extends IService<TalkMessage> {
     void addNewMessage(NewTalkMessageDto dto)
             throws ObjectNotFoundException, ServiceException;
 
-    Page<IUnreadTalkMessagesGroupByTalkIdCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
+    Page<IUnreadTalkMessagesGroupByTalkIdCountView> getUnreadMessagesByRecipientIdGroupByTalkId(UserIdDto dto, Pageable pageable)
             throws ObjectNotFoundException;
 
-    IUnreadTalkMessagesGroupByTalkIdCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto, Long talkId)
-            throws ObjectNotFoundException;
+    void updateMessagesSetUnreadFalseByRecipientId(UserIdDto dto);
 
-    void deleteCacheMessagesByRecipientId(UserIdDto dto);
-
-    void deleteCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Long talkId);
+    void updateMessagesSetUnreadFalseByRecipientIdAndTalkId(UserIdDto dto, Long talkId);
 }

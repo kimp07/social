@@ -10,7 +10,7 @@ import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Image;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.UserImage;
-import org.senlacourse.social.domain.UserImagePk;
+import org.senlacourse.social.domain.UserImageId;
 import org.senlacourse.social.dto.NewUserImageDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.UserImageDto;
@@ -87,7 +87,7 @@ public class UserImageService implements IUserImageService {
         return userImageDtoMapper.fromEntity(
                 userImageRepository
                         .save(new UserImage()
-                                .setId(new UserImagePk()
+                                .setId(new UserImageId()
                                         .setUser(user)
                                         .setImage(image))));
     }

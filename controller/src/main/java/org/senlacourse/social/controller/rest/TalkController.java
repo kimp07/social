@@ -98,39 +98,30 @@ public class TalkController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @GetMapping("/messages/{talkId}/cache")
-    public ResponseEntity<IUnreadTalkMessagesGroupByTalkIdCountView> getUnreadMessages(@NotNull @PathVariable Long talkId,
-                                                                                       @RequestParam(defaultValue = "0") Long userId) {
-        return new ResponseEntity<>(
-                talkMessageService.findCacheMessagesCountByRecipientIdAndTalkId(new UserIdDto(userId), talkId),
-                HttpStatus.OK);
-    }
-
-    @Secured(value = {"ROLE_USER"})
-    @GetMapping("/messages/cache")
+    @GetMapping("/messages/unread")
     public ResponseEntity<Page<IUnreadTalkMessagesGroupByTalkIdCountView>> getUnreadMessages(
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "0") Integer pageNum,
             @RequestParam(defaultValue = "0") Long userId) {
         return new ResponseEntity<>(
-                talkMessageService.findCacheMessagesByRecipientIdAndTalkId(
+                talkMessageService.getUnreadMessagesByRecipientIdGroupByTalkId(
                         new UserIdDto(userId),
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @DeleteMapping("/messages/{talkId}/cache")
+    @DeleteMapping("/messages/{talkId}/unread")
     public ResponseEntity<ResponseMessageDto> removeUnreadMessages(@NotNull @PathVariable Long talkId,
                                                                    @RequestParam(defaultValue = "0") Long userId) {
-        talkMessageService.deleteCacheMessagesByRecipientIdAndTalkId(new UserIdDto(userId), talkId);
+        talkMessageService.updateMessagesSetUnreadFalseByRecipientIdAndTalkId(new UserIdDto(userId), talkId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @DeleteMapping("/messages/cache")
+    @DeleteMapping("/messages/unread")
     public ResponseEntity<ResponseMessageDto> removeUnreadMessages(@RequestParam(defaultValue = "0") Long userId) {
-        talkMessageService.deleteCacheMessagesByRecipientId(new UserIdDto(userId));
+        talkMessageService.updateMessagesSetUnreadFalseByRecipientId(new UserIdDto(userId));
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 

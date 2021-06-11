@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.localstorage.IFileTransportService;
 import org.senlacourse.social.api.service.IImageService;
-import org.senlacourse.social.domain.AbstractEntity;
 import org.senlacourse.social.domain.Image;
 import org.senlacourse.social.dto.ImageDto;
 import org.senlacourse.social.mapstruct.ImageDtoMapper;

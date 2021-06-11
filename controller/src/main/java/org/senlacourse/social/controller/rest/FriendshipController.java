@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.IFriendshipRequestService;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.dto.FriendshipMemberDto;
+import org.senlacourse.social.dto.FriendshipDto;
 import org.senlacourse.social.dto.FriendshipRequestDto;
 import org.senlacourse.social.dto.NewFriendshipRequestDto;
 import org.senlacourse.social.dto.ResponseMessageDto;
@@ -68,11 +68,11 @@ public class FriendshipController {
 
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/fiends/{id}")
-    public ResponseEntity<Page<FriendshipMemberDto>> getFriends(@PathVariable Long id,
-                                                                @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                @RequestParam(defaultValue = "0") Integer pageNum) {
+    public ResponseEntity<Page<FriendshipDto>> getFriends(@PathVariable Long id,
+                                                          @RequestParam(defaultValue = "10") Integer pageSize,
+                                                          @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipService.findAllFriendshipMembersByUserId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
+                friendshipService.findAllByUserId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 

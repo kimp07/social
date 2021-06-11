@@ -8,7 +8,7 @@ import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.SocietyMember;
-import org.senlacourse.social.domain.SocietyMemberPk;
+import org.senlacourse.social.domain.SocietyMemberId;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.Wall;
 import org.senlacourse.social.dto.NewSocietyDto;
@@ -75,7 +75,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     @Override
     public Page<SocietyMemberDto> findAllSocietyMembersBySocietyId(Long societyId, Pageable pageable) {
         return societyMemberDtoMapper.map(
-                societyMemberRepository.findAllBySocietyId(societyId, pageable));
+                societyMemberRepository.findAllByIdSocietyId(societyId, pageable));
     }
 
     private void createWall(Society society) {
@@ -95,7 +95,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         society = societyRepository.save(society);
         createWall(society);
         SocietyMember societyMember = new SocietyMember()
-                .setId(new SocietyMemberPk()
+                .setId(new SocietyMemberId()
                         .setSociety(society)
                         .setUser(owner));
         societyMemberRepository.save(societyMember);
@@ -113,6 +113,13 @@ public class SocietyService extends AbstractService<Society> implements ISociety
         }
     }
 
+    private SocietyMember findEntitySocietyMemberByUserIdAndSocietyId(Long userId, Long societyId)
+            throws ObjectNotFoundException {
+        return societyMemberRepository
+                .findOneByIdUserIdAndIdSocietyId(userId, societyId)
+                .orElseThrow(ObjectNotFoundException::new);
+    }
+
     @AuthorizedUser
     @Override
     public SocietyMemberDto addUserToSociety(UserIdDto dto, Long societyId)
@@ -125,11 +132,11 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                             findEntitySocietyMemberByUserIdAndSocietyId(dto.getAuthorizedUserId(), societyId));
         } else {
             return societyMemberDtoMapper
-                    .fromEntity(
-                            societyMemberRepository.save(
-                                    new SocietyMember()
+                    .fromEntity(societyMemberRepository.save(
+                            new SocietyMember().setId(
+                                    new SocietyMemberId()
                                             .setSociety(society)
-                                            .setUser(user)));
+                                            .setUser(user))));
         }
     }
 
@@ -145,7 +152,7 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     @Override
     public boolean isUserMemberOfSociety(Long userId, Long societyId) {
         return societyMemberRepository
-                .findByUserIdAndSocietyId(
+                .findOneByIdUserIdAndIdSocietyId(
                         userId,
                         societyId)
                 .isPresent();

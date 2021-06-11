@@ -19,7 +19,7 @@ import java.util.Objects;
 public class SocietyMember {
 
     @EmbeddedId
-    private SocietyMemberPk id;
+    private SocietyMemberId id;
 
     @Override
     public boolean equals(Object o) {

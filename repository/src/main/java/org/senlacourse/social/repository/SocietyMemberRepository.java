@@ -1,7 +1,7 @@
 package org.senlacourse.social.repository;
 
 import org.senlacourse.social.domain.SocietyMember;
-import org.senlacourse.social.domain.SocietyMemberPk;
+import org.senlacourse.social.domain.SocietyMemberId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SocietyMemberRepository extends JpaRepository<SocietyMember, SocietyMemberPk> {
+public interface SocietyMemberRepository extends JpaRepository<SocietyMember, SocietyMemberId> {
 
     @EntityGraph(attributePaths = {"society", "user"})
     Page<SocietyMember> findAllByIdSocietyId(Long societyId, Pageable pageable);

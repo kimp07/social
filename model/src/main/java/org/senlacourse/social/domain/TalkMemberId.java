@@ -16,27 +16,27 @@ import java.util.Objects;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class SocietyMemberPk implements Serializable {
+public class TalkMemberId implements Serializable {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "talk_id", referencedColumnName = "id")
+    @ToString.Exclude
+    private Talk talk;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ToString.Exclude
     private User user;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "society_id", referencedColumnName = "id")
-    @ToString.Exclude
-    private Society society;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SocietyMemberPk that = (SocietyMemberPk) o;
-        return getUser().equals(that.getUser()) && getSociety().equals(that.getSociety());
+        TalkMemberId that = (TalkMemberId) o;
+        return getUser().equals(that.getUser()) && getTalk().equals(that.getTalk());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUser(), getSociety());
+        return Objects.hash(getUser(), getTalk());
     }
 }

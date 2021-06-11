@@ -1,7 +1,7 @@
 package org.senlacourse.social.repository;
 
 import org.senlacourse.social.domain.UserImage;
-import org.senlacourse.social.domain.UserImagePk;
+import org.senlacourse.social.domain.UserImageId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserImageRepository extends JpaRepository<UserImage, UserImagePk> {
+public interface UserImageRepository extends JpaRepository<UserImage, UserImageId> {
 
     @EntityGraph(attributePaths = {"image"})
     Page<UserImage> findAllByIdUserId(Long userId, Pageable pageable);

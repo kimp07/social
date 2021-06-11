@@ -3,6 +3,7 @@ package org.senlacourse.social.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -14,7 +15,8 @@ import java.util.Objects;
 @Embeddable
 @Getter
 @Setter
-public class FriendshipPk implements Serializable {
+@Accessors(chain = true)
+public class FriendshipId implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -30,7 +32,7 @@ public class FriendshipPk implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FriendshipPk that = (FriendshipPk) o;
+        FriendshipId that = (FriendshipId) o;
         return getUser().equals(that.getUser()) && getFriend().equals(that.getFriend());
     }
 

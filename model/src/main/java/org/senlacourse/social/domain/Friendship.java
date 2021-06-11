@@ -19,7 +19,7 @@ import java.util.Objects;
 public class Friendship {
 
     @EmbeddedId
-    private FriendshipPk id;
+    private FriendshipId id;
 
     @Override
     public boolean equals(Object o) {

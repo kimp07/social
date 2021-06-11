@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class UserImagePk implements Serializable {
+public class UserImageId implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -28,7 +28,7 @@ public class UserImagePk implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserImagePk that = (UserImagePk) o;
+        UserImageId that = (UserImageId) o;
         return getUser().equals(that.getUser()) && getImage().equals(that.getImage());
     }
 

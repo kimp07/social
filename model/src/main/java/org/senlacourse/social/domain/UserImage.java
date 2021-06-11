@@ -17,7 +17,7 @@ import java.util.Objects;
 public class UserImage {
 
     @EmbeddedId
-    private UserImagePk id;
+    private UserImageId id;
 
     @Override
     public boolean equals(Object o) {

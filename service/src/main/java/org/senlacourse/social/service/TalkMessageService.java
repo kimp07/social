@@ -36,7 +36,6 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     private final TalkMessageRepository talkMessageRepository;
     private final IUserService userService;
     private final TalkMemberRepository talkMemberRepository;
-    private final TalkMessagesCacheRepository talkMessagesCacheRepository;
     private final TalkMessageDtoMapper talkMessageDtoMapper;
     private final ITalkService talkService;
 
@@ -58,8 +57,8 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                         .setMessageDate(dateTime)
                         .setSender(sender)
                         .setMessage(message)
-                        .setTalk(talkMember.getTalk())
-                        .setUser(talkMember.getUser())
+                        .setTalk(talkMember.getId().getTalk())
+                        .setUser(talkMember.getId().getUser())
                         .setAnsweredMessage(answeredMessage)));
     }
 
@@ -67,13 +66,13 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
         int pageSize = 20;
         LocalDateTime now = LocalDateTime.now();
         Page<TalkMember> talkMembersPage
-                = talkMemberRepository.findAllByTalkId(talk.getId(), PageRequest.of(0, pageSize));
+                = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(0, pageSize));
         int totalPages = talkMembersPage.getTotalPages();
         sendMessageToTalkMembers(message, talkMembersPage, sender, answeredMessage, now);
         if (talkMembersPage.getTotalPages() > 1) {
             for (int pageNum = 1; pageNum < totalPages; pageNum++) {
                 talkMembersPage
-                        = talkMemberRepository.findAllByTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
+                        = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
                 sendMessageToTalkMembers(message, talkMembersPage, sender, answeredMessage, now);
             }
         }
@@ -112,28 +111,22 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @AuthorizedUser
     @Override
-    public Page<IUnreadTalkMessagesGroupByTalkIdCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
+    public Page<IUnreadTalkMessagesGroupByTalkIdCountView> getUnreadMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
+                                                                                                       Pageable pageable)
             throws ObjectNotFoundException {
-        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
+        return talkMessageRepository.findCountByUserIdAndUnreadIsTrueGroupByTalkId(dto.getAuthorizedUserId(), pageable);
     }
 
     @AuthorizedUser
     @Override
-    public IUnreadTalkMessagesGroupByTalkIdCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto, Long talkId)
-            throws ObjectNotFoundException {
-        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
+    public void updateMessagesSetUnreadFalseByRecipientId(UserIdDto dto) {
+        talkMessageRepository.updateAllSetUnreadFalseByUserId(dto.getAuthorizedUserId());
     }
 
     @AuthorizedUser
     @Override
-    public void deleteCacheMessagesByRecipientId(UserIdDto dto) {
-        talkMessagesCacheRepository.deleteAllByRecipientId(dto.getAuthorizedUserId());
-    }
-
-    @AuthorizedUser
-    @Override
-    public void deleteCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Long talkId) {
-        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
+    public void updateMessagesSetUnreadFalseByRecipientIdAndTalkId(UserIdDto dto, Long talkId) {
+        talkMessageRepository.updateAllSetUnreadFalseByUserAndTalkId(dto.getAuthorizedUserId(), talkId);
     }
 
 }

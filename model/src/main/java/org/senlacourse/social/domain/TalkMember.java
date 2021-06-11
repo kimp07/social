@@ -7,9 +7,6 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Objects;
 
@@ -22,7 +19,7 @@ import java.util.Objects;
 public class TalkMember {
 
     @EmbeddedId
-    private TalkMemberPk id;
+    private TalkMemberId id;
 
     @Override
     public boolean equals(Object o) {

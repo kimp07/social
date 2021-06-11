@@ -86,7 +86,7 @@ class TalkMessageTests {
                         .setMessage("Some message"));
         Assertions.assertNotNull(
                 talkMessageService
-                        .findCacheMessagesByRecipientIdAndTalkId(
+                        .getUnreadMessagesByRecipientIdGroupByTalkId(
                                 new UserIdDto(recipient.getId()),
                                         PageRequest.of(0, 1))
                         .getContent());
