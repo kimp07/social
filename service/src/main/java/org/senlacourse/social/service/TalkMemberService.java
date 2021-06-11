@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
+import org.senlacourse.social.api.service.ITalkMemberService;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.TalkMemberId;
@@ -25,7 +26,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Log4j
-public class TalkMemberService {
+public class TalkMemberService implements ITalkMemberService {
 
     private final TalkMemberRepository talkMemberRepository;
     private final UserRepository userRepository;
@@ -55,10 +56,12 @@ public class TalkMemberService {
                 });
     }
 
+    @Override
     public boolean isUserTalkMember(Long userId, Long talkId) {
         return getByUserIdAndTalkId(userId, talkId).isPresent();
     }
 
+    @Override
     public TalkMember findEntityByUserIdAndTalkId(Long userId, Long talkId) throws ObjectNotFoundException {
         return getByUserIdAndTalkId(userId, talkId)
                 .orElseThrow(() -> {
@@ -68,11 +71,13 @@ public class TalkMemberService {
                 });
     }
 
+    @Override
     public TalkMemberDto findByUserIdAndTalkId(Long userId, Long talkId) throws ObjectNotFoundException {
         return talkMemberDtoMapper.fromEntity(
                 findEntityByUserIdAndTalkId(userId, talkId));
     }
 
+    @Override
     public Page<TalkMemberDto> findAllByTalkId(Long talkId, Pageable pageable) {
         return talkMemberDtoMapper.map(
                 talkMemberRepository.findAllByIdTalkId(talkId, pageable));
@@ -86,6 +91,7 @@ public class TalkMemberService {
                         .setUser(user)));
     }
 
+    @Override
     @AuthorizedUser
     @Transactional(rollbackFor = {Throwable.class})
     public void save(UserIdDto dto, Long talkId) throws ObjectNotFoundException, ServiceException {

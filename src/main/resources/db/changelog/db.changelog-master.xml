@@ -85,7 +85,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="about_me" type="VARCHAR(255)"/>
-            <column name="image_id" type="LONG">
+            <column name="image_id" type="BIGINT">
                 <constraints foreignKeyName="users_image_fk" referencedTableName="images" referencedColumnNames="id"/>
             </column>
         </createTable>
@@ -314,9 +314,6 @@
             </not>
         </preConditions>
         <createTable tableName="talk_members">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="talk_members_pk"/>
-            </column>
             <column name="talk_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="talk_members_talk_fk"
                              referencedTableName="talks" referencedColumnNames="id"/>
@@ -326,6 +323,7 @@
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
+        <addPrimaryKey tableName="talk_members" columnNames="talk_id,user_id" constraintName="talk_members_pk" />
     </changeSet><!-- //TABLE talk_members -->
     <!-- TABLE talk_members INDEXES-->
     <changeSet author="alex" id="2021-05-06_8-00AM-08-01">
