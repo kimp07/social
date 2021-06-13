@@ -7,7 +7,6 @@ import org.senlacourse.social.dto.TalkMemberDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ITalkMemberService {
     boolean isUserTalkMember(Long userId, Long talkId);
@@ -18,7 +17,5 @@ public interface ITalkMemberService {
 
     Page<TalkMemberDto> findAllByTalkId(Long talkId, Pageable pageable);
 
-    @AuthorizedUser
-    @Transactional(rollbackFor = {Throwable.class})
     void save(UserIdDto dto, Long talkId) throws ObjectNotFoundException, ServiceException;
 }

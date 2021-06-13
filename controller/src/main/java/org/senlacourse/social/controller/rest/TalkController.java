@@ -41,7 +41,7 @@ public class TalkController {
     @GetMapping
     public ResponseEntity<Page<TalkDto>> getAllUserTalks(@RequestParam(defaultValue = "10") Integer pageSize,
                                                          @RequestParam(defaultValue = "0") Integer pageNum,
-                                                         @RequestParam(defaultValue = "") Long[] userId) {
+                                                         @RequestParam(defaultValue = "") Long userId) {
         return new ResponseEntity<>(
                 talkService.findAllByUserId(
                         userId,

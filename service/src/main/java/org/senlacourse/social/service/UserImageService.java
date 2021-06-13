@@ -35,11 +35,12 @@ public class UserImageService implements IUserImageService {
     private final IImageService imageService;
     private final UserImageDtoMapper userImageDtoMapper;
 
+    @AuthorizedUser
     @Override
-    public UserImageDto findByUserIdAndImageId(Long userId, Long imageId) throws ObjectNotFoundException {
+    public UserImageDto findByUserIdAndImageId(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
         return userImageDtoMapper.fromEntity(
                 userImageRepository
-                        .findByIdUserIdAndIdImageId(userId, imageId)
+                        .findByIdUserIdAndIdImageId(dto.getAuthorizedUserId(), imageId)
                         .orElseThrow(ObjectNotFoundException::new));
     }
 
@@ -56,7 +57,7 @@ public class UserImageService implements IUserImageService {
             throws ObjectNotFoundException, ServiceException {
         UserImage image = userImageRepository
                 .findByIdUserIdAndIdImageId(dto.getAuthorizedUserId(), userImageId)
-                .orElseThrow(() -> {
+                .<ObjectNotFoundException>orElseThrow(() -> {
                     throw new ObjectNotFoundException("Object not found");
                 });
         if (image.getId().getUser().getId().equals(dto.getAuthorizedUserId())) {

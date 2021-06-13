@@ -33,28 +33,30 @@ public class SocietyMemberService {
 
     private SocietyMember findByUserIdAndSocietyId(Long userId, Long societyId) throws ObjectNotFoundException {
         return societyMemberRepository
-                        .findOneByIdUserIdAndIdSocietyId(userId, societyId)
-                        .orElseThrow(() -> {
-                            ObjectNotFoundException e = new ObjectNotFoundException();
-                            log.error(e.getMessage(), e);
-                            throw e;
-                        });
+                .findOneByIdUserIdAndIdSocietyId(userId, societyId)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    ObjectNotFoundException e = new ObjectNotFoundException();
+                    log.error(e.getMessage(), e);
+                    throw e;
+                });
     }
 
     private User findUserById(Long id) throws ObjectNotFoundException {
-        return userRepository.findById(id).orElseThrow(() -> {
-                ObjectNotFoundException e = new ObjectNotFoundException();
-                log.error(e.getMessage(), e);
-                throw e;
-        });
+        return userRepository.findById(id)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    ObjectNotFoundException e = new ObjectNotFoundException();
+                    log.error(e.getMessage(), e);
+                    throw e;
+                });
     }
 
     private Society findSocietyById(Long id) throws ObjectNotFoundException {
-        return societyRepository.findById(id).orElseThrow(() -> {
-            ObjectNotFoundException e = new ObjectNotFoundException();
-            log.error(e.getMessage(), e);
-            throw e;
-        });
+        return societyRepository.findById(id)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    ObjectNotFoundException e = new ObjectNotFoundException();
+                    log.error(e.getMessage(), e);
+                    throw e;
+                });
     }
 
     private boolean isMemberOfSociety(Long userId, Long societyId) {
@@ -66,13 +68,13 @@ public class SocietyMemberService {
         return societyMemberDtoMapper.fromEntity(findByUserIdAndSocietyId(dto.getAuthorizedUserId(), societyId));
     }
 
-    public Page<SocietyMemberDto>  findAllBySocietyId(Long societyId, Pageable pageable) {
+    public Page<SocietyMemberDto> findAllBySocietyId(Long societyId, Pageable pageable) {
         return societyMemberDtoMapper.map(
                 societyMemberRepository.findAllByIdSocietyId(societyId, pageable));
     }
 
     @AuthorizedUser
-    public Page<SocietyMemberDto>  findAllByUserId(UserIdDto dto, Pageable pageable) {
+    public Page<SocietyMemberDto> findAllByUserId(UserIdDto dto, Pageable pageable) {
         return societyMemberDtoMapper.map(
                 societyMemberRepository.findAllByIdUserId(dto.getAuthorizedUserId(), pageable));
     }

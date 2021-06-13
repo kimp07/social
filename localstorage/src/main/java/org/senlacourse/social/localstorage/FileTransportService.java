@@ -24,8 +24,6 @@ import java.io.IOException;
 @Log4j
 public class FileTransportService implements IFileTransportService {
 
-    private final IUserImageService userImageService;
-
     @Value("${files.dir:/imgstorage}")
     private String localStorageDir;
 

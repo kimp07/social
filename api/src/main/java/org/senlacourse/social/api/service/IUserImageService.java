@@ -9,21 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IUserImageService {
-    UserImageDto findByUserIdAndImageId(Long userId, Long imageId) throws ObjectNotFoundException;
 
-    @AuthorizedUser
+    UserImageDto findByUserIdAndImageId(UserIdDto userId, Long imageId) throws ObjectNotFoundException;
+
     Page<UserImageDto> findAllImagesByUserId(UserIdDto dto, Pageable pageable) throws ObjectNotFoundException;
 
-    @AuthorizedUser
     void deleteByUserImageIdAndUserId(UserIdDto dto, Long userImageId)
             throws ObjectNotFoundException, ServiceException;
 
-    @AuthorizedUser
     void deleteAllByUserId(UserIdDto dto) throws ObjectNotFoundException;
 
-    @AuthorizedUser
     UserImageDto save(NewUserImageDto dto) throws ObjectNotFoundException;
 
-    @AuthorizedUser
     void setImageToUserAvatar(UserIdDto dto, Long imageId) throws ObjectNotFoundException;
 }

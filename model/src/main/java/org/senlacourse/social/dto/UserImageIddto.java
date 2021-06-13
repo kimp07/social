@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UserImagePkdto {
+public class UserImageIddto {
 
     private UserSimpleDto user;
     private String imgFileName;

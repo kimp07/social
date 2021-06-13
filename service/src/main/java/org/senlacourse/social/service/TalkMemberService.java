@@ -40,7 +40,7 @@ public class TalkMemberService implements ITalkMemberService {
 
     private User findUserById(Long id) throws ObjectNotFoundException {
         return userRepository.findById(id)
-                .orElseThrow(() -> {
+                .<ObjectNotFoundException>orElseThrow(() -> {
                     ObjectNotFoundException e = new ObjectNotFoundException();
                     log.error(e.getMessage(), e);
                     throw e;
@@ -49,7 +49,7 @@ public class TalkMemberService implements ITalkMemberService {
 
     private Talk findTalkById(Long id) throws ObjectNotFoundException {
         return talkRepository.findById(id)
-                .orElseThrow(() -> {
+                .<ObjectNotFoundException>orElseThrow(() -> {
                     ObjectNotFoundException e = new ObjectNotFoundException();
                     log.error(e.getMessage(), e);
                     throw e;
@@ -64,7 +64,7 @@ public class TalkMemberService implements ITalkMemberService {
     @Override
     public TalkMember findEntityByUserIdAndTalkId(Long userId, Long talkId) throws ObjectNotFoundException {
         return getByUserIdAndTalkId(userId, talkId)
-                .orElseThrow(() -> {
+                .<ObjectNotFoundException>orElseThrow(() -> {
                     ObjectNotFoundException e = new ObjectNotFoundException();
                     log.error(e.getMessage(), e);
                     throw e;
