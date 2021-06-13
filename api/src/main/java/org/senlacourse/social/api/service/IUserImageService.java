@@ -2,7 +2,6 @@ package org.senlacourse.social.api.service;
 
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.dto.NewUserImageDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.UserImageDto;
 import org.springframework.data.domain.Page;

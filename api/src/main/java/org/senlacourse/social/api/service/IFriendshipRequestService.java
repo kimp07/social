@@ -21,7 +21,8 @@ public interface IFriendshipRequestService extends IService<FriendshipRequest> {
     FriendshipRequestDto saveNewFriendshipRequest(NewFriendshipRequestDto dto)
             throws ObjectNotFoundException, ServiceException;
 
-    void deleteById(Long id) throws ObjectNotFoundException;
+    void decline(UserIdDto dto, Long requestId) throws ObjectNotFoundException, ServiceException;
 
-    FriendshipDto confirmFriendshipRequestById(Long id) throws ObjectNotFoundException;
+    FriendshipDto confirmFriendshipRequestById(UserIdDto dto, Long requestId)
+            throws ObjectNotFoundException, ServiceException;
 }

@@ -104,29 +104,50 @@ public class FriendshipRequestService extends AbstractService<FriendshipRequest>
                         .save(friendshipRequest));
     }
 
-    @Transactional
-    @Override
-    public void deleteById(Long id) throws ObjectNotFoundException {
+    private void deleteById(Long id) throws ObjectNotFoundException {
         friendshipRequestRepository.deleteById(
                 findEntityById(id)
                         .getId());
     }
 
+    @AuthorizedUser
     @Transactional
     @Override
-    public FriendshipDto confirmFriendshipRequestById(Long id) throws ObjectNotFoundException {
-        FriendshipRequest friendshipRequest = findEntityById(id);
-        Friendship friendship = new Friendship()
+    public void decline(UserIdDto dto, Long requestId) throws ObjectNotFoundException, ServiceException {
+        FriendshipRequest friendshipRequest = findEntityById(requestId);
+        if (!friendshipRequest.getRecipient().getId().equals(dto.getAuthorizedUserId())
+                && !friendshipRequest.getSender().getId().equals(dto.getAuthorizedUserId())) {
+            ServiceException e = new ServiceException("User id=" + dto.getAuthorizedUserId() + "can`t accept request");
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+        deleteById(requestId);
+    }
+
+    @AuthorizedUser
+    @Transactional
+    @Override
+    public FriendshipDto confirmFriendshipRequestById(UserIdDto dto, Long requestId)
+            throws ObjectNotFoundException, ServiceException {
+        FriendshipRequest friendshipRequest = findEntityById(requestId);
+        if (!friendshipRequest.getRecipient().getId().equals(dto.getAuthorizedUserId())) {
+            ServiceException e = new ServiceException("User id=" + dto.getAuthorizedUserId() + "can`t decline request");
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+        FriendshipDto friendshipDto = friendshipDtoMapper.fromEntity(
+                createNewFriendshipFromFriendshipRequest(friendshipRequest));
+        friendshipRequestRepository.deleteById(requestId);
+        return friendshipDto;
+    }
+
+    private Friendship createNewFriendshipFromFriendshipRequest(FriendshipRequest friendshipRequest) throws ObjectNotFoundException {
+        return friendshipRepository.save(new Friendship()
                 .setId(new FriendshipId()
                         .setUser(
-                                userService.findEntityById(
-                                        friendshipRequest.getSender().getId()))
+                                userService.findEntityById(friendshipRequest.getSender().getId()))
                         .setFriend(
-                                userService.findEntityById(
-                                        friendshipRequest.getRecipient().getId()))
-                );
-        FriendshipDto friendshipDto = friendshipDtoMapper.fromEntity(friendshipRepository.save(friendship));
-        friendshipRequestRepository.deleteById(id);
-        return friendshipDto;
+                                userService.findEntityById(friendshipRequest.getRecipient().getId()))
+                ));
     }
 }

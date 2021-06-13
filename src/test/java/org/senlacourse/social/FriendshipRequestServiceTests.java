@@ -7,11 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.senlacourse.social.api.service.IFriendshipRequestService;
 import org.senlacourse.social.api.service.IFriendshipService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.dto.FriendshipRequestDto;
-import org.senlacourse.social.dto.NewFriendshipRequestDto;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserIdDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -77,9 +73,10 @@ class FriendshipRequestServiceTests {
     }
 
     @Test
-    void confirmFriendipRequestMustBeCreatedFriendship() {
+    void confirmFriendshipRequestMustBeCreatedFriendship() {
         requestDto = saveNewRequest();
-        friendshipRequestService.confirmFriendshipRequestById(requestDto.getId());
+        friendshipRequestService.confirmFriendshipRequestById(
+                new UserIdDto(recipient.getId()), requestDto.getId());
         Assertions.assertTrue(
                 friendshipService
                         .friendshipExistsByBothUserIds(
