@@ -13,12 +13,10 @@ import java.util.Optional;
 @Repository
 public interface TalkMemberRepository extends JpaRepository<TalkMember, TalkMemberId> {
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"id.user"})
     Page<TalkMember> findAllByIdTalkId(Long talkId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "path"})
+    @EntityGraph(attributePaths = {"id.user", "id.talk"})
     Optional<TalkMember> findOneByIdTalkIdAndIdUserId(Long talkId, Long userId);
 
-    @EntityGraph(attributePaths = {"talk"})
-    Page<TalkMember> findAllByIdUserId(Long userId, Pageable pageable);
 }

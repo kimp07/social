@@ -19,7 +19,7 @@ public interface IUserImageService {
 
     void deleteAllByUserId(UserIdDto dto) throws ObjectNotFoundException;
 
-    UserImageDto save(NewUserImageDto dto) throws ObjectNotFoundException;
+    UserImageDto save(UserIdDto dto, Long imageId) throws ObjectNotFoundException;
 
     void setImageToUserAvatar(UserIdDto dto, Long imageId) throws ObjectNotFoundException;
 }

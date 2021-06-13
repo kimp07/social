@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 public interface UserDtoMapper {
 
     @Mapping(target = "birthDate", source = "birthDate", dateFormat = "yyyy-MM-dd")
+    @Mapping(target = "authorizedUserId", ignore = true)
     UserDto fromEntity(User entity);
 
     @Mapping(target = "password", ignore = true)

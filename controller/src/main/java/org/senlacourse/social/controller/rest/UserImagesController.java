@@ -10,17 +10,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/galary")
+@RequestMapping("/gallery")
 @RequiredArgsConstructor
 public class UserImagesController {
 
@@ -38,14 +33,25 @@ public class UserImagesController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @GetMapping
-    public ResponseEntity<UserImageDto> getUserImages(@RequestParam(defaultValue = "0") Long userId,
-                                                            @NotNull @RequestParam Long imageId) {
+    @GetMapping("/image")
+    public ResponseEntity<UserImageDto> getUserImage(@RequestParam(defaultValue = "0") Long userId,
+                                                     @NotNull @RequestParam Long imageId) {
         return new ResponseEntity<>(
                 userImageService
                         .findByUserIdAndImageId(new UserIdDto(userId), imageId),
                 HttpStatus.OK);
     }
+
+    @Secured(value = {"ROLE_USER"})
+    @PostMapping("/image")
+    public ResponseEntity<UserImageDto> addUserImage(@RequestParam(defaultValue = "0") Long userId,
+                                                     @NotNull @RequestParam Long imageId) {
+        return new ResponseEntity<>(
+                userImageService
+                        .save(new UserIdDto(userId), imageId),
+                HttpStatus.OK);
+    }
+
 
     @Secured(value = {"ROLE_USER"})
     @PutMapping("/avatar")

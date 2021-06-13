@@ -45,7 +45,7 @@ public class UserDto implements IAuthorizedUserDto {
     private Boolean credentialsNonExpired;
     private AuthProvider authProvider;
     private String authProviderId;
-    private String userImageFileName;
+    private ImageDto avatar;
 
     @Override
     public void setAuthorizedUserId(Long id) {

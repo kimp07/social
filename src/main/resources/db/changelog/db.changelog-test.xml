@@ -69,7 +69,9 @@
             <column name="u_credentials_non_expired" type="BOOLEAN" defaultValue="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="role_id" type="BIGINT" />
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
             <column name="auth_provider" type="VARCHAR(20)"/>
             <column name="auth_provider_id" type="VARCHAR(200)"/>
             <column name="first_name" type="VARCHAR(100)">
@@ -134,8 +136,12 @@
             </not>
         </preConditions>
         <createTable tableName="friendships">
-            <column name="user_id" type="BIGINT" />
-            <column name="friend_id" type="BIGINT" />
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="friend_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
         </createTable>
         <addPrimaryKey tableName="friendships" columnNames="user_id,friend_id" constraintName="friendships_pk"/>
     </changeSet>  <!-- //TABLE friendships -->
@@ -153,8 +159,12 @@
             <column name="request_date_time" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="sender_id" type="BIGINT" />
-            <column name="recipient_id" type="BIGINT" />
+            <column name="sender_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet><!-- //TABLE friendship_requests -->
     <!-- TABLE friendship_requests INDEXES-->
@@ -192,7 +202,9 @@
             <column name="title" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="owner_id" type="BIGINT" />
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
         </createTable>
     </changeSet><!-- //TABLE societies -->
     <!-- TABLE societies INDEXES-->
@@ -227,8 +239,12 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="society_members_pk"/>
             </column>
-            <column name="society_id" type="BIGINT" />
-            <column name="user_id" type="BIGINT" />
+            <column name="society_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet><!-- //TABLE society_members -->
     <!-- TABLE society_members INDEXES-->
@@ -263,7 +279,9 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talks_pk"/>
             </column>
-            <column name="owner_id" type="BIGINT"/>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet><!-- //TABLE talks -->
     <!-- TABLE talks INDEXES-->
@@ -285,8 +303,12 @@
             </not>
         </preConditions>
         <createTable tableName="talk_members">
-            <column name="talk_id" type="BIGINT"/>
-            <column name="user_id" type="BIGINT"/>
+            <column name="talk_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
         </createTable>
         <addPrimaryKey tableName="talk_members" columnNames="talk_id,user_id" constraintName="talk_members_pk" />
     </changeSet><!-- //TABLE talk_members -->
@@ -312,17 +334,25 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talk_messages_pk"/>
             </column>
-            <column name="talk_id" type="BIGINT"/>
-            <column name="answered_message_id" type="BIGINT"/>
-            <column name="sender_id" type="BIGINT"/>
-            <column name="user_id" type="BIGINT"/>
+            <column name="talk_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="answered_message_id" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+            <column name="sender_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="unread" type="BOOLEAN" defaultValue="true">
+            <column name="unread" type="BOOLEAN" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -352,7 +382,10 @@
             <column name="root_wall" type="BOOLEAN" defaultValue="false">
                 <constraints nullable="false"/>
             </column>
-            <column name="society_id" type="BIGINT"/>
+            <column name="society_id" type="BIGINT">
+                <constraints nullable="false"
+                             uniqueConstraintName="walls_society_unique" unique="true"/>
+            </column>
         </createTable>
     </changeSet><!-- //TABLE walls -->
     <!-- TABLE wall_messages -->
@@ -369,8 +402,12 @@
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="wall_id" type="BIGINT"/>
-            <column name="user_id" type="BIGINT"/>
+            <column name="wall_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -404,12 +441,18 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="wall_message_comments_pk"/>
             </column>
-            <column name="wall_message_id" type="BIGINT"/>
-            <column name="answered_comment_id" type="BIGINT"/>
+            <column name="wall_message_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="answered_comment_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="user_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -440,8 +483,12 @@
         </preConditions>
         <!-- TABLE user_images -->
         <createTable tableName="user_images">
-            <column name="user_id" type="BIGINT"/>
-            <column name="image_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="image_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
         </createTable>
         <addPrimaryKey tableName="user_images" columnNames="user_id,image_id" constraintName="user_images_pk"/>
     </changeSet> <!-- //TABLE user_images -->

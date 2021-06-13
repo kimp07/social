@@ -16,7 +16,5 @@ public interface SocietyRepository extends JpaRepository<Society, Long> {
     @Override
     Optional<Society> findById(Long aLong);
 
-    Page<Society> findAllByOwnerId(Long ownerId, Pageable pageable);
-
     Page<Society> findAllByTitleIsLike(String title, Pageable pageable);
 }

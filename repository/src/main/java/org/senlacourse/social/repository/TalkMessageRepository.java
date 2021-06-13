@@ -25,7 +25,7 @@ public interface TalkMessageRepository extends JpaRepository<TalkMessage, Long> 
     Optional<TalkMessage> findById(Long id);
 
     @Query("select t.id as talkId, count(t.id) as talkMessagesCount from TalkMessage tm "
-            + "join User u on tm.user.id = u.id join Talk t on tm.talk.id = t.id where u.id = :userId and tm.unread "
+            + "join User u on tm.user.id = u.id join Talk t on tm.talk.id = t.id where u.id = :userId and tm.unread=TRUE "
             + "group by t.id")
     Page<IUnreadTalkMessagesGroupByTalkIdCountView> findCountByUserIdAndUnreadIsTrueGroupByTalkId(Long userId,
                                                                                                   Pageable pageable);

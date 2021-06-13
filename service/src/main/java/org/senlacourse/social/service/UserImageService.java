@@ -4,18 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.api.service.IImageService;
 import org.senlacourse.social.api.service.IUserImageService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Image;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.UserImage;
 import org.senlacourse.social.domain.UserImageId;
-import org.senlacourse.social.dto.NewUserImageDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.UserImageDto;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.mapstruct.UserImageDtoMapper;
+import org.senlacourse.social.repository.ImageRepository;
 import org.senlacourse.social.repository.UserImageRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
@@ -32,8 +31,17 @@ public class UserImageService implements IUserImageService {
     private final UserImageRepository userImageRepository;
     private final UserDtoMapper userDtoMapper;
     private final IUserService userService;
-    private final IImageService imageService;
+    private final ImageRepository imageRepository;
     private final UserImageDtoMapper userImageDtoMapper;
+
+    private Image findImageById(Long imageId) throws ObjectNotFoundException {
+        return imageRepository.findById(imageId)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    ObjectNotFoundException e = new ObjectNotFoundException();
+                    log.error(e.getMessage(), e);
+                    throw e;
+                });
+    }
 
     @AuthorizedUser
     @Override
@@ -81,10 +89,9 @@ public class UserImageService implements IUserImageService {
 
     @AuthorizedUser
     @Override
-    public UserImageDto save(NewUserImageDto dto) throws ObjectNotFoundException {
-        Image image = new Image()
-                .setImgFileName(dto.getImgFileName());
-        User user = userService.findEntityById(dto.getUserId());
+    public UserImageDto save(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
+        Image image = findImageById(imageId);
+        User user = userService.findEntityById(dto.getAuthorizedUserId());
         return userImageDtoMapper.fromEntity(
                 userImageRepository
                         .save(new UserImage()
@@ -97,7 +104,7 @@ public class UserImageService implements IUserImageService {
     @Override
     public void setImageToUserAvatar(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
         User user = userService.findEntityById(dto.getAuthorizedUserId());
-        Image image = imageService.findEntityById(imageId);
+        Image image = findImageById(imageId);
         user.setAvatar(image);
         userService.updateUser(userDtoMapper.fromEntity(user));
     }

@@ -59,7 +59,8 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                         .setMessage(message)
                         .setTalk(talkMember.getId().getTalk())
                         .setUser(talkMember.getId().getUser())
-                        .setAnsweredMessage(answeredMessage)));
+                        .setAnsweredMessage(answeredMessage)
+                        .setUnread(true)));
     }
 
     private void sendMessagesToTalkMembers(Talk talk, String message, User sender, TalkMessage answeredMessage) {
