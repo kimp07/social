@@ -50,32 +50,32 @@ public class FriendshipController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @GetMapping("/fiends/{id}")
-    public ResponseEntity<Page<FriendshipDto>> getFriends(@PathVariable Long id,
+    @GetMapping("/friends")
+    public ResponseEntity<Page<FriendshipDto>> getFriends(@RequestParam(defaultValue = "0") Long userId,
                                                           @RequestParam(defaultValue = "10") Integer pageSize,
                                                           @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipService.findAllByUserId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
+                friendshipService.findAllByUserId(new UserIdDto(userId), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @GetMapping("/requests/in/{id}")
-    public ResponseEntity<Page<FriendshipRequestDto>> getInRequests(@PathVariable Long id,
+    @GetMapping("/requests/in")
+    public ResponseEntity<Page<FriendshipRequestDto>> getInRequests(@RequestParam(defaultValue = "0") Long userId,
                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
                                                                     @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipRequestService.findAllByRecipientId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
+                friendshipRequestService.findAllByRecipientId(new UserIdDto(userId), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @GetMapping("/requests/out/{id}")
-    public ResponseEntity<Page<FriendshipRequestDto>> getOutRequests(@PathVariable Long id,
+    @GetMapping("/requests/out")
+    public ResponseEntity<Page<FriendshipRequestDto>> getOutRequests(@RequestParam(defaultValue = "0") Long userId,
                                                                     @RequestParam(defaultValue = "10") Integer pageSize,
                                                                     @RequestParam(defaultValue = "0") Integer pageNum) {
         return new ResponseEntity<>(
-                friendshipRequestService.findAllBySenderId(new UserIdDto(id), PageRequest.of(pageNum, pageSize)),
+                friendshipRequestService.findAllBySenderId(new UserIdDto(userId), PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 }

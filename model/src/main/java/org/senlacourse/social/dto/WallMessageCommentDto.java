@@ -14,6 +14,7 @@ public class WallMessageCommentDto {
     private UserSimpleDto user;
     @JsonIgnore
     private WallMessageDto wallMessage;
+    private WallMessageCommentDto answeredComment;
     private String messageDate;
     private String message;
     private Integer likesCount;
