@@ -57,16 +57,6 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
                         .orElse(null));
     }
 
-    @Transactional
-    public void method1() {
-
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void method2() {
-
-    }
-
     @Override
     public Page<WallMessageDto> findAllByWallId(Long wallId, Pageable pageable) {
         return wallMessageDtoMapper.map(
