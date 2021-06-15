@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IFileTransportService {
 
-    void uploadFile(Long userId, MultipartFile file) throws ApplicationException, ObjectNotFoundException;
+    String uploadFile(MultipartFile file) throws ApplicationException, ObjectNotFoundException;
 
-    ResponseEntity<Object> downloadFile(Long imageId) throws ObjectNotFoundException, ApplicationException;
+    ResponseEntity<Object> downloadFile(String imgFileName) throws ObjectNotFoundException, ApplicationException;
 }

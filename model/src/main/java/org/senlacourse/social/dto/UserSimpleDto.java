@@ -26,5 +26,5 @@ public class UserSimpleDto {
     private String surname;
     private String birthDate;
     private String aboutMe;
-    private String userImageFileName;
+    private ImageDto avatar;
 }

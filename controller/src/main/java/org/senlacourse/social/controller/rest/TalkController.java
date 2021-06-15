@@ -4,13 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
-import org.senlacourse.social.dto.NewTalkDto;
-import org.senlacourse.social.dto.NewTalkMessageDto;
-import org.senlacourse.social.dto.ResponseMessageDto;
-import org.senlacourse.social.dto.TalkDto;
-import org.senlacourse.social.dto.TalkMessageDto;
-import org.senlacourse.social.dto.UserIdDto;
+import org.senlacourse.social.domain.projection.IUnreadTalkMessagesGroupByTalkIdCountView;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -18,14 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -41,9 +29,9 @@ public class TalkController {
     @GetMapping
     public ResponseEntity<Page<TalkDto>> getAllUserTalks(@RequestParam(defaultValue = "10") Integer pageSize,
                                                          @RequestParam(defaultValue = "0") Integer pageNum,
-                                                         @RequestParam(defaultValue = "") Long[] userId) {
+                                                         @RequestParam(defaultValue = "") Long userId) {
         return new ResponseEntity<>(
-                talkService.findAllByUserIds(
+                talkService.findAllByUserId(
                         userId,
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
@@ -98,39 +86,30 @@ public class TalkController {
     }
 
     @Secured(value = {"ROLE_USER"})
-    @GetMapping("/messages/{talkId}/cache")
-    public ResponseEntity<ITalkMessagesCacheTalksCountView> getUnreadMessages(@NotNull @PathVariable Long talkId,
-                                                                              @RequestParam(defaultValue = "0") Long userId) {
-        return new ResponseEntity<>(
-                talkMessageService.findCacheMessagesCountByRecipientIdAndTalkId(new UserIdDto(userId), talkId),
-                HttpStatus.OK);
-    }
-
-    @Secured(value = {"ROLE_USER"})
-    @GetMapping("/messages/cache")
-    public ResponseEntity<Page<ITalkMessagesCacheTalksCountView>> getUnreadMessages(
+    @GetMapping("/messages/unread")
+    public ResponseEntity<Page<IUnreadTalkMessagesGroupByTalkIdCountView>> getUnreadMessages(
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "0") Integer pageNum,
             @RequestParam(defaultValue = "0") Long userId) {
         return new ResponseEntity<>(
-                talkMessageService.findCacheMessagesByRecipientIdAndTalkId(
+                talkMessageService.getUnreadMessagesByRecipientIdGroupByTalkId(
                         new UserIdDto(userId),
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @DeleteMapping("/messages/{talkId}/cache")
+    @DeleteMapping("/messages/{talkId}/unread")
     public ResponseEntity<ResponseMessageDto> removeUnreadMessages(@NotNull @PathVariable Long talkId,
                                                                    @RequestParam(defaultValue = "0") Long userId) {
-        talkMessageService.deleteCacheMessagesByRecipientIdAndTalkId(new UserIdDto(userId), talkId);
+        talkMessageService.updateMessagesSetUnreadFalseByRecipientIdAndTalkId(new UserIdDto(userId), talkId);
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 
     @Secured(value = {"ROLE_USER"})
-    @DeleteMapping("/messages/cache")
+    @DeleteMapping("/messages/unread")
     public ResponseEntity<ResponseMessageDto> removeUnreadMessages(@RequestParam(defaultValue = "0") Long userId) {
-        talkMessageService.deleteCacheMessagesByRecipientId(new UserIdDto(userId));
+        talkMessageService.updateMessagesSetUnreadFalseByRecipientId(new UserIdDto(userId));
         return new ResponseEntity<>(new ResponseMessageDto(), HttpStatus.NO_CONTENT);
     }
 

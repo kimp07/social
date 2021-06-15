@@ -21,6 +21,22 @@
             </column>
         </createTable>
     </changeSet><!-- //TABLE roles -->
+    <!-- TABLE images -->
+    <changeSet id="2021-05-06_8-00AM-15" author="Alex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="images"/>
+            </not>
+        </preConditions>
+        <createTable tableName="images">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="images_pk"/>
+            </column>
+            <column name="img_file_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet> <!-- //TABLE images -->
     <!-- TABLE users -->
     <changeSet author="alex" id="2021-05-06_8-00AM-11">
         <preConditions onFail="MARK_RAN">
@@ -69,7 +85,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="about_me" type="VARCHAR(255)"/>
-            <column name="user_image_file_name" type="VARCHAR(100)"/>
+            <column name="image_id" type="BIGINT">
+                <constraints foreignKeyName="users_image_fk" referencedTableName="images" referencedColumnNames="id"/>
+            </column>
         </createTable>
     </changeSet><!-- //TABLE users -->
     <!-- TABLE users INDEXES-->
@@ -114,50 +132,24 @@
         </createIndex>
     </changeSet> <!-- //TABLE users INDEXES -->
     <!-- TABLE friendships -->
-    <changeSet author="alex" id="2021-05-06_8-00AM-01">
+    <changeSet author="alex" id="2021-05-06_8-00AM-02">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="friendships"/>
             </not>
         </preConditions>
         <createTable tableName="friendships">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="friendships_pk"/>
-            </column>
-        </createTable>
-    </changeSet> <!-- //TABLE friendships -->
-    <!-- TABLE friendship_members -->
-    <changeSet author="alex" id="2021-05-06_8-00AM-02">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="friendship_members"/>
-            </not>
-        </preConditions>
-        <createTable tableName="friendship_members">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="friendship_members_pk"/>
-            </column>
-            <column name="friendship_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_members_friendship_fk"
-                             referencedTableName="friendships" referencedColumnNames="id"/>
-            </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_members_user_fk"
+                <constraints nullable="false" foreignKeyName="friendships_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="friend_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="friendships_friend_fk"
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
-    </changeSet>  <!-- //TABLE friendship_members -->
-    <!-- TABLE friendship_members INDEXES-->
-    <changeSet author="alex" id="2021-05-06_8-00AM-02-01">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="friendship_members_user_idx" tableName="friendship_members"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="friendship_members_user_idx" tableName="friendship_members">
-            <column name="user_id"/>
-        </createIndex>
-    </changeSet> <!-- //TABLE friendship_members INDEXES -->
+        <addPrimaryKey tableName="friendships" columnNames="user_id,friend_id" constraintName="friendships_pk"/>
+    </changeSet>  <!-- //TABLE friendships -->
     <!-- TABLE friendship_requests -->
     <changeSet author="alex" id="2021-05-06_8-00AM-03">
         <preConditions onFail="MARK_RAN">
@@ -322,9 +314,6 @@
             </not>
         </preConditions>
         <createTable tableName="talk_members">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="talk_members_pk"/>
-            </column>
             <column name="talk_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="talk_members_talk_fk"
                              referencedTableName="talks" referencedColumnNames="id"/>
@@ -334,6 +323,7 @@
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
+        <addPrimaryKey tableName="talk_members" columnNames="talk_id,user_id" constraintName="talk_members_pk" />
     </changeSet><!-- //TABLE talk_members -->
     <!-- TABLE talk_members INDEXES-->
     <changeSet author="alex" id="2021-05-06_8-00AM-08-01">
@@ -361,6 +351,14 @@
                 <constraints nullable="false" foreignKeyName="talk_messages_talk_fk"
                              referencedTableName="talks" referencedColumnNames="id"/>
             </column>
+            <column name="answered_message_id" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="talk_messages_answered_message_fk"
+                             referencedTableName="talk_messages" referencedColumnNames="id"/>
+            </column>
+            <column name="sender_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="talk_messages_sender_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="talk_messages_user_fk"
                              referencedTableName="users" referencedColumnNames="id"/>
@@ -369,6 +367,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="message" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unread" type="BOOLEAN" defaultValue="true">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -384,38 +385,6 @@
             <column name="user_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE talk_messages INDEXES -->
-    <!-- TABLE talk_messages_cache -->
-    <changeSet author="alex" id="2021-05-06_8-00AM-10">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="talk_messages_cache"/>
-            </not>
-        </preConditions>
-        <createTable tableName="talk_messages_cache">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="talk_messages_cache_pk"/>
-            </column>
-            <column name="talk_message_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_messages_cache_talk_message_fk"
-                             referencedTableName="talk_messages" referencedColumnNames="id"/>
-            </column>
-            <column name="recipient_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="friendship_requests_recipient_fk"
-                             referencedTableName="users" referencedColumnNames="id"/>
-            </column>
-        </createTable>
-    </changeSet><!-- //TABLE talk_messages_cache -->
-    <!-- TABLE talk_messages_cache INDEXES-->
-    <changeSet author="alex" id="2021-05-06_8-00AM-10-01">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="talk_messages_cache_recipient_idx" tableName="talk_messages_cache"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="talk_messages_cache_recipient_idx" tableName="talk_messages_cache">
-            <column name="recipient_id"/>
-        </createIndex>
-    </changeSet> <!-- //TABLE talk_messages_cache INDEXES -->
     <!-- TABLE walls -->
     <changeSet author="alex" id="2021-05-06_8-00AM-12">
         <preConditions onFail="MARK_RAN">
@@ -496,6 +465,10 @@
                 <constraints nullable="false" foreignKeyName="wall_message_comments_wall_message_fk"
                              referencedTableName="wall_messages" referencedColumnNames="id"/>
             </column>
+            <column name="answered_comment_id" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="wall_message_comments_answered_comment_fk"
+                             referencedTableName="wall_message_comments" referencedColumnNames="id"/>
+            </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
@@ -525,7 +498,7 @@
             <column name="wall_message_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE wall_message_comments INDEXES -->
-    <changeSet id="2021-05-06_8-00AM-15" author="Alex">
+    <changeSet id="2021-05-06_8-00AM-16" author="Alex">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="user_images"/>
@@ -533,31 +506,19 @@
         </preConditions>
         <!-- TABLE user_images -->
         <createTable tableName="user_images">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="user_images_pk"/>
-            </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="user_images_user_fk"
-                             referencedTableName="users" referencedColumnNames="id"/>
+                referencedTableName="users" referencedColumnNames="id"/>
             </column>
-            <column name="img_file_name" type="VARCHAR(100)">
-                <constraints nullable="false"/>
+            <column name="image_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="user_images_image_fk"
+                             referencedTableName="images" referencedColumnNames="id"/>
             </column>
         </createTable>
+        <addPrimaryKey tableName="user_images" columnNames="user_id,image_id" constraintName="user_images_pk"/>
     </changeSet> <!-- //TABLE user_images -->
-    <!-- TABLE user_images INDEXES-->
-    <changeSet author="alex" id="2021-05-06_8-00AM-15-01">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="user_images_user_id_idx" tableName="user_images"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="user_images_user_id_idx" tableName="user_images">
-            <column name="user_id"/>
-        </createIndex>
-    </changeSet> <!-- //TABLE user_images INDEXES -->
     <!-- SYSTEM DATA -->
-    <changeSet id="" author="2021-05-06_8-00AM-16">
+    <changeSet id="" author="2021-05-06_8-00AM-17">
         <insert tableName="roles">
             <column name="role_name">USER</column>
             <column name="role_disabled">false</column>

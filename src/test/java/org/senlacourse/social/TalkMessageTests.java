@@ -7,12 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.dto.NewTalkDto;
-import org.senlacourse.social.dto.NewTalkMessageDto;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.TalkDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserIdDto;
+import org.senlacourse.social.dto.*;
 import org.senlacourse.social.repository.TalkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,7 +81,7 @@ class TalkMessageTests {
                         .setMessage("Some message"));
         Assertions.assertNotNull(
                 talkMessageService
-                        .findCacheMessagesByRecipientIdAndTalkId(
+                        .getUnreadMessagesByRecipientIdGroupByTalkId(
                                 new UserIdDto(recipient.getId()),
                                         PageRequest.of(0, 1))
                         .getContent());

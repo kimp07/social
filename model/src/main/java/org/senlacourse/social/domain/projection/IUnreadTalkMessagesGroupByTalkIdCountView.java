@@ -1,6 +1,7 @@
 package org.senlacourse.social.domain.projection;
 
-public interface ITalkMessagesCacheTalksCountView {
+
+public interface IUnreadTalkMessagesGroupByTalkIdCountView {
 
     Long getTalkId();
     Integer getTalkMessagesCount();

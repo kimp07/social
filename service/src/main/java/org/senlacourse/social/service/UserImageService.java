@@ -6,13 +6,15 @@ import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.IUserImageService;
 import org.senlacourse.social.api.service.IUserService;
+import org.senlacourse.social.domain.Image;
 import org.senlacourse.social.domain.User;
 import org.senlacourse.social.domain.UserImage;
-import org.senlacourse.social.dto.NewUserImageDto;
+import org.senlacourse.social.domain.UserImageId;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.UserImageDto;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.mapstruct.UserImageDtoMapper;
+import org.senlacourse.social.repository.ImageRepository;
 import org.senlacourse.social.repository.UserImageRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
@@ -24,41 +26,50 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = {Throwable.class})
 @RequiredArgsConstructor
 @Log4j
-public class UserImageService extends AbstractService<UserImage> implements IUserImageService {
+public class UserImageService implements IUserImageService {
 
     private final UserImageRepository userImageRepository;
     private final UserDtoMapper userDtoMapper;
     private final IUserService userService;
+    private final ImageRepository imageRepository;
     private final UserImageDtoMapper userImageDtoMapper;
 
-    @Override
-    public UserImage findEntityById(Long id) throws ObjectNotFoundException {
-        return validateEntityNotNull(
-                userImageRepository
-                        .findById(id)
-                        .orElse(null));
+    private Image findImageById(Long imageId) throws ObjectNotFoundException {
+        return imageRepository.findById(imageId)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    ObjectNotFoundException e = new ObjectNotFoundException();
+                    log.error(e.getMessage(), e);
+                    throw e;
+                });
     }
 
+    @AuthorizedUser
     @Override
-    public UserImageDto findById(Long id) throws ObjectNotFoundException {
+    public UserImageDto findByUserIdAndImageId(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
         return userImageDtoMapper.fromEntity(
-                findEntityById(id));
+                userImageRepository
+                        .findByIdUserIdAndIdImageId(dto.getAuthorizedUserId(), imageId)
+                        .orElseThrow(ObjectNotFoundException::new));
     }
 
     @AuthorizedUser
     @Override
     public Page<UserImageDto> findAllImagesByUserId(UserIdDto dto, Pageable pageable) throws ObjectNotFoundException {
         return userImageDtoMapper.map(
-                userImageRepository.findAllByUserId(dto.getAuthorizedUserId(), pageable));
+                userImageRepository.findAllByIdUserId(dto.getAuthorizedUserId(), pageable));
     }
 
     @AuthorizedUser
     @Override
     public void deleteByUserImageIdAndUserId(UserIdDto dto, Long userImageId)
             throws ObjectNotFoundException, ServiceException {
-        UserImage userImage = findEntityById(userImageId);
-        if (userImage.getUser().getId().equals(dto.getAuthorizedUserId())) {
-            userImageRepository.deleteById(userImageId);
+        UserImage image = userImageRepository
+                .findByIdUserIdAndIdImageId(dto.getAuthorizedUserId(), userImageId)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    throw new ObjectNotFoundException("Object not found");
+                });
+        if (image.getId().getUser().getId().equals(dto.getAuthorizedUserId())) {
+            userImageRepository.deleteById(image.getId());
         } else {
             ServiceException e
                     = new ServiceException("User id=" + dto.getAuthorizedUserId() + " can`t delete image id=" + userImageId);
@@ -71,28 +82,30 @@ public class UserImageService extends AbstractService<UserImage> implements IUse
     @Override
     public void deleteAllByUserId(UserIdDto dto) throws ObjectNotFoundException {
         User user = userService.findEntityById(dto.getAuthorizedUserId());
-        user.setUserImageFileName("");
+        user.setAvatar(null);
         userService.updateUser(userDtoMapper.fromEntity(user));
-        userImageRepository.deleteAllByUserId(dto.getAuthorizedUserId());
+        userImageRepository.deleteAllByIdUserId(dto.getAuthorizedUserId());
     }
 
     @AuthorizedUser
     @Override
-    public UserImageDto save(NewUserImageDto dto) throws ObjectNotFoundException {
-        UserImage userImage = new UserImage()
-                .setUser(
-                        userService.findEntityById(dto.getUserId()))
-                .setImgFileName(dto.getImgFileName());
+    public UserImageDto save(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
+        Image image = findImageById(imageId);
+        User user = userService.findEntityById(dto.getAuthorizedUserId());
         return userImageDtoMapper.fromEntity(
-                userImageRepository.save(userImage));
+                userImageRepository
+                        .save(new UserImage()
+                                .setId(new UserImageId()
+                                        .setUser(user)
+                                        .setImage(image))));
     }
 
     @AuthorizedUser
     @Override
     public void setImageToUserAvatar(UserIdDto dto, Long imageId) throws ObjectNotFoundException {
         User user = userService.findEntityById(dto.getAuthorizedUserId());
-        UserImage image = findEntityById(imageId);
-        user.setUserImageFileName(image.getImgFileName());
+        Image image = findImageById(imageId);
+        user.setAvatar(image);
         userService.updateUser(userDtoMapper.fromEntity(user));
     }
 }

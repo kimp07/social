@@ -3,11 +3,7 @@ package org.senlacourse.social.controller.rest;
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
-import org.senlacourse.social.dto.NewSocietyDto;
-import org.senlacourse.social.dto.ResponseMessageDto;
-import org.senlacourse.social.dto.SocietyDto;
-import org.senlacourse.social.dto.SocietyMemberDto;
-import org.senlacourse.social.dto.UserIdDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,21 +11,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
 import java.util.Locale;
 
 @RestController

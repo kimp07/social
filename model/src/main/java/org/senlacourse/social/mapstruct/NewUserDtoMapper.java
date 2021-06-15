@@ -15,6 +15,6 @@ public interface NewUserDtoMapper {
     @Mapping(target = "credentialsNonExpired", ignore = true, defaultValue = "true")
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "birthDate", source = "birthDate", dateFormat = "yyyy-MM-dd")
-    @Mapping(target = "userImageFileName", ignore = true)
+    @Mapping(target = "avatar", ignore = true)
     User toEntity(NewUserDto dto);
 }

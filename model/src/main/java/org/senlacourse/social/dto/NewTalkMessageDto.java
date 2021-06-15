@@ -18,6 +18,9 @@ public class NewTalkMessageDto implements IAuthorizedUserDto {
     @NotNull
     @NotEmpty
     private String message;
+    private Long answeredMessageId;
+    private Boolean unread;
+
 
     @Override
     public void setAuthorizedUserId(Long id) {

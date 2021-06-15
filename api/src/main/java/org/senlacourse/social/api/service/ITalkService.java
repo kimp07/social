@@ -13,7 +13,7 @@ public interface ITalkService extends IService<Talk> {
 
     Page<TalkDto> findAll(Pageable pageable);
 
-    Page<TalkDto> findAllByUserIds(Long[] userId, Pageable pageable);
+    Page<TalkDto> findAllByUserId(Long userId, Pageable pageable);
 
     boolean isUserMemberOfTalk(Long userId, Long talkId) throws ServiceException;
 

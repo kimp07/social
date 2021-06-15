@@ -39,11 +39,11 @@ public class RoleService extends AbstractService<Role> implements IRoleService {
     }
 
     @Override
-    public RoleDto findByName(String roleName) throws ObjectNotFoundException {
+    public RoleDto findByRoleName(String roleName) throws ObjectNotFoundException {
         return roleDtoMapper.fromEntity(
                 validateEntityNotNull(
                         roleRepository
-                                .findByName(roleName)
+                                .findByRoleName(roleName)
                                 .orElse(null)));
     }
 

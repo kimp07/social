@@ -38,7 +38,7 @@ public class WallService extends AbstractService<Wall> implements IWallService {
         return wallDtoMapper.fromEntity(
                 validateEntityNotNull(
                         wallRepository
-                                .findBySocietyId(societyId)
+                                .findOneBySocietyId(societyId)
                                 .orElse(null)));
     }
 

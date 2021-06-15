@@ -10,16 +10,14 @@ import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.TalkMessage;
-import org.senlacourse.social.domain.TalkMessagesCache;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.domain.projection.ITalkMessagesCacheTalksCountView;
+import org.senlacourse.social.domain.projection.IUnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkMessageRepository;
-import org.senlacourse.social.repository.TalkMessagesCacheRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +36,6 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     private final TalkMessageRepository talkMessageRepository;
     private final IUserService userService;
     private final TalkMemberRepository talkMemberRepository;
-    private final TalkMessagesCacheRepository talkMessagesCacheRepository;
     private final TalkMessageDtoMapper talkMessageDtoMapper;
     private final ITalkService talkService;
 
@@ -50,42 +47,40 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                         .orElse(null));
     }
 
-    private void sendMessageToCacheForTalkMembers(TalkMessage talkMessage,
-                                                  Page<TalkMember> talkMembersPage,
-                                                  User sender) {
-        talkMembersPage.forEach(talkMember -> {
-            if (!talkMember.getUser().getId().equals(sender.getId())) {
-                talkMessagesCacheRepository.save(new TalkMessagesCache()
-                        .setTalkMessage(talkMessage)
-                        .setRecipient(talkMember.getUser()));
-            }
-        });
+    private void sendMessageToTalkMembers(String message,
+                                          Page<TalkMember> talkMembersPage,
+                                          User sender,
+                                          TalkMessage answeredMessage,
+                                          LocalDateTime dateTime) {
+        talkMembersPage.forEach(talkMember ->
+                talkMessageRepository.save(new TalkMessage()
+                        .setMessageDate(dateTime)
+                        .setSender(sender)
+                        .setMessage(message)
+                        .setTalk(talkMember.getId().getTalk())
+                        .setUser(talkMember.getId().getUser())
+                        .setAnsweredMessage(answeredMessage)
+                        .setUnread(true)));
     }
 
-    private void sendMessagesToCache(Talk talk, TalkMessage talkMessage, User sender) {
+    private void sendMessagesToTalkMembers(Talk talk, String message, User sender, TalkMessage answeredMessage) {
         int pageSize = 20;
+        LocalDateTime now = LocalDateTime.now();
         Page<TalkMember> talkMembersPage
-                = talkMemberRepository.findAllByTalkId(talk.getId(), PageRequest.of(0, pageSize));
+                = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(0, pageSize));
         int totalPages = talkMembersPage.getTotalPages();
-        sendMessageToCacheForTalkMembers(talkMessage, talkMembersPage, sender);
+        sendMessageToTalkMembers(message, talkMembersPage, sender, answeredMessage, now);
         if (talkMembersPage.getTotalPages() > 1) {
             for (int pageNum = 1; pageNum < totalPages; pageNum++) {
                 talkMembersPage
-                        = talkMemberRepository.findAllByTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
-                sendMessageToCacheForTalkMembers(talkMessage, talkMembersPage, sender);
+                        = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
+                sendMessageToTalkMembers(message, talkMembersPage, sender, answeredMessage, now);
             }
         }
     }
 
-    private TalkMessage addNewMessage(User user, Talk talk, String message) {
-        TalkMessage talkMessage = talkMessageRepository
-                .save(new TalkMessage()
-                        .setMessage(message)
-                        .setTalk(talk)
-                        .setUser(user)
-                        .setMessageDate(LocalDateTime.now()));
-        sendMessagesToCache(talk, talkMessage, user);
-        return talkMessage;
+    private void addNewMessage(User user, Talk talk, String message, TalkMessage answeredMessage) {
+        sendMessagesToTalkMembers(talk, message, user, answeredMessage);
     }
 
     @Override
@@ -99,45 +94,42 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
 
     @AuthorizedUser
     @Override
-    public TalkMessageDto addNewMessage(NewTalkMessageDto dto)
-            throws ObjectNotFoundException, ServiceException {
-        if (talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
-            User user = userService.findEntityById(dto.getUserId());
-            Talk talk = talkService.findEntityById(dto.getTalkId());
-            return talkMessageDtoMapper.fromEntity(
-                    addNewMessage(user, talk, dto.getMessage()));
-        } else {
+    public void addNewMessage(NewTalkMessageDto dto) throws ObjectNotFoundException, ServiceException {
+        if (!talkService.isUserMemberOfTalk(dto.getUserId(), dto.getTalkId())) {
             ServiceException e = new ServiceException("User with id=" + dto.getUserId() +
                     "can't add message to talk with id=" + dto.getTalkId());
             log.error(e.getMessage(), e);
             throw e;
         }
+        TalkMessage answeredMessage = null;
+        if (dto.getAnsweredMessageId() != null && !dto.getAnsweredMessageId().equals(0L)) {
+            answeredMessage = findEntityById(dto.getAnsweredMessageId());
+        }
+        addNewMessage(
+                userService.findEntityById(dto.getUserId()),
+                talkService.findEntityById(dto.getTalkId()),
+                dto.getMessage(),
+                answeredMessage);
     }
 
     @AuthorizedUser
     @Override
-    public Page<ITalkMessagesCacheTalksCountView> findCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Pageable pageable)
+    public Page<IUnreadTalkMessagesGroupByTalkIdCountView> getUnreadMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
+                                                                                                       Pageable pageable)
             throws ObjectNotFoundException {
-        return talkMessagesCacheRepository.findAllByRecipientIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
+        return talkMessageRepository.findCountByUserIdAndUnreadIsTrueGroupByTalkId(dto.getAuthorizedUserId(), pageable);
     }
 
     @AuthorizedUser
     @Override
-    public ITalkMessagesCacheTalksCountView findCacheMessagesCountByRecipientIdAndTalkId(UserIdDto dto, Long talkId)
-            throws ObjectNotFoundException {
-        return talkMessagesCacheRepository.getCountByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
+    public void updateMessagesSetUnreadFalseByRecipientId(UserIdDto dto) {
+        talkMessageRepository.updateAllSetUnreadFalseByUserId(dto.getAuthorizedUserId());
     }
 
     @AuthorizedUser
     @Override
-    public void deleteCacheMessagesByRecipientId(UserIdDto dto) {
-        talkMessagesCacheRepository.deleteAllByRecipientId(dto.getAuthorizedUserId());
-    }
-
-    @AuthorizedUser
-    @Override
-    public void deleteCacheMessagesByRecipientIdAndTalkId(UserIdDto dto, Long talkId) {
-        talkMessagesCacheRepository.deleteAllByRecipientIdAndTalkId(dto.getAuthorizedUserId(), talkId);
+    public void updateMessagesSetUnreadFalseByRecipientIdAndTalkId(UserIdDto dto, Long talkId) {
+        talkMessageRepository.updateAllSetUnreadFalseByUserAndTalkId(dto.getAuthorizedUserId(), talkId);
     }
 
 }

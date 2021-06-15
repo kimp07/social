@@ -8,12 +8,7 @@ import org.senlacourse.social.api.security.IAuthorizedUserService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.util.SqlUtil;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.UpdateUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserIdDto;
-import org.senlacourse.social.dto.UserPasswordDto;
-import org.senlacourse.social.dto.UserSimpleDto;
+import org.senlacourse.social.dto.*;
 import org.senlacourse.social.mapstruct.NewUserDtoMapper;
 import org.senlacourse.social.mapstruct.UserDtoMapper;
 import org.senlacourse.social.repository.RoleRepository;
@@ -52,7 +47,7 @@ public class UserService extends AbstractService<User> implements IUserService {
     private User findEntityByLogin(String login) throws ObjectNotFoundException {
         return validateEntityNotNull(
                 userRepository
-                        .findOneByUserLogin(login)
+                        .findOneByLogin(login)
                         .orElse(null));
     }
 
@@ -102,7 +97,7 @@ public class UserService extends AbstractService<User> implements IUserService {
     public Page<UserDto> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable) {
         firstName = SqlUtil.normalizeLikeFilter(firstName.toLowerCase());
         surname = SqlUtil.normalizeLikeFilter(surname.toLowerCase());
-        return userDtoMapper.map(userRepository.findAllByFirstNameAndSurname(firstName, surname, pageable));
+        return userDtoMapper.map(userRepository.findAllByFirstNameIsLikeAndSurnameIsLike(firstName, surname, pageable));
     }
 
     private User handleNewUserDto(NewUserDto dto) throws ServiceException {

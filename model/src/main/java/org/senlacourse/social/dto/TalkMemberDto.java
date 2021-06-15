@@ -9,7 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TalkMemberDto {
 
-    private Long id;
-    private TalkDto talk;
-    private UserSimpleDto user;
+    private TalkMemberIdDto id;
 }

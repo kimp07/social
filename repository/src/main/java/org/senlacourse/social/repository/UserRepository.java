@@ -3,8 +3,8 @@ package org.senlacourse.social.repository;
 import org.senlacourse.social.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,12 +12,11 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(value = "select u from User u where lower(u.firstName) like :firstName and lower(u.surname) like :surname")
-    Page<User> findAllByFirstNameAndSurname(String firstName, String surname, Pageable pageable);
+    Page<User> findAllByFirstNameIsLikeAndSurnameIsLike(String firstName, String surname, Pageable pageable);
 
-    @Query(value = "select u from User u join fetch u.role r where u.login = :userLogin")
-    Optional<User> findOneByUserLogin(String userLogin);
+    @EntityGraph(attributePaths = {"role"})
+    Optional<User> findOneByLogin(String userLogin);
 
-    @Query(value = "select u from User u where u.email = :email")
+    @EntityGraph(attributePaths = {"role"})
     Optional<User> findOneByEmail(String email);
 }

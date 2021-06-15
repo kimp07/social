@@ -1,6 +1,5 @@
 package org.senlacourse.social.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
@@ -22,13 +21,13 @@ import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
 @Transactional(rollbackFor = {Throwable.class})
-@RequiredArgsConstructor
 @Log4j
 public class WallMessageService extends AbstractService<WallMessage> implements IWallMessageService {
 
@@ -41,12 +40,31 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     private final ISocietyService societyService;
     private final WallMessageDtoMapper wallMessageDtoMapper;
 
+    public WallMessageService(WallMessageRepository wallMessageRepository, WallMessageCommentRepository wallMessageCommentRepository, IUserService userService, IWallService wallService, ISocietyService societyService, WallMessageDtoMapper wallMessageDtoMapper) {
+        this.wallMessageRepository = wallMessageRepository;
+        this.wallMessageCommentRepository = wallMessageCommentRepository;
+        this.userService = userService;
+        this.wallService = wallService;
+        this.societyService = societyService;
+        this.wallMessageDtoMapper = wallMessageDtoMapper;
+    }
+
     @Override
     public WallMessage findEntityById(Long id) throws ObjectNotFoundException {
         return validateEntityNotNull(
                 wallMessageRepository
                         .findById(id)
                         .orElse(null));
+    }
+
+    @Transactional
+    public void method1() {
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void method2() {
+
     }
 
     @Override

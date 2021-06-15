@@ -9,5 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class FriendshipDto {
 
-    Long id;
+    private FriendshipIdDto id;
 }

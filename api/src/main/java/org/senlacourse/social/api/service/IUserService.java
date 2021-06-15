@@ -3,12 +3,7 @@ package org.senlacourse.social.api.service;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.UpdateUserDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserIdDto;
-import org.senlacourse.social.dto.UserPasswordDto;
-import org.senlacourse.social.dto.UserSimpleDto;
+import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -14,6 +14,7 @@ public class NewWallMessageCommentDto implements IAuthorizedUserDto {
 
     @NotNull
     private Long wallMessageId;
+    private Long answeredCommentId;
     private Long userId;
     @NotNull
     @NotEmpty

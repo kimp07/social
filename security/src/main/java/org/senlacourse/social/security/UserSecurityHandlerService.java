@@ -7,14 +7,7 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.security.IUserSecurityHandlerService;
 import org.senlacourse.social.api.service.IRoleService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.dto.AuthDto;
-import org.senlacourse.social.dto.EmailDto;
-import org.senlacourse.social.dto.NewRoleDto;
-import org.senlacourse.social.dto.NewUserDto;
-import org.senlacourse.social.dto.RoleDto;
-import org.senlacourse.social.dto.UserDto;
-import org.senlacourse.social.dto.UserIdDto;
-import org.senlacourse.social.dto.UserPasswordDto;
+import org.senlacourse.social.dto.*;
 import org.senlacourse.social.security.jwt.JwtProvider;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +43,7 @@ public class UserSecurityHandlerService implements IUserSecurityHandlerService {
     private RoleDto getRoleByNameUser() {
         RoleDto role = null;
         try {
-            role = roleService.findByName(ROLE_USER);
+            role = roleService.findByRoleName(ROLE_USER);
         } catch (ObjectNotFoundException e) {
             log.warn(e.getMessage(), e);
         }

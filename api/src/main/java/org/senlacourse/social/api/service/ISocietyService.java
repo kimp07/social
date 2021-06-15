@@ -2,7 +2,6 @@ package org.senlacourse.social.api.service;
 
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
-import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.dto.NewSocietyDto;
 import org.senlacourse.social.dto.SocietyDto;
 import org.senlacourse.social.dto.SocietyMemberDto;
@@ -10,7 +9,7 @@ import org.senlacourse.social.dto.UserIdDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ISocietyService extends IService<Society> {
+public interface ISocietyService {
 
     SocietyDto findById(Long id) throws ObjectNotFoundException;
 
