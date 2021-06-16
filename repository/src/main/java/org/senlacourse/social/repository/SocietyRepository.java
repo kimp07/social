@@ -1,7 +1,6 @@
 package org.senlacourse.social.repository;
 
 import org.senlacourse.social.domain.Society;
-import org.senlacourse.social.dto.SocietyDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
