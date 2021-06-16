@@ -57,7 +57,7 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
     @Override
     public void deleteAllByMessageId(UserIdDto dto, Long messageId) throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = wallMessageService.findEntityById(messageId);
-        Society society = wallMessage.getWall().getSociety();
+        Society society = wallMessage.getSociety();
         if (society.getOwner().getId().equals(dto.getAuthorizedUserId())) {
             wallMessageCommentRepository.deleteAllByWallMessageId(messageId);
         }
@@ -69,25 +69,21 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
             throws ObjectNotFoundException, ServiceException {
         WallMessageComment wallMessageComment = findEntityById(wallMessageCommentId);
         User user = wallMessageComment.getUser();
-        Society society = wallMessageComment.getWallMessage().getWall().getSociety();
+        Society society = wallMessageComment.getWallMessage().getSociety();
         if (society.getOwner().getId().equals(dto.getAuthorizedUserId()) || user.getId().equals(dto.getAuthorizedUserId())) {
             wallMessageRepository.deleteById(wallMessageCommentId);
         }
     }
 
-    private boolean userCanAddMessageComment(User user, Wall wall) {
-        return wall.getRoot()
-                || societyService.isUserMemberOfSociety(user.getId(), wall.getSociety().getId());
+    private boolean userCanAddMessageComment(User user, Society society) {
+        return society.getRoot()
+                || societyService.isUserMemberOfSociety(user.getId(), society.getId());
     }
 
-    private boolean userCanEditMessage(User user, Wall wall, WallMessageComment wallMessageComment) {
-        return userCanAddMessageComment(user, wall) && wallMessageComment.getUser().getId().equals(user.getId());
-    }
-
-    private WallMessageComment addNewWallMessageComment(WallMessage wallMessage, User user, Wall wall,
+    private WallMessageComment addNewWallMessageComment(WallMessage wallMessage, User user,
                                                         String message, WallMessageComment answeredComment)
             throws ServiceException {
-        if (userCanAddMessageComment(user, wall)) {
+        if (userCanAddMessageComment(user, wallMessage.getSociety())) {
             WallMessageComment wallMessageComment = new WallMessageComment()
                     .setWallMessage(wallMessage)
                     .setUser(user)
@@ -101,10 +97,14 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
         } else {
             ServiceException e = new ServiceException(
                     USER_WITH_ID + user.getId() +
-                            " can`t add comment to wall with id=" + wall.getId());
+                            " can`t add comment to society wall");
             log.warn(e.getMessage(), e);
             throw e;
         }
+    }
+
+    private boolean userCanEditMessage(User user, Society wall, WallMessageComment wallMessageComment) {
+        return userCanAddMessageComment(user, wall) && wallMessageComment.getUser().getId().equals(user.getId());
     }
 
     @AuthorizedUser
@@ -117,15 +117,14 @@ public class WallMessageCommentService extends AbstractService<WallMessageCommen
             answeredMessage = findEntityById(dto.getAnsweredCommentId());
         }
         User user = userService.findEntityById(dto.getUserId());
-        Wall wall = wallMessage.getWall();
         return wallMessageCommentDtoMapper.fromEntity(
-                addNewWallMessageComment(wallMessage, user, wall, dto.getMessage(), answeredMessage));
+                addNewWallMessageComment(wallMessage, user, dto.getMessage(), answeredMessage));
     }
 
     private WallMessageComment editWallMessageComment(User user, WallMessageComment wallMessageComment, String message)
             throws ObjectNotFoundException, ServiceException {
-        Wall wall = wallMessageComment.getWallMessage().getWall();
-        if (userCanEditMessage(user, wall, wallMessageComment)) {
+        Society society = wallMessageComment.getWallMessage().getSociety();
+        if (userCanEditMessage(user, society, wallMessageComment)) {
             wallMessageComment.setMessage(message);
             return wallMessageCommentRepository.save(wallMessageComment);
         } else {

@@ -84,7 +84,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="about_me" type="VARCHAR(255)"/>
-            <column name="image_id" type="BIGINT" />
+            <column name="image_id" type="BIGINT"/>
         </createTable>
     </changeSet><!-- //TABLE users -->
     <!-- TABLE users INDEXES-->
@@ -140,7 +140,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="friend_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
         <addPrimaryKey tableName="friendships" columnNames="user_id,friend_id" constraintName="friendships_pk"/>
@@ -160,7 +160,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="sender_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="recipient_id" type="BIGINT">
                 <constraints nullable="false"/>
@@ -203,7 +203,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="owner_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_root" type="BOOLEAN" defaultValue="0">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet><!-- //TABLE societies -->
@@ -236,16 +239,15 @@
             </not>
         </preConditions>
         <createTable tableName="society_members">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="society_members_pk"/>
-            </column>
             <column name="society_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addPrimaryKey tableName="society_members" columnNames="society_id,user_id"
+                       constraintName="society_members_pk"/>
     </changeSet><!-- //TABLE society_members -->
     <!-- TABLE society_members INDEXES-->
     <changeSet author="alex" id="2021-05-06_8-00AM-06-01">
@@ -304,10 +306,10 @@
         </preConditions>
         <createTable tableName="talk_members">
             <column name="talk_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
         <addPrimaryKey tableName="talk_members" columnNames="talk_id,user_id" constraintName="talk_members_pk" />
@@ -335,16 +337,16 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="talk_messages_pk"/>
             </column>
             <column name="talk_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="answered_message_id" type="BIGINT">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="sender_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
@@ -352,7 +354,7 @@
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="unread" type="BOOLEAN" defaultValue="1">
+            <column name="unread" type="BOOLEAN" defaultValue="true">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -368,26 +370,6 @@
             <column name="user_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE talk_messages INDEXES -->
-    <!-- TABLE walls -->
-    <changeSet author="alex" id="2021-05-06_8-00AM-12">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="walls"/>
-            </not>
-        </preConditions>
-        <createTable tableName="walls">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="walls_pk"/>
-            </column>
-            <column name="root_wall" type="BOOLEAN" defaultValue="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="society_id" type="BIGINT">
-                <constraints nullable="false"
-                             uniqueConstraintName="walls_society_unique" unique="true"/>
-            </column>
-        </createTable>
-    </changeSet><!-- //TABLE walls -->
     <!-- TABLE wall_messages -->
     <changeSet author="alex" id="2021-05-06_8-00AM-13">
         <preConditions onFail="MARK_RAN">
@@ -402,11 +384,11 @@
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="wall_id" type="BIGINT">
-                <constraints nullable="false" />
+            <column name="society_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -426,8 +408,8 @@
                 <indexExists indexName="wall_messages_wall_idx" tableName="wall_messages"/>
             </not>
         </preConditions>
-        <createIndex indexName="wall_messages_wall_idx" tableName="wall_messages">
-            <column name="wall_id"/>
+        <createIndex indexName="wall_messages_society_idx" tableName="wall_messages">
+            <column name="society_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE wall_messages INDEXES -->
     <!-- TABLE wall_message_comments -->
@@ -442,16 +424,16 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="wall_message_comments_pk"/>
             </column>
             <column name="wall_message_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="answered_comment_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="true"/>
             </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -484,10 +466,10 @@
         <!-- TABLE user_images -->
         <createTable tableName="user_images">
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="image_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
         <addPrimaryKey tableName="user_images" columnNames="user_id,image_id" constraintName="user_images_pk"/>
@@ -515,10 +497,7 @@
         <insert tableName="societies">
             <column name="title">root society</column>
             <column name="owner_id">1</column>
-        </insert>
-        <insert tableName="walls">
-            <column name="root_wall">true</column>
-            <column name="society_id">1</column>
+            <column name="is_root">1</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

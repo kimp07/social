@@ -13,6 +13,8 @@ public interface ISocietyService {
 
     SocietyDto findById(Long id) throws ObjectNotFoundException;
 
+    SocietyDto findRootSociety() throws ObjectNotFoundException;
+
     Page<SocietyDto> findAll(Pageable pageable);
 
     Page<SocietyDto> findAll(String title, Pageable pageable);

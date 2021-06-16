@@ -213,6 +213,9 @@
                 <constraints nullable="false" foreignKeyName="societies_owner_fk"
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
+            <column name="is_root" type="BOOLEAN" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet><!-- //TABLE societies -->
     <!-- TABLE societies INDEXES-->
@@ -244,9 +247,6 @@
             </not>
         </preConditions>
         <createTable tableName="society_members">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="society_members_pk"/>
-            </column>
             <column name="society_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="society_members_society_fk"
                              referencedTableName="societies" referencedColumnNames="id"/>
@@ -256,6 +256,8 @@
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
         </createTable>
+        <addPrimaryKey tableName="society_members" columnNames="society_id,user_id"
+                       constraintName="society_members_pk"/>
     </changeSet><!-- //TABLE society_members -->
     <!-- TABLE society_members INDEXES-->
     <changeSet author="alex" id="2021-05-06_8-00AM-06-01">
@@ -385,27 +387,6 @@
             <column name="user_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE talk_messages INDEXES -->
-    <!-- TABLE walls -->
-    <changeSet author="alex" id="2021-05-06_8-00AM-12">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="walls"/>
-            </not>
-        </preConditions>
-        <createTable tableName="walls">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="walls_pk"/>
-            </column>
-            <column name="root_wall" type="BOOLEAN" defaultValue="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="society_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="walls_society_fk"
-                             referencedTableName="societies" referencedColumnNames="id"
-                             uniqueConstraintName="walls_society_unique" unique="true"/>
-            </column>
-        </createTable>
-    </changeSet><!-- //TABLE walls -->
     <!-- TABLE wall_messages -->
     <changeSet author="alex" id="2021-05-06_8-00AM-13">
         <preConditions onFail="MARK_RAN">
@@ -420,9 +401,9 @@
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="wall_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="wall_messages_wall_fk"
-                             referencedTableName="walls" referencedColumnNames="id"/>
+            <column name="society_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="wall_messages_society_fk"
+                             referencedTableName="societies" referencedColumnNames="id"/>
             </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="wall_messages_user_fk"
@@ -446,8 +427,8 @@
                 <indexExists indexName="wall_messages_wall_idx" tableName="wall_messages"/>
             </not>
         </preConditions>
-        <createIndex indexName="wall_messages_wall_idx" tableName="wall_messages">
-            <column name="wall_id"/>
+        <createIndex indexName="wall_messages_society_idx" tableName="wall_messages">
+            <column name="society_id"/>
         </createIndex>
     </changeSet> <!-- //TABLE wall_messages INDEXES -->
     <!-- TABLE wall_message_comments -->
@@ -540,10 +521,7 @@
         <insert tableName="societies">
             <column name="title">root society</column>
             <column name="owner_id">1</column>
-        </insert>
-        <insert tableName="walls">
-            <column name="root_wall">true</column>
-            <column name="society_id">1</column>
+            <column name="is_root">1</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

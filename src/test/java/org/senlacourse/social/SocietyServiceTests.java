@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
-import org.senlacourse.social.api.service.IWallService;
 import org.senlacourse.social.dto.*;
 import org.senlacourse.social.repository.SocietyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ class SocietyServiceTests {
     ISocietyService societyService;
     @Autowired
     SocietyRepository societyRepository;
-    @Autowired
-    IWallService wallService;
 
     UserDto owner;
     UserDto societyMember;
@@ -68,16 +65,7 @@ class SocietyServiceTests {
     }
 
     @Test
-    void afterCreatingSocietyMastBeCreatedSocietyWall() {
-        societyDto = societyService.createNewSociety(
-                new NewSocietyDto()
-                        .setOwnerId(owner.getId())
-                        .setTitle("Society"));
-        Assertions.assertDoesNotThrow(() -> wallService.findWallBySocietyId(societyDto.getId()));
-    }
-
-    @Test
-    void successfullAddingNewSocietyMember() {
+    void successfullyAddingNewSocietyMember() {
         societyDto = societyService.createNewSociety(
                 new NewSocietyDto()
                         .setOwnerId(owner.getId())

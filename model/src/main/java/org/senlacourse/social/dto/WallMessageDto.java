@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 public class WallMessageDto {
 
     private Long id;
-    private WallDto wall;
+    private SocietyDto society;
     private UserSimpleDto user;
     private String messageDate;
     private String message;

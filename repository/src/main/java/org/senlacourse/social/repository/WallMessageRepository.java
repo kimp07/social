@@ -14,12 +14,12 @@ import java.util.Optional;
 public interface WallMessageRepository extends JpaRepository<WallMessage, Long> {
 
     @EntityGraph(attributePaths = {"user"})
-    Page<WallMessage> findAllByWallId(Long wallId, Pageable pageable);
+    Page<WallMessage> findAllBySocietyId(Long societyId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"wall", "user"})
+    @EntityGraph(attributePaths = {"society", "user"})
     @Override
     Optional<WallMessage> findById(Long id);
 
-    @Query(value = "delete from WallMessage wm where wm.wall.id = :wallId")
-    void deleteAllByWallId(Long wallId);
+    @Query(value = "delete from WallMessage wm where wm.society.id = :societyId")
+    void deleteAllBySocietyId(Long societyId);
 }

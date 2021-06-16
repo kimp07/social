@@ -29,7 +29,6 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     private final SocietyRepository societyRepository;
     private final SocietyMemberRepository societyMemberRepository;
     private final IUserService userService;
-    private final WallRepository wallRepository;
     private final WallMessageRepository wallMessageRepository;
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final SocietyDtoMapper societyDtoMapper;
@@ -41,6 +40,17 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                 societyRepository
                         .findById(id)
                         .orElse(null));
+    }
+
+    @Override
+    public SocietyDto findRootSociety() throws ObjectNotFoundException {
+        return societyDtoMapper
+                .fromEntity(societyRepository.findOneByRootIsTrue()
+                        .<ObjectNotFoundException>orElseThrow(() -> {
+                            ObjectNotFoundException e = new ObjectNotFoundException();
+                            log.error(e.getMessage(), e);
+                            throw e;
+                        }));
     }
 
     public SocietyDto findById(Long id) throws ObjectNotFoundException {
@@ -70,22 +80,15 @@ public class SocietyService extends AbstractService<Society> implements ISociety
                 societyMemberRepository.findAllByIdSocietyId(societyId, pageable));
     }
 
-    private void createWall(Society society) {
-        wallRepository.save(
-                new Wall()
-                        .setSociety(society)
-                        .setRoot(false));
-    }
-
     @AuthorizedUser
     @Override
     public SocietyDto createNewSociety(NewSocietyDto dto) throws ObjectNotFoundException, ServiceException {
         User owner = userService.findEntityById(dto.getOwnerId());
         Society society = new Society()
                 .setTitle(dto.getTitle())
-                .setOwner(owner);
+                .setOwner(owner)
+                .setRoot(false);
         society = societyRepository.save(society);
-        createWall(society);
         SocietyMember societyMember = new SocietyMember()
                 .setId(new SocietyMemberId()
                         .setSociety(society)
@@ -153,8 +156,8 @@ public class SocietyService extends AbstractService<Society> implements ISociety
     @Override
     public void deleteSocietyById(Long id) throws ObjectNotFoundException {
         Society society = findEntityById(id);
-        wallMessageCommentRepository.deleteAllByWallId(society.getId());
-        wallMessageRepository.deleteAllByWallId(society.getId());
+        wallMessageCommentRepository.deleteAllBySocietyId(society.getId());
+        wallMessageRepository.deleteAllBySocietyId(society.getId());
         societyMemberRepository.deleteAllByIdSocietyId(society.getId());
     }
 }

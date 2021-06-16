@@ -12,5 +12,5 @@ public class SocietyDto {
     private Long id;
     private String title;
     private UserSimpleDto owner;
-    private WallDto wall;
+    private Boolean root;
 }

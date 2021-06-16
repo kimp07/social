@@ -1,33 +1,34 @@
 package org.senlacourse.social.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.senlacourse.social.api.exception.ObjectNotFoundException;
 import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.service.IWallMessageService;
-import org.senlacourse.social.api.service.IWallService;
+import org.senlacourse.social.domain.Society;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.domain.Wall;
 import org.senlacourse.social.domain.WallMessage;
 import org.senlacourse.social.dto.EditMessageDto;
 import org.senlacourse.social.dto.NewWallMessageDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.dto.WallMessageDto;
 import org.senlacourse.social.mapstruct.WallMessageDtoMapper;
+import org.senlacourse.social.repository.SocietyRepository;
 import org.senlacourse.social.repository.WallMessageCommentRepository;
 import org.senlacourse.social.repository.WallMessageRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
 @Transactional(rollbackFor = {Throwable.class})
+@RequiredArgsConstructor
 @Log4j
 public class WallMessageService extends AbstractService<WallMessage> implements IWallMessageService {
 
@@ -36,18 +37,19 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     private final WallMessageRepository wallMessageRepository;
     private final WallMessageCommentRepository wallMessageCommentRepository;
     private final IUserService userService;
-    private final IWallService wallService;
     private final ISocietyService societyService;
     private final WallMessageDtoMapper wallMessageDtoMapper;
+    private final SocietyRepository societyRepository;
 
-    public WallMessageService(WallMessageRepository wallMessageRepository, WallMessageCommentRepository wallMessageCommentRepository, IUserService userService, IWallService wallService, ISocietyService societyService, WallMessageDtoMapper wallMessageDtoMapper) {
-        this.wallMessageRepository = wallMessageRepository;
-        this.wallMessageCommentRepository = wallMessageCommentRepository;
-        this.userService = userService;
-        this.wallService = wallService;
-        this.societyService = societyService;
-        this.wallMessageDtoMapper = wallMessageDtoMapper;
+    private Society findSocietyById(Long id) throws ObjectNotFoundException {
+        return societyRepository.findById(id)
+                .<ObjectNotFoundException>orElseThrow(() -> {
+                    ObjectNotFoundException e = new ObjectNotFoundException();
+                    log.error(e.getMessage(), e);
+                    throw e;
+                });
     }
+
 
     @Override
     public WallMessage findEntityById(Long id) throws ObjectNotFoundException {
@@ -58,23 +60,23 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     }
 
     @Override
-    public Page<WallMessageDto> findAllByWallId(Long wallId, Pageable pageable) {
+    public Page<WallMessageDto> findAllBySocietyId(Long societyId, Pageable pageable) {
         return wallMessageDtoMapper.map(
                 wallMessageRepository
-                        .findAllByWallId(
-                                wallId,
+                        .findAllBySocietyId(
+                                societyId,
                                 pageable));
     }
 
     @AuthorizedUser
     @Override
-    public void deleteAllMessagesByWallIdAndUserId(UserIdDto dto, Long wallId)
+    public void deleteAllMessagesBySocietyIdAndUserId(UserIdDto dto, Long societyId)
             throws ObjectNotFoundException, ServiceException {
-        Wall wall = wallService.findEntityById(wallId);
-        User owner = wall.getSociety().getOwner();
+        Society society = findSocietyById(societyId);
+        User owner = society.getOwner();
         if (owner.getId().equals(dto.getAuthorizedUserId())) {
-            wallMessageRepository.deleteAllByWallId(wallId);
-            wallMessageCommentRepository.deleteAllByWallId(wallId);
+            wallMessageRepository.deleteAllBySocietyId(societyId);
+            wallMessageCommentRepository.deleteAllBySocietyId(societyId);
         }
     }
 
@@ -84,8 +86,8 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
             throws ObjectNotFoundException, ServiceException {
         WallMessage wallMessage = findEntityById(wallMessageId);
         User user = wallMessage.getUser();
-        Wall wall = wallMessage.getWall();
-        if (user.getId().equals(dto.getAuthorizedUserId()) || wall.getSociety().getOwner().getId().equals(dto.getAuthorizedUserId())) {
+        Society society = wallMessage.getSociety();
+        if (user.getId().equals(dto.getAuthorizedUserId()) || society.getOwner().getId().equals(dto.getAuthorizedUserId())) {
             wallMessageRepository.deleteById(wallMessageId);
             wallMessageCommentRepository.deleteAllByWallMessageId(wallMessageId);
         } else {
@@ -97,19 +99,19 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
         }
     }
 
-    private boolean userCanAddMessage(User user, Wall wall) {
-        return wall.getRoot()
-                || societyService.isUserMemberOfSociety(user.getId(), wall.getSociety().getId());
+    private boolean userCanAddMessage(User user, Society society) {
+        return society.getRoot()
+                || societyService.isUserMemberOfSociety(user.getId(), society.getId());
     }
 
-    private boolean userCanEditMessage(User user, Wall wall, WallMessage wallMessage) {
-        return userCanAddMessage(user, wall) && wallMessage.getUser().getId().equals(user.getId());
+    private boolean userCanEditMessage(User user, Society society, WallMessage wallMessage) {
+        return userCanAddMessage(user, society) && wallMessage.getUser().getId().equals(user.getId());
     }
 
-    private WallMessage addNewMessage(User user, Wall wall, String message) throws ServiceException {
-        if (userCanAddMessage(user, wall)) {
+    private WallMessage addNewMessage(User user, Society society, String message) throws ServiceException {
+        if (userCanAddMessage(user, society)) {
             WallMessage wallMessage = new WallMessage();
-            wallMessage.setWall(wall)
+            wallMessage.setSociety(society)
                     .setUser(user)
                     .setMessage(message)
                     .setMessageDate(LocalDateTime.now())
@@ -119,7 +121,7 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
         } else {
             ServiceException e = new ServiceException(
                     USER_WITH_ID + user.getId() +
-                            " can`t add message to wall with id=" + wall.getId());
+                            " can`t add message to society wall with id=" + society.getId());
             log.warn(e.getMessage(), e);
             throw e;
         }
@@ -129,15 +131,15 @@ public class WallMessageService extends AbstractService<WallMessage> implements 
     @Override
     public WallMessageDto addNewMessage(NewWallMessageDto dto) throws ObjectNotFoundException, ServiceException {
         User user = userService.findEntityById(dto.getUserId());
-        Wall wall = wallService.findEntityById(dto.getWallId());
+        Society society = findSocietyById(dto.getSocietyId());
         return wallMessageDtoMapper
                 .fromEntity(
-                        addNewMessage(user, wall, dto.getMessage()));
+                        addNewMessage(user, society, dto.getMessage()));
     }
 
     private WallMessage editWallMessage(User user, WallMessage wallMessage, String message)
             throws ServiceException {
-        Wall wall = wallMessage.getWall();
+        Society wall = wallMessage.getSociety();
         if (userCanEditMessage(user, wall, wallMessage)) {
             wallMessage.setMessage(message);
             return wallMessageRepository.save(wallMessage);

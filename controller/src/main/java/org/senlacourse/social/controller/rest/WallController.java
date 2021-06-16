@@ -3,7 +3,6 @@ package org.senlacourse.social.controller.rest;
 import lombok.RequiredArgsConstructor;
 import org.senlacourse.social.api.service.IWallMessageCommentService;
 import org.senlacourse.social.api.service.IWallMessageService;
-import org.senlacourse.social.api.service.IWallService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
 import org.senlacourse.social.dto.*;
 import org.springframework.data.domain.Page;
@@ -22,34 +21,17 @@ import javax.validation.constraints.NotNull;
 @RequestMapping("/walls")
 public class WallController {
 
-    private final IWallService wallService;
     private final IWallMessageService wallMessageService;
     private final IWallMessageCommentService wallMessageCommentService;
-
-    @Secured(value = {"ROLE_USER"})
-    @GetMapping("/{societyId}")
-    public ResponseEntity<WallDto> getWall(@NotNull @PathVariable Long societyId) {
-        return new ResponseEntity<>(
-                wallService.findWallBySocietyId(societyId),
-                HttpStatus.OK);
-    }
-
-    @Secured(value = {"ROLE_USER"})
-    @GetMapping
-    public ResponseEntity<WallDto> getRootWall() {
-        return new ResponseEntity<>(
-                wallService.findRootWall(),
-                HttpStatus.OK);
-    }
 
     @Secured(value = {"ROLE_USER"})
     @GetMapping("/{wallId}/messages")
     public ResponseEntity<Page<WallMessageDto>> getWallMessages(@RequestParam(defaultValue = "10") Integer pageSize,
                                                                 @RequestParam(defaultValue = "0") Integer pageNum,
-                                                                @NotNull @PathVariable Long wallId) {
+                                                                @NotNull @PathVariable Long societyId) {
         return new ResponseEntity<>(
-                wallMessageService.findAllByWallId(
-                        wallId,
+                wallMessageService.findAllBySocietyId(
+                        societyId,
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }

@@ -18,13 +18,12 @@ public class Society extends AbstractEntity {
 
     @Column(name = "title")
     private String title;
-    @OneToOne(mappedBy = "society", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private Wall wall;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     @ToString.Exclude
     private User owner;
+    @Column(name = "is_root")
+    private Boolean root;
 
     @Override
     public boolean equals(Object o) {

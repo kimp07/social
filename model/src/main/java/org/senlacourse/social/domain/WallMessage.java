@@ -17,9 +17,9 @@ import java.util.Objects;
 public class WallMessage extends AbstractMessageEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wall_id", referencedColumnName = "id")
+    @JoinColumn(name = "society_id", referencedColumnName = "id")
     @ToString.Exclude
-    private Wall wall;
+    private Society society;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ToString.Exclude

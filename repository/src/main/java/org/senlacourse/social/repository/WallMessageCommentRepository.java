@@ -22,6 +22,6 @@ public interface WallMessageCommentRepository extends JpaRepository<WallMessageC
 
     void deleteAllByWallMessageId(Long wallMessageId);
 
-    @Query("delete from WallMessageComment w where w.wallMessage.wall.id = :wallId")
-    void deleteAllByWallId(Long wallId);
+    @Query("delete from WallMessageComment w where w.wallMessage.society.id = :societyId")
+    void deleteAllBySocietyId(Long societyId);
 }

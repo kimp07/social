@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.senlacourse.social.api.service.ISocietyService;
 import org.senlacourse.social.api.service.IUserService;
 import org.senlacourse.social.api.service.IWallMessageService;
-import org.senlacourse.social.api.service.IWallService;
 import org.senlacourse.social.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,12 +14,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class WallServiceTests {
+class WallMessageServiceTests {
 
     @Autowired
     ISocietyService societyService;
-    @Autowired
-    IWallService wallService;
     @Autowired
     IWallMessageService wallMessageService;
     @Autowired
@@ -64,12 +61,12 @@ class WallServiceTests {
     }
 
     @Test
-    void canAddMessageToRootWall() {
-        WallDto wallDto = wallService.findRootWall();
+    void canAddMessageToRootSociety() {
+        SocietyDto societyDto = societyService.findRootSociety();
         Assertions.assertDoesNotThrow(() ->
                 wallMessageService.addNewMessage(
                         new NewWallMessageDto()
-                                .setWallId(wallDto.getId())
+                                .setSocietyId(societyDto.getId())
                                 .setUserId(societyMember.getId())
                                 .setMessage("New message to wall")));
 
@@ -81,11 +78,10 @@ class WallServiceTests {
                 new NewSocietyDto()
                         .setTitle("New society")
                         .setOwnerId(owner.getId()));
-        WallDto wallDto = wallService.findWallBySocietyId(societyDto.getId());
         Assertions.assertThrows(Exception.class,
                 () -> wallMessageService.addNewMessage(
                         new NewWallMessageDto()
-                                .setWallId(wallDto.getId())
+                                .setSocietyId(societyDto.getId())
                                 .setUserId(societyMember.getId())
                                 .setMessage("New message to wall")));
     }
@@ -99,10 +95,9 @@ class WallServiceTests {
         societyService.addUserToSociety(
                 new UserIdDto(societyMember.getId()),
                 societyDto.getId());
-        WallDto wallDto = wallService.findWallBySocietyId(societyDto.getId());
         Assertions.assertDoesNotThrow(() -> wallMessageService.addNewMessage(
                         new NewWallMessageDto()
-                                .setWallId(wallDto.getId())
+                                .setSocietyId(societyDto.getId())
                                 .setUserId(societyMember.getId())
                                 .setMessage("New message to wall")));
     }

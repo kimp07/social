@@ -12,9 +12,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface IWallMessageService extends IService<WallMessage> {
 
-    Page<WallMessageDto> findAllByWallId(Long wallId, Pageable pageable);
+    Page<WallMessageDto> findAllBySocietyId(Long wallId, Pageable pageable);
 
-    void deleteAllMessagesByWallIdAndUserId(UserIdDto dto, Long wallId) throws ObjectNotFoundException, ServiceException;
+    void deleteAllMessagesBySocietyIdAndUserId(UserIdDto dto, Long wallId) throws ObjectNotFoundException, ServiceException;
 
     void deleteByMessageIdAndUserId(UserIdDto dto, Long wallMessageId) throws ObjectNotFoundException, ServiceException;
 

@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 public class NewWallMessageDto implements IAuthorizedUserDto {
 
     @NotNull
-    private Long wallId;
+    private Long societyId;
     private Long userId;
     @NotNull
     @NotEmpty
