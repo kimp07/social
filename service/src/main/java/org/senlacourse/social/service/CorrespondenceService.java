@@ -2,11 +2,11 @@ package org.senlacourse.social.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.senlacourse.social.projection.IUnreadTalkMessagesView;
-import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.dto.CorrespondenceDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.CorrespondenceDtoMapper;
+import org.senlacourse.social.projection.IUnreadTalkMessagesView;
+import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.repository.CorrespondenceRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;

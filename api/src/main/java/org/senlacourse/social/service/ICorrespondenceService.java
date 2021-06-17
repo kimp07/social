@@ -1,9 +1,9 @@
 package org.senlacourse.social.service;
 
-import org.senlacourse.social.projection.IUnreadTalkMessagesView;
-import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.dto.CorrespondenceDto;
 import org.senlacourse.social.dto.UserIdDto;
+import org.senlacourse.social.projection.IUnreadTalkMessagesView;
+import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCountView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
