@@ -9,6 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SocietyMemberDto {
 
-    private SocietyDto society;
-    private UserSimpleDto user;
+    private SocietyMemberIdDto id;
 }

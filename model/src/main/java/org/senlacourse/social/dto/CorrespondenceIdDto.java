@@ -7,7 +7,8 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UserImageDto {
+public class CorrespondenceIdDto {
 
-    private UserImageIdDto id;
+    private UserSimpleDto user;
+    private TalkMessageDto talkMessage;
 }

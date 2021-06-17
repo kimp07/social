@@ -36,17 +36,10 @@ public class TalkMessage extends AbstractEntity {
     @BatchSize(size = 1)
     @ToString.Exclude
     private TalkMessage answeredMessage;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
     @ToString.Exclude
     private User sender;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ToString.Exclude
-    private User user;
-    @Column(name = "unread")
-    private Boolean unread;
 
     @Override
     public boolean equals(Object o) {

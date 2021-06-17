@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UserImageIddto {
+public class CorrespondenceDto {
 
-    private UserSimpleDto user;
-    private String imgFileName;
+    private CorrespondenceIdDto id;
+    private Boolean unread;
 }

@@ -1,4 +1,4 @@
-package org.senlacourse.social.domain.projection;
+package org.senlacourse.social.projection;
 
 public interface IFriendshipMembersCountView {
 

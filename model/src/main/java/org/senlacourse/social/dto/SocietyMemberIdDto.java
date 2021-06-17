@@ -7,7 +7,8 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UserImageDto {
+public class SocietyMemberIdDto {
 
-    private UserImageIdDto id;
+    private SocietyDto society;
+    private UserSimpleDto user;
 }

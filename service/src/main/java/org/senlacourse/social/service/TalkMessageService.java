@@ -7,15 +7,16 @@ import org.senlacourse.social.api.exception.ServiceException;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.service.IUserService;
+import org.senlacourse.social.domain.Correspondence;
+import org.senlacourse.social.domain.CorrespondenceId;
 import org.senlacourse.social.domain.Talk;
 import org.senlacourse.social.domain.TalkMember;
 import org.senlacourse.social.domain.TalkMessage;
 import org.senlacourse.social.domain.User;
-import org.senlacourse.social.domain.projection.IUnreadTalkMessagesGroupByTalkIdCountView;
 import org.senlacourse.social.dto.NewTalkMessageDto;
 import org.senlacourse.social.dto.TalkMessageDto;
-import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.TalkMessageDtoMapper;
+import org.senlacourse.social.repository.CorrespondenceRepository;
 import org.senlacourse.social.repository.TalkMemberRepository;
 import org.senlacourse.social.repository.TalkMessageRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
@@ -36,6 +37,7 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     private final TalkMessageRepository talkMessageRepository;
     private final IUserService userService;
     private final TalkMemberRepository talkMemberRepository;
+    private final CorrespondenceRepository correspondenceRepository;
     private final TalkMessageDtoMapper talkMessageDtoMapper;
     private final ITalkService talkService;
 
@@ -43,44 +45,45 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     public TalkMessage findEntityById(Long id) throws ObjectNotFoundException {
         return validateEntityNotNull(
                 talkMessageRepository
-                        .findById(id)
+                        .findByTalkMessageId(id)
                         .orElse(null));
     }
 
-    private void sendMessageToTalkMembers(String message,
-                                          Page<TalkMember> talkMembersPage,
-                                          User sender,
-                                          TalkMessage answeredMessage,
-                                          LocalDateTime dateTime) {
+    private void sendMessageToTalkMembers(Page<TalkMember> talkMembersPage,
+                                          TalkMessage talkMessage) {
         talkMembersPage.forEach(talkMember ->
-                talkMessageRepository.save(new TalkMessage()
-                        .setMessageDate(dateTime)
-                        .setSender(sender)
-                        .setMessage(message)
-                        .setTalk(talkMember.getId().getTalk())
-                        .setUser(talkMember.getId().getUser())
-                        .setAnsweredMessage(answeredMessage)
-                        .setUnread(true)));
+            correspondenceRepository.save(
+                    new Correspondence()
+                            .setUnread(true)
+                            .setId(new CorrespondenceId()
+                                    .setTalkMessage(talkMessage)
+                                    .setUser(talkMember.getId().getUser())))
+        );
     }
 
-    private void sendMessagesToTalkMembers(Talk talk, String message, User sender, TalkMessage answeredMessage) {
+    private void sendMessagesToTalkMembers(Talk talk, TalkMessage talkMessage) {
         int pageSize = 20;
-        LocalDateTime now = LocalDateTime.now();
         Page<TalkMember> talkMembersPage
                 = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(0, pageSize));
         int totalPages = talkMembersPage.getTotalPages();
-        sendMessageToTalkMembers(message, talkMembersPage, sender, answeredMessage, now);
+        sendMessageToTalkMembers(talkMembersPage, talkMessage);
         if (talkMembersPage.getTotalPages() > 1) {
             for (int pageNum = 1; pageNum < totalPages; pageNum++) {
                 talkMembersPage
                         = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
-                sendMessageToTalkMembers(message, talkMembersPage, sender, answeredMessage, now);
+                sendMessageToTalkMembers(talkMembersPage, talkMessage);
             }
         }
     }
 
-    private void addNewMessage(User user, Talk talk, String message, TalkMessage answeredMessage) {
-        sendMessagesToTalkMembers(talk, message, user, answeredMessage);
+    private void addNewMessage(User sender, Talk talk, String message, TalkMessage answeredMessage) {
+        TalkMessage talkMessage = talkMessageRepository.save(new TalkMessage()
+                .setMessageDate(LocalDateTime.now())
+                .setSender(sender)
+                .setMessage(message)
+                .setTalk(talk)
+                .setAnsweredMessage(answeredMessage));
+        sendMessagesToTalkMembers(talk, talkMessage);
     }
 
     @Override
@@ -111,25 +114,4 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                 dto.getMessage(),
                 answeredMessage);
     }
-
-    @AuthorizedUser
-    @Override
-    public Page<IUnreadTalkMessagesGroupByTalkIdCountView> getUnreadMessagesByRecipientIdGroupByTalkId(UserIdDto dto,
-                                                                                                       Pageable pageable)
-            throws ObjectNotFoundException {
-        return talkMessageRepository.findCountByUserIdAndUnreadIsTrueGroupByTalkId(dto.getAuthorizedUserId(), pageable);
-    }
-
-    @AuthorizedUser
-    @Override
-    public void updateMessagesSetUnreadFalseByRecipientId(UserIdDto dto) {
-        talkMessageRepository.updateAllSetUnreadFalseByUserId(dto.getAuthorizedUserId());
-    }
-
-    @AuthorizedUser
-    @Override
-    public void updateMessagesSetUnreadFalseByRecipientIdAndTalkId(UserIdDto dto, Long talkId) {
-        talkMessageRepository.updateAllSetUnreadFalseByUserAndTalkId(dto.getAuthorizedUserId(), talkId);
-    }
-
 }

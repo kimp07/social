@@ -14,6 +14,7 @@ import org.senlacourse.social.dto.TalkDto;
 import org.senlacourse.social.dto.UserDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.repository.TalkRepository;
+import org.senlacourse.social.service.ICorrespondenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,8 @@ class TalkMessageTests {
     ITalkMessageService talkMessageService;
     @Autowired
     ITalkService talkService;
+    @Autowired
+    ICorrespondenceService correspondenceService;
     @Autowired
     IUserService userService;
     @Autowired
@@ -78,16 +81,17 @@ class TalkMessageTests {
     }
 
     @Test
-    void mustCreatedTalkMessageCacheRecord() {
+    void mustCreatedUnreadTalkMessages() {
         talkMessageService.addNewMessage(
                 new NewTalkMessageDto()
                         .setTalkId(talkDto.getId())
                         .setUserId(sender.getId())
                         .setMessage("Some message"));
         Assertions.assertNotNull(
-                talkMessageService
-                        .getUnreadMessagesByRecipientIdGroupByTalkId(
+                correspondenceService
+                        .getCountUnreadMessagesByUserIdGroupByTalkId(
                                 new UserIdDto(recipient.getId()),
+                                        talkDto.getId(),
                                         PageRequest.of(0, 1))
                         .getContent());
     }

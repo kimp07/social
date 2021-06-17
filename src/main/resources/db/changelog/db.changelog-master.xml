@@ -361,32 +361,58 @@
                 <constraints nullable="false" foreignKeyName="talk_messages_sender_fk"
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
-            <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="talk_messages_user_fk"
-                             referencedTableName="users" referencedColumnNames="id"/>
-            </column>
             <column name="message_date" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
             <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="unread" type="BOOLEAN" defaultValue="true">
+        </createTable>
+    </changeSet><!-- //TABLE talk_messages -->
+    <!-- TABLE correspondence -->
+    <changeSet id="2021-05-06_8-00AM-09-18" author="alex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="correspondence"/>
+            </not>
+        </preConditions>
+        <createTable tableName="correspondence">
+            <column name="talk_message_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="correspondence_talk_message_fk"
+                             referencedTableName="talk_messages" referencedColumnNames="id"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="correspondence_user_fk"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="unread" type="BOOLEAN" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-    </changeSet><!-- //TABLE talk_messages -->
-    <!-- TABLE talk_messages INDEXES-->
-    <changeSet author="alex" id="2021-05-06_8-00AM-09-01">
+        <addPrimaryKey tableName="correspondence" columnNames="talk_message_id,user_id"/>
+    </changeSet><!-- //TABLE correspondence -->
+    <!-- TABLE correspondence INDEXES-->
+    <changeSet author="alex" id="2021-05-06_8-00AM-18-01">
         <preConditions onFail="MARK_RAN">
             <not>
-                <indexExists indexName="talk_messages_user_idx" tableName="talk_messages"/>
+                <indexExists indexName="correspondence_talk_message_idx" tableName="correspondence"/>
             </not>
         </preConditions>
-        <createIndex indexName="talk_messages_user_idx" tableName="talk_messages">
+        <createIndex indexName="correspondence_talk_message_idx" tableName="correspondence">
+            <column name="talk_message_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="alex" id="2021-05-06_8-00AM-18-02">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="correspondence_user_idx" tableName="correspondence"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="correspondence_user_idx" tableName="correspondence">
             <column name="user_id"/>
         </createIndex>
-    </changeSet> <!-- //TABLE talk_messages INDEXES -->
+    </changeSet> <!-- //TABLE correspondence INDEXES -->
+
     <!-- TABLE wall_messages -->
     <changeSet author="alex" id="2021-05-06_8-00AM-13">
         <preConditions onFail="MARK_RAN">

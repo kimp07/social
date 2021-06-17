@@ -10,8 +10,9 @@ import lombok.experimental.Accessors;
 public class TalkMessageDto {
 
     private Long id;
+    private TalkMessageDto answeredMessage;
     private String messageDate;
-    private UserSimpleDto user;
+    private UserSimpleDto sender;
     private TalkDto talk;
     private String message;
 }
