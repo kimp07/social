@@ -1,6 +1,6 @@
 package org.senlacourse.social.projection;
 
-public interface UnreadTalkMessagesGroupByTalkIdCountView {
+public interface UnreadTalkMessagesGroupByTalkIdCount {
 
     Long getTalkId();
     Long getTalkMessagesCount();

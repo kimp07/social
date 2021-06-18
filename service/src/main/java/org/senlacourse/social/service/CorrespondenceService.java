@@ -6,7 +6,8 @@ import org.senlacourse.social.dto.CorrespondenceDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.CorrespondenceDtoMapper;
 import org.senlacourse.social.projection.IUnreadTalkMessagesView;
-import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCountView;
+import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCount;
+import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdDto;
 import org.senlacourse.social.repository.CorrespondenceRepository;
 import org.senlacourse.social.security.service.AuthorizedUser;
 import org.springframework.data.domain.Page;
@@ -34,10 +35,18 @@ public class CorrespondenceService implements ICorrespondenceService {
 
     @AuthorizedUser
     @Override
-    public Page<UnreadTalkMessagesGroupByTalkIdCountView> getCountUnreadMessagesByUserIdGroupByTalkId(UserIdDto dto,
-                                                                                                      Pageable pageable) {
+    public Page<UnreadTalkMessagesGroupByTalkIdCount> getCountUnreadMessagesByUserIdGroupByTalkId(UserIdDto dto,
+                                                                                                  Pageable pageable) {
         return correspondenceRepository
                 .findCountUnreadMessagesByUserIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
+    }
+
+    @AuthorizedUser
+    @Override
+    public Page<UnreadTalkMessagesGroupByTalkIdDto> getCountUnreadMessagesByUserIdGroupByTalkIdCriteria(UserIdDto dto,
+                                                                                                        Pageable pageable) {
+        return correspondenceRepository
+                .findCountUnreadMessagesByUserIdGroupByTalkIdCriteria(dto.getAuthorizedUserId(), pageable);
     }
 
     @Override

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FriendshipRepository extends JpaRepository<Friendship, FriendshipId> {
+public interface FriendshipRepository extends JpaRepository<Friendship, FriendshipId>, FriendshipRepositoryCustom {
 
     @Query("delete from Friendship f where (f.id.user.id = :userId and f.id.friend.id = :friendId) "
     + "or (f.id.friend.id = :userId and f.id.user.id = :friendId)")

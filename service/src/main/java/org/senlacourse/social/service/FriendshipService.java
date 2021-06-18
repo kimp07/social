@@ -35,7 +35,7 @@ public class FriendshipService implements IFriendshipService {
             throws ServiceException {
         return friendshipDtoMapper.map(
                 friendshipRepository
-                        .findAllByUserId(dto.getAuthorizedUserId(), pageable));
+                        .findAllByUserIdCriteria(dto.getAuthorizedUserId(), pageable));
     }
 
     @Override
