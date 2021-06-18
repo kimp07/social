@@ -35,11 +35,9 @@ public class CorrespondenceService implements ICorrespondenceService {
     @AuthorizedUser
     @Override
     public Page<UnreadTalkMessagesGroupByTalkIdCountView> getCountUnreadMessagesByUserIdGroupByTalkId(UserIdDto dto,
-                                                                                                      Long talkId,
                                                                                                       Pageable pageable) {
         return correspondenceRepository
-                .findCountUnreadMessagesByUserIdGroupByTalkId(dto.getAuthorizedUserId(), talkId,
-                        pageable);
+                .findCountUnreadMessagesByUserIdGroupByTalkId(dto.getAuthorizedUserId(), pageable);
     }
 
     @Override

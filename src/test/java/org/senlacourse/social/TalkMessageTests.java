@@ -91,7 +91,6 @@ class TalkMessageTests {
                 correspondenceService
                         .getCountUnreadMessagesByUserIdGroupByTalkId(
                                 new UserIdDto(recipient.getId()),
-                                        talkDto.getId(),
                                         PageRequest.of(0, 1))
                         .getContent());
     }

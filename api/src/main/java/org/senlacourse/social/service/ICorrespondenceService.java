@@ -12,7 +12,6 @@ public interface ICorrespondenceService {
     Page<CorrespondenceDto> findAllByUserIdAndTalkId(UserIdDto dto, Long talkId, Pageable pageable);
 
     Page<UnreadTalkMessagesGroupByTalkIdCountView> getCountUnreadMessagesByUserIdGroupByTalkId(UserIdDto dto,
-                                                                                               Long talkId,
                                                                                                Pageable pageable);
 
     IUnreadTalkMessagesView getCountUnreadMessagesByUserId(UserIdDto dto);

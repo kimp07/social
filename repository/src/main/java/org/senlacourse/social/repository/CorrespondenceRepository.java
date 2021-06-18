@@ -30,8 +30,7 @@ public interface CorrespondenceRepository extends JpaRepository<Correspondence, 
     void deleteByIdUserIdAndIdTalkMessageId(Long userId, Long talkMessageId);
 
     @Query("select c.id.talkMessage.talk.id as talkId, count(c.id.talkMessage.talk.id) as talkMessagesCount from Correspondence c "
-    + " where c.id.user.id = :userId and c.id.talkMessage.talk.id = :talkId and c.unread = true group by c.id.talkMessage.talk.id")
+    + " where c.id.user.id = :userId and c.unread = true group by c.id.talkMessage.talk.id")
     Page<UnreadTalkMessagesGroupByTalkIdCountView> findCountUnreadMessagesByUserIdGroupByTalkId(Long userId,
-                                                                                                Long talkId,
                                                                                                 Pageable pageable);
 }

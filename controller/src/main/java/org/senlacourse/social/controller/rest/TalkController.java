@@ -107,12 +107,10 @@ public class TalkController {
     public ResponseEntity<Page<UnreadTalkMessagesGroupByTalkIdCountView>> getUnreadMessagesGroupByTalk(
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "0") Integer pageNum,
-            @RequestParam(defaultValue = "0") Long userId,
-            @RequestParam Long talkId) {
+            @RequestParam(defaultValue = "0") Long userId) {
         return new ResponseEntity<>(
                 correspondenceService.getCountUnreadMessagesByUserIdGroupByTalkId(
                         new UserIdDto(userId),
-                        talkId,
                         PageRequest.of(pageNum, pageSize)),
                 HttpStatus.OK);
     }
