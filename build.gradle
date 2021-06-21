@@ -23,13 +23,13 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
 	testRuntimeOnly 'com.h2database:h2:1.4.200'
 
-	implementation project(":model")
-	implementation project(":controller")
-	implementation project(":api")
-	implementation project(":repository")
-	implementation project(":service")
-	implementation project(":security")
-	implementation project(":localstorage")
+	compile project(":model")
+	compile project(":controller")
+	compile project(":api")
+	compile project(":repository")
+	compile project(":service")
+	compile project(":security")
+	compile project(":localstorage")
 
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
