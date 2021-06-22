@@ -14,7 +14,7 @@ import org.senlacourse.social.dto.TalkDto;
 import org.senlacourse.social.dto.UserDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.repository.TalkRepository;
-import org.senlacourse.social.service.ICorrespondenceService;
+import org.senlacourse.social.api.service.ICorrespondenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;

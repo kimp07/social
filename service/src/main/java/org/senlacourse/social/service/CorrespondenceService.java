@@ -2,6 +2,7 @@ package org.senlacourse.social.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.senlacourse.social.api.service.ICorrespondenceService;
 import org.senlacourse.social.dto.CorrespondenceDto;
 import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.mapstruct.CorrespondenceDtoMapper;

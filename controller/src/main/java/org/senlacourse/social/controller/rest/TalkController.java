@@ -13,7 +13,7 @@ import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.projection.IUnreadTalkMessagesView;
 import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCount;
 import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdDto;
-import org.senlacourse.social.service.ICorrespondenceService;
+import org.senlacourse.social.api.service.ICorrespondenceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;

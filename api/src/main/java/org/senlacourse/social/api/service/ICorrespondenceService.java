@@ -1,4 +1,4 @@
-package org.senlacourse.social.service;
+package org.senlacourse.social.api.service;
 
 import org.senlacourse.social.dto.CorrespondenceDto;
 import org.senlacourse.social.dto.UserIdDto;
