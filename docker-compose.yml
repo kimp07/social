@@ -4,6 +4,8 @@ services:
     image: 'postgres:11-alpine'
     network_mode: bridge
     container_name: postgres_db
+    volumes:
+      - /home/user/work/dockervols/postgres:/var/lib/postgresql
     expose:
       - 5492
     ports:
@@ -15,7 +17,8 @@ services:
     restart: unless-stopped
   # social-docker *****************************************
   social-docker:
-
+    volumes:
+      - /home/user/work/dockervols/socialnet:/imgstorage
     image: 'aleksandrkempinski/myrepo:social-docker-0.0.1'
     network_mode: host
     container_name: social-docker-0.0.1
