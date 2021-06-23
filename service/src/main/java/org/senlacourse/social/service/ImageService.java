@@ -10,6 +10,7 @@ import org.senlacourse.social.mapstruct.ImageDtoMapper;
 import org.senlacourse.social.repository.ImageRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,9 +57,8 @@ public class ImageService extends AbstractService<Image> implements IImageServic
     }
 
     @Override
-    public Object getImageFileById(Long id) throws ObjectNotFoundException {
+    public ResponseEntity<Object> getImageFileById(Long id) throws ObjectNotFoundException {
         return fileTransportService
-                .downloadFile(findById(id)
-                        .getImgFileName());
+                .downloadFile(findById(id).getImgFileName());
     }
 }

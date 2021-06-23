@@ -1,6 +1,7 @@
 package org.senlacourse.social.controller.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.senlacourse.social.api.service.ICorrespondenceService;
 import org.senlacourse.social.api.service.ITalkMessageService;
 import org.senlacourse.social.api.service.ITalkService;
 import org.senlacourse.social.api.validation.ValidatedBindingResult;
@@ -13,7 +14,6 @@ import org.senlacourse.social.dto.UserIdDto;
 import org.senlacourse.social.projection.IUnreadTalkMessagesView;
 import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdCount;
 import org.senlacourse.social.projection.UnreadTalkMessagesGroupByTalkIdDto;
-import org.senlacourse.social.api.service.ICorrespondenceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;

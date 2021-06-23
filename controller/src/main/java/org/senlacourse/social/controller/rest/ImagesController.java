@@ -45,7 +45,7 @@ public class ImagesController {
     @Secured(value = {"ROLE_USER"})
     @GetMapping()
     public ResponseEntity<Object> downloadFile(@NotNull @RequestParam Long imageId) {
-        return new ResponseEntity<>(imageService.getImageFileById(imageId), HttpStatus.OK);
+        return imageService.getImageFileById(imageId);
     }
 
 

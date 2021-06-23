@@ -16,7 +16,7 @@ public interface UserImageRepository extends JpaRepository<UserImage, UserImageI
     @EntityGraph(attributePaths = {"image"})
     Page<UserImage> findAllByIdUserId(Long userId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user","image"})
+    @EntityGraph(attributePaths = {"id.user","id.image"})
     Optional<UserImage> findByIdUserIdAndIdImageId(Long userId, Long imageId);
 
     void deleteAllByIdUserId(Long userId);

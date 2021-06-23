@@ -5,6 +5,7 @@ import org.senlacourse.social.domain.Image;
 import org.senlacourse.social.dto.ImageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface IImageService extends IService<Image> {
@@ -17,5 +18,5 @@ public interface IImageService extends IService<Image> {
 
     ImageDto save(MultipartFile multipartFile);
 
-    Object getImageFileById(Long id) throws ObjectNotFoundException;
+    ResponseEntity<Object> getImageFileById(Long id) throws ObjectNotFoundException;
 }
