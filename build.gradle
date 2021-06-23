@@ -29,7 +29,6 @@ dependencies {
 	compile project(":repository")
 	compile project(":service")
 	compile project(":security")
-	compile project(":localstorage")
 
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
