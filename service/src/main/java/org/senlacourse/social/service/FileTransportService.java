@@ -24,8 +24,10 @@ import java.io.IOException;
 @Log4j
 public class FileTransportService implements IFileTransportService {
 
-    @Value("${files.dir:http://localhost:8083/images}")
+    @Value("${social-storage.uri:http://localhost:8083}")
     private String uri;
+    @Value("${social-storage.endPoint:/images}")
+    private String endPoint;
 
     private InputStreamResource getMultipartStreamResource(MultipartFile file) throws ApplicationException {
         if (file.isEmpty()) {
@@ -53,11 +55,11 @@ public class FileTransportService implements IFileTransportService {
 
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate
-                .postForEntity(uri, requestEntity, String.class).getBody();
+                .postForEntity(uri + endPoint, requestEntity, String.class).getBody();
     }
 
     @Override
     public ResponseEntity<Object> downloadFile(String imgFileName) throws ObjectNotFoundException, ApplicationException {
-        return new ResponseEntity<>(uri + "/" + imgFileName, HttpStatus.OK);
+        return new ResponseEntity<>(uri + endPoint + "/" + imgFileName, HttpStatus.OK);
     }
 }

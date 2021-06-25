@@ -7,4 +7,5 @@ include 'controller'
 include 'security'
 include 'api'
 include 'localstorage'
+include 'social-storage-starter'
 

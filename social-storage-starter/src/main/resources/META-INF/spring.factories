@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.senlacourse.social.storagestarter.SocialStorageStarterConfig
+org.springframework.context.ApplicationContextInitializer=org.senlacourse.social.storagestarter.SocialStorageEnableValidator
