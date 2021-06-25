@@ -50,28 +50,28 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
     }
 
     private void sendMessageToTalkMembers(Page<TalkMember> talkMembersPage,
-                                          TalkMessage talkMessage) {
+                                          TalkMessage talkMessage, User sender) {
         talkMembersPage.forEach(talkMember ->
             correspondenceRepository.save(
                     new Correspondence()
-                            .setUnread(true)
+                            .setUnread(!talkMember.getId().getUser().equals(sender))
                             .setId(new CorrespondenceId()
                                     .setTalkMessage(talkMessage)
                                     .setUser(talkMember.getId().getUser())))
         );
     }
 
-    private void sendMessagesToTalkMembers(Talk talk, TalkMessage talkMessage) {
+    private void sendMessagesToTalkMembers(Talk talk, TalkMessage talkMessage, User sender) {
         int pageSize = 20;
         Page<TalkMember> talkMembersPage
                 = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(0, pageSize));
         int totalPages = talkMembersPage.getTotalPages();
-        sendMessageToTalkMembers(talkMembersPage, talkMessage);
+        sendMessageToTalkMembers(talkMembersPage, talkMessage, sender);
         if (talkMembersPage.getTotalPages() > 1) {
             for (int pageNum = 1; pageNum < totalPages; pageNum++) {
                 talkMembersPage
                         = talkMemberRepository.findAllByIdTalkId(talk.getId(), PageRequest.of(pageNum, pageSize));
-                sendMessageToTalkMembers(talkMembersPage, talkMessage);
+                sendMessageToTalkMembers(talkMembersPage, talkMessage, sender);
             }
         }
     }
@@ -83,7 +83,7 @@ public class TalkMessageService extends AbstractService<TalkMessage> implements 
                 .setMessage(message)
                 .setTalk(talk)
                 .setAnsweredMessage(answeredMessage));
-        sendMessagesToTalkMembers(talk, talkMessage);
+        sendMessagesToTalkMembers(talk, talkMessage, sender);
     }
 
     @Override
